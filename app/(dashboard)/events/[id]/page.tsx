@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getEvent, getEventOrders } from '@/data'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -38,7 +39,7 @@ export default async function Event({ params }: { params: Promise<{ id: string }
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-wrap items-center gap-6">
           <div className="w-32 shrink-0">
-            <img className="aspect-3/2 rounded-lg shadow-sm" src={event.imgUrl} alt="" />
+            <Image className="aspect-3/2 rounded-lg shadow-sm" src={event.imgUrl} alt="" width={128} height={85} />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">

@@ -7,6 +7,7 @@ import { Link } from '@/components/ui/link'
 import { getEvents } from '@/data'
 import { EllipsisVerticalIcon } from '@heroicons/react/16/solid'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'Events',
@@ -31,7 +32,7 @@ export default async function Events() {
               <div key={event.id} className="flex gap-6 py-6">
                 <div className="w-32 shrink-0">
                   <Link href={event.url} aria-hidden="true">
-                    <img className="aspect-3/2 rounded-lg shadow-sm" src={event.imgUrl} alt="" />
+                    <Image className="aspect-3/2 rounded-lg shadow-sm" src={event.imgUrl} alt="" width={128} height={85} />
                   </Link>
                 </div>
                 <div className="space-y-1.5">

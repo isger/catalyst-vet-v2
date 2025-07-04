@@ -20,13 +20,29 @@ export type Order = {
   url: string
   amount: {
     usd: string
+    cad: string
+    fee: string
+    net: string
   }
   customer: {
     name: string
+    email: string
+    address: string
+    country: string
+    countryFlagUrl: string
   }
   event: {
     name: string
     thumbUrl: string
+    url: string
+  }
+  payment: {
+    transactionId: string
+    card: {
+      type: string
+      number: string
+      expiry: string
+    }
   }
 }
 
@@ -82,34 +98,94 @@ export async function getRecentOrders(): Promise<Order[]> {
       id: '1001',
       date: '2024-01-12',
       url: '/orders/1001',
-      amount: { usd: '$145.00' },
-      customer: { name: 'Sarah Johnson' },
+      amount: { 
+        usd: '$145.00',
+        cad: '$195.00',
+        fee: '$5.85',
+        net: '$189.15'
+      },
+      customer: { 
+        name: 'Sarah Johnson',
+        email: 'sarah.johnson@example.com',
+        address: '123 Maple Street, Toronto, ON M5V 2A1',
+        country: 'Canada',
+        countryFlagUrl: 'https://flagcdn.com/ca.svg'
+      },
       event: {
         name: 'Annual Wellness Checkup',
         thumbUrl: '/events/wellness-checkup-thumb.jpg',
+        url: '/events/1'
       },
+      payment: {
+        transactionId: 'txn_1001_abc123',
+        card: {
+          type: 'Visa',
+          number: '4532',
+          expiry: '12/26'
+        }
+      }
     },
     {
       id: '1002',
       date: '2024-01-11',
       url: '/orders/1002',
-      amount: { usd: '$89.50' },
-      customer: { name: 'Mike Chen' },
+      amount: { 
+        usd: '$89.50',
+        cad: '$120.25',
+        fee: '$3.61',
+        net: '$116.64'
+      },
+      customer: { 
+        name: 'Mike Chen',
+        email: 'mike.chen@example.com',
+        address: '456 Oak Avenue, Vancouver, BC V6J 1M3',
+        country: 'Canada',
+        countryFlagUrl: 'https://flagcdn.com/ca.svg'
+      },
       event: {
         name: 'Vaccination Clinic',
         thumbUrl: '/events/vaccination-thumb.jpg',
+        url: '/events/2'
       },
+      payment: {
+        transactionId: 'txn_1002_def456',
+        card: {
+          type: 'Mastercard',
+          number: '5412',
+          expiry: '08/25'
+        }
+      }
     },
     {
       id: '1003',
       date: '2024-01-10',
       url: '/orders/1003',
-      amount: { usd: '$225.00' },
-      customer: { name: 'Emily Rodriguez' },
+      amount: { 
+        usd: '$225.00',
+        cad: '$302.25',
+        fee: '$9.09',
+        net: '$293.16'
+      },
+      customer: { 
+        name: 'Emily Rodriguez',
+        email: 'emily.rodriguez@example.com',
+        address: '789 Pine Boulevard, Montreal, QC H3A 1G1',
+        country: 'Canada',
+        countryFlagUrl: 'https://flagcdn.com/ca.svg'
+      },
       event: {
         name: 'Pet Health Seminar',
         thumbUrl: '/events/seminar-thumb.jpg',
+        url: '/events/3'
       },
+      payment: {
+        transactionId: 'txn_1003_ghi789',
+        card: {
+          type: 'American Express',
+          number: '3782',
+          expiry: '04/27'
+        }
+      }
     },
   ]
 }
@@ -162,11 +238,11 @@ export async function getOrder(id: string): Promise<Order & {
 
 export function getCountries() {
   return [
-    { code: 'US', name: 'United States' },
-    { code: 'CA', name: 'Canada' },
-    { code: 'GB', name: 'United Kingdom' },
-    { code: 'AU', name: 'Australia' },
-    { code: 'DE', name: 'Germany' },
-    { code: 'FR', name: 'France' },
+    { code: 'US', name: 'United States', flagUrl: 'https://flagcdn.com/us.svg', regions: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'] },
+    { code: 'CA', name: 'Canada', flagUrl: 'https://flagcdn.com/ca.svg', regions: ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Ontario'] },
+    { code: 'GB', name: 'United Kingdom', flagUrl: 'https://flagcdn.com/gb.svg', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland'] },
+    { code: 'AU', name: 'Australia', flagUrl: 'https://flagcdn.com/au.svg', regions: ['New South Wales', 'Victoria', 'Queensland', 'South Australia'] },
+    { code: 'DE', name: 'Germany', flagUrl: 'https://flagcdn.com/de.svg', regions: ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg'] },
+    { code: 'FR', name: 'France', flagUrl: 'https://flagcdn.com/fr.svg', regions: ['Île-de-France', 'Provence-Alpes-Côte d\'Azur', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine'] },
   ]
 }

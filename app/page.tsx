@@ -24,7 +24,7 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-24 text-center">
         <div className="flex justify-center mb-6">
-          <Badge variant="secondary" className="px-4 py-1">
+          <Badge color="zinc" className="px-4 py-1">
             <Sparkles className="w-3 h-3 mr-1" />
             Next.js 15.3 + Supabase + TypeScript
           </Badge>
@@ -45,19 +45,19 @@ export default async function Home() {
         <div className="flex gap-4 justify-center">
           {user ? (
             <Link href="/dashboard">
-              <Button size="lg" className="gap-2">
+              <Button className="gap-2">
                 Go to Dashboard <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           ) : (
             <>
               <Link href="/signin">
-                <Button size="lg" className="gap-2">
+                <Button className="gap-2">
                   Get Started <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button size="lg" variant="outline">
+                <Button outline>
                   Create Account
                 </Button>
               </Link>
@@ -264,18 +264,18 @@ export async function getPosts() {
             <div className="flex gap-4 justify-center">
               {user ? (
                 <Link href="/dashboard">
-                  <Button size="lg" variant="secondary" className="gap-2">
+                  <Button color="white" className="gap-2">
                     Go to Dashboard <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               ) : (
                 <Link href="/signin">
-                  <Button size="lg" variant="secondary" className="gap-2">
+                  <Button color="white" className="gap-2">
                     Get Started <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               )}
-              <Button size="lg" variant="ghost" className="text-white hover:text-white hover:bg-white/20">
+              <Button plain className="text-white hover:text-white hover:bg-white/20">
                 Read Documentation
               </Button>
             </div>

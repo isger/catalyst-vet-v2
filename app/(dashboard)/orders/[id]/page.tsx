@@ -8,6 +8,7 @@ import { Link } from '@/components/ui/link'
 import { getOrder } from '@/data'
 import { BanknotesIcon, CalendarIcon, ChevronLeftIcon, CreditCardIcon } from '@heroicons/react/16/solid'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { RefundOrder } from './refund'
 
@@ -115,7 +116,7 @@ export default async function Order({ params }: { params: Promise<{ id: string }
           <DescriptionTerm>Country</DescriptionTerm>
           <DescriptionDetails>
             <span className="inline-flex gap-3">
-              <img src={order.customer.countryFlagUrl} alt={order.customer.country} />
+              <Image src={order.customer.countryFlagUrl} alt={order.customer.country} width={20} height={15} />
               {order.customer.country}
             </span>
           </DescriptionDetails>
