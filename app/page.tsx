@@ -16,9 +16,17 @@ import {
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const supabase = await createClient()
+    const { data: { user: fetchedUser } } = await supabase.auth.getUser()
+    user = fetchedUser
+  } catch (error) {
+    console.error('Error fetching user:', error)
+  }
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -57,7 +65,7 @@ export default async function Home() {
                 </Button>
               </Link>
               <Link href="/signup">
-                <Button outline>
+                <Button outline={true}>
                   Create Account
                 </Button>
               </Link>
@@ -275,7 +283,7 @@ export async function getPosts() {
                   </Button>
                 </Link>
               )}
-              <Button plain className="text-white hover:text-white hover:bg-white/20">
+              <Button plain={true} className="text-white hover:text-white hover:bg-white/20">
                 Read Documentation
               </Button>
             </div>
