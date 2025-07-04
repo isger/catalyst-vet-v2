@@ -2,22 +2,56 @@
 
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import clsx from "clsx"
 
 import { cn } from "@/lib/utils"
 
+type AvatarProps = {
+  src?: string | null
+  initials?: string
+  alt?: string
+  square?: boolean
+  className?: string
+  slot?: string
+} & React.ComponentProps<typeof AvatarPrimitive.Root>
+
 function Avatar({
+  src,
+  initials,
+  alt = "",
+  square = false,
   className,
+  slot,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+}: AvatarProps) {
   return (
     <AvatarPrimitive.Root
-      data-slot="avatar"
+      data-slot={slot || "avatar"}
       className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
+        "relative flex size-8 shrink-0 overflow-hidden",
+        square ? "rounded-lg" : "rounded-full",
         className
       )}
       {...props}
-    />
+    >
+      {src && (
+        <AvatarPrimitive.Image
+          src={src}
+          alt={alt}
+          className="aspect-square size-full object-cover"
+        />
+      )}
+      {initials && (
+        <AvatarPrimitive.Fallback
+          className={clsx(
+            "flex size-full items-center justify-center bg-zinc-500 text-white text-sm font-medium",
+            square ? "rounded-lg" : "rounded-full"
+          )}
+        >
+          {initials}
+        </AvatarPrimitive.Fallback>
+      )}
+    </AvatarPrimitive.Root>
   )
 }
 
