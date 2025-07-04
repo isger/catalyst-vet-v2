@@ -11,16 +11,18 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { RefundOrder } from './refund'
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const order = await getOrder(params.id)
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params
+  const order = await getOrder(id)
 
   return {
     title: order && `Order #${order.id}`,
   }
 }
 
-export default async function Order({ params }: { params: { id: string } }) {
-  const order = await getOrder(params.id)
+export default async function Order({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const order = await getOrder(id)
 
   if (!order) {
     notFound()
