@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export default function SignInPage() {
   return (
     <div className="container flex items-center justify-center min-h-screen py-8">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold">Sign in</CardTitle>
           <CardDescription>

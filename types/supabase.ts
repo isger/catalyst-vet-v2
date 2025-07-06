@@ -7,57 +7,410 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
-      profiles: {
+      Appointment: {
         Row: {
-          avatar_url: string | null
-          created_at: string
-          full_name: string | null
+          createdAt: string
+          duration: number
           id: string
-          updated_at: string
-          username: string | null
+          notes: string | null
+          patientId: string
+          scheduledAt: string
+          status: string
+          tenantId: string
+          type: string
+          updatedAt: string
+          veterinarianId: string
         }
         Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name?: string | null
+          createdAt?: string
+          duration: number
           id: string
-          updated_at?: string
-          username?: string | null
+          notes?: string | null
+          patientId: string
+          scheduledAt: string
+          status: string
+          tenantId: string
+          type: string
+          updatedAt: string
+          veterinarianId: string
         }
         Update: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name?: string | null
+          createdAt?: string
+          duration?: number
           id?: string
-          updated_at?: string
-          username?: string | null
+          notes?: string | null
+          patientId?: string
+          scheduledAt?: string
+          status?: string
+          tenantId?: string
+          type?: string
+          updatedAt?: string
+          veterinarianId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Appointment_patientId_fkey"
+            columns: ["patientId"]
+            isOneToOne: false
+            referencedRelation: "Patient"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Appointment_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Invoice: {
+        Row: {
+          appointmentId: string | null
+          createdAt: string
+          dueDate: string
+          id: string
+          items: Json[] | null
+          paidAt: string | null
+          patientId: string
+          status: string
+          subtotal: number
+          tax: number
+          tenantId: string
+          total: number
+          updatedAt: string
+        }
+        Insert: {
+          appointmentId?: string | null
+          createdAt?: string
+          dueDate: string
+          id: string
+          items?: Json[] | null
+          paidAt?: string | null
+          patientId: string
+          status: string
+          subtotal: number
+          tax: number
+          tenantId: string
+          total: number
+          updatedAt: string
+        }
+        Update: {
+          appointmentId?: string | null
+          createdAt?: string
+          dueDate?: string
+          id?: string
+          items?: Json[] | null
+          paidAt?: string | null
+          patientId?: string
+          status?: string
+          subtotal?: number
+          tax?: number
+          tenantId?: string
+          total?: number
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Invoice_appointmentId_fkey"
+            columns: ["appointmentId"]
+            isOneToOne: false
+            referencedRelation: "Appointment"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Invoice_patientId_fkey"
+            columns: ["patientId"]
+            isOneToOne: false
+            referencedRelation: "Patient"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Invoice_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      MedicalRecord: {
+        Row: {
+          chiefComplaint: string
+          createdAt: string
+          diagnosis: string[] | null
+          id: string
+          notes: string
+          patientId: string
+          prescriptions: Json[] | null
+          tenantId: string
+          treatments: Json[] | null
+          updatedAt: string
+          veterinarianId: string
+          visitDate: string
+        }
+        Insert: {
+          chiefComplaint: string
+          createdAt?: string
+          diagnosis?: string[] | null
+          id: string
+          notes: string
+          patientId: string
+          prescriptions?: Json[] | null
+          tenantId: string
+          treatments?: Json[] | null
+          updatedAt: string
+          veterinarianId: string
+          visitDate: string
+        }
+        Update: {
+          chiefComplaint?: string
+          createdAt?: string
+          diagnosis?: string[] | null
+          id?: string
+          notes?: string
+          patientId?: string
+          prescriptions?: Json[] | null
+          tenantId?: string
+          treatments?: Json[] | null
+          updatedAt?: string
+          veterinarianId?: string
+          visitDate?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "MedicalRecord_patientId_fkey"
+            columns: ["patientId"]
+            isOneToOne: false
+            referencedRelation: "Patient"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "MedicalRecord_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Owner: {
+        Row: {
+          address: Json
+          createdAt: string
+          email: string
+          firstName: string
+          id: string
+          lastName: string
+          phone: string
+          tenantId: string
+          updatedAt: string
+        }
+        Insert: {
+          address: Json
+          createdAt?: string
+          email: string
+          firstName: string
+          id: string
+          lastName: string
+          phone: string
+          tenantId: string
+          updatedAt: string
+        }
+        Update: {
+          address?: Json
+          createdAt?: string
+          email?: string
+          firstName?: string
+          id?: string
+          lastName?: string
+          phone?: string
+          tenantId?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Owner_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Patient: {
+        Row: {
+          breed: string | null
+          createdAt: string
+          dateOfBirth: string | null
+          id: string
+          microchipId: string | null
+          name: string
+          ownerId: string
+          species: string
+          tenantId: string
+          updatedAt: string
+        }
+        Insert: {
+          breed?: string | null
+          createdAt?: string
+          dateOfBirth?: string | null
+          id: string
+          microchipId?: string | null
+          name: string
+          ownerId: string
+          species: string
+          tenantId: string
+          updatedAt: string
+        }
+        Update: {
+          breed?: string | null
+          createdAt?: string
+          dateOfBirth?: string | null
+          id?: string
+          microchipId?: string | null
+          name?: string
+          ownerId?: string
+          species?: string
+          tenantId?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Patient_ownerId_fkey"
+            columns: ["ownerId"]
+            isOneToOne: false
+            referencedRelation: "Owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Patient_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      Tenant: {
+        Row: {
+          createdAt: string
+          customDomain: string | null
+          id: string
+          logo: string | null
+          name: string
+          primaryColor: string | null
+          settings: Json
+          subdomain: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          customDomain?: string | null
+          id: string
+          logo?: string | null
+          name: string
+          primaryColor?: string | null
+          settings?: Json
+          subdomain: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          customDomain?: string | null
+          id?: string
+          logo?: string | null
+          name?: string
+          primaryColor?: string | null
+          settings?: Json
+          subdomain?: string
+          updatedAt?: string
+        }
+        Relationships: []
+      }
+      TenantMembership: {
+        Row: {
+          createdAt: string
+          id: string
+          invitedAt: string | null
+          invitedBy: string | null
+          joinedAt: string | null
+          role: string
+          status: string
+          tenantId: string
+          updatedAt: string
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          invitedAt?: string | null
+          invitedBy?: string | null
+          joinedAt?: string | null
+          role: string
+          status: string
+          tenantId: string
+          updatedAt: string
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          invitedAt?: string | null
+          invitedBy?: string | null
+          joinedAt?: string | null
+          role?: string
+          status?: string
+          tenantId?: string
+          updatedAt?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "TenantMembership_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "TenantMembership_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "User"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      User: {
+        Row: {
+          createdAt: string
+          email: string
+          id: string
+          image: string | null
+          name: string | null
+          phone: string | null
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          email: string
+          id: string
+          image?: string | null
+          name?: string | null
+          phone?: string | null
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          email?: string
+          id?: string
+          image?: string | null
+          name?: string | null
+          phone?: string | null
+          updatedAt?: string
         }
         Relationships: []
       }
@@ -183,11 +536,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },
 } as const
-

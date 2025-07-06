@@ -1,26 +1,61 @@
 import { Badge } from '@/components/ui/badge'
+import { getActiveCustomers } from '@/server/queries/customers'
 
-export function ActiveCustomers() {
+export async function ActiveCustomers() {
+  const customers = await getActiveCustomers()
+  
+  const formatLastVisit = (lastVisit: string | undefined) => {
+    if (!lastVisit) return 'No visits yet'
+    
+    const date = new Date(lastVisit)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 1) return '1 day ago'
+    if (diffDays < 7) return `${diffDays} days ago`
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`
+    return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`
+  }
+
+  const formatPets = (patients: any[]) => {
+    if (!patients || patients.length === 0) return 'No pets'
+    if (patients.length === 1) {
+      const pet = patients[0]
+      return `${pet.name} (${pet.breed || pet.species})`
+    }
+    return `${patients.length} pets`
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h4 className="text-lg font-medium text-zinc-950 dark:text-white">Active Customers</h4>
-        <Badge color="green">24 customers</Badge>
+        <Badge color="green">{customers.length} customers</Badge>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {/* Sample active customers */}
-        {[
-          { name: 'Sarah Johnson', pet: 'Max (Golden Retriever)', lastVisit: '2 days ago' },
-          { name: 'Mike Chen', pet: 'Luna (Persian Cat)', lastVisit: '1 week ago' },
-          { name: 'Emma Davis', pet: 'Charlie (Beagle)', lastVisit: '3 days ago' },
-        ].map((customer, index) => (
-          <div key={index} className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-            <h5 className="font-medium text-zinc-950 dark:text-white">{customer.name}</h5>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">{customer.pet}</p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-500">Last visit: {customer.lastVisit}</p>
+        {customers.map((customer) => (
+          <div key={customer.id} className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+            <h5 className="font-medium text-zinc-950 dark:text-white">
+              {customer.firstName} {customer.lastName}
+            </h5>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {formatPets(customer.patients)}
+            </p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500">
+              Last visit: {formatLastVisit(customer.lastVisit)}
+            </p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
+              {customer.email}
+            </p>
           </div>
         ))}
       </div>
+      {customers.length === 0 && (
+        <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
+          No active customers found
+        </div>
+      )}
     </div>
   )
 }

@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js + Supabase Starter",
-  description: "A modern web application with authentication",
+  title: "Catalyst Vet",
+  description: "Veterinary management software",
 };
 
 export default function RootLayout({

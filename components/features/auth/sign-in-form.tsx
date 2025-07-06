@@ -29,8 +29,19 @@ function SubmitButton() {
   const { pending } = useFormStatus()
   
   return (
-    <Button type="submit" className="w-full" disabled={pending}>
-      {pending ? 'Signing in...' : 'Sign In'}
+    <Button 
+      type="submit" 
+      className="w-full transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]" 
+      disabled={pending}
+    >
+      <div className="flex items-center justify-center gap-2">
+        {pending && (
+          <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full"></div>
+        )}
+        <span className={`transition-all duration-200 ${pending ? 'opacity-80' : 'opacity-100'}`}>
+          {pending ? 'Signing in...' : 'Sign In'}
+        </span>
+      </div>
     </Button>
   )
 }
@@ -64,7 +75,7 @@ export function SignInForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 animate-in fade-in-0 duration-300">
         <FormField
           control={form.control}
           name="email"
@@ -75,6 +86,7 @@ export function SignInForm() {
                 <Input
                   type="email"
                   placeholder="you@example.com"
+                  className="transition-all duration-200 ease-in-out focus:scale-[1.02] focus:shadow-md"
                   {...field}
                 />
               </FormControl>
@@ -92,6 +104,7 @@ export function SignInForm() {
                 <Input
                   type="password"
                   placeholder="••••••••"
+                  className="transition-all duration-200 ease-in-out focus:scale-[1.02] focus:shadow-md"
                   {...field}
                 />
               </FormControl>
