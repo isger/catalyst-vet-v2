@@ -18,7 +18,7 @@ export async function ActiveCustomers() {
     return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`
   }
 
-  const formatPets = (patients: any[]) => {
+  const formatPets = (patients: { name: string; breed: string | null; species: string }[]) => {
     if (!patients || patients.length === 0) return 'No pets'
     if (patients.length === 1) {
       const pet = patients[0]

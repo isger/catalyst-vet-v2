@@ -198,36 +198,48 @@ export type Database = {
       }
       Owner: {
         Row: {
+          additionalNotes: string | null
           address: Json
           createdAt: string
           email: string
           firstName: string
+          gdprConsent: boolean
           id: string
           lastName: string
           phone: string
+          preferredPractice: string | null
           tenantId: string
+          title: string | null
           updatedAt: string
         }
         Insert: {
+          additionalNotes?: string | null
           address: Json
           createdAt?: string
           email: string
           firstName: string
+          gdprConsent?: boolean
           id: string
           lastName: string
           phone: string
+          preferredPractice?: string | null
           tenantId: string
+          title?: string | null
           updatedAt: string
         }
         Update: {
+          additionalNotes?: string | null
           address?: Json
           createdAt?: string
           email?: string
           firstName?: string
+          gdprConsent?: boolean
           id?: string
           lastName?: string
           phone?: string
+          preferredPractice?: string | null
           tenantId?: string
+          title?: string | null
           updatedAt?: string
         }
         Relationships: [
@@ -283,6 +295,13 @@ export type Database = {
             columns: ["ownerId"]
             isOneToOne: false
             referencedRelation: "Owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "Patient_ownerId_fkey"
+            columns: ["ownerId"]
+            isOneToOne: false
+            referencedRelation: "OwnerDetails"
             referencedColumns: ["id"]
           },
           {
@@ -416,7 +435,34 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      OwnerDetails: {
+        Row: {
+          additionalNotes: string | null
+          address: Json | null
+          createdAt: string | null
+          email: string | null
+          firstName: string | null
+          gdprConsent: boolean | null
+          id: string | null
+          lastName: string | null
+          phone: string | null
+          practiceName: string | null
+          practiceSubdomain: string | null
+          preferredPractice: string | null
+          tenantId: string | null
+          title: string | null
+          updatedAt: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Owner_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "Tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never

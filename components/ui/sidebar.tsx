@@ -6,6 +6,7 @@ import { LayoutGroup, motion } from 'framer-motion'
 import React, { forwardRef, useId } from 'react'
 import { TouchTarget } from './button'
 import { Link } from './link'
+import { cn } from '@/lib/utils'
 
 export function Sidebar({ className, ...props }: React.ComponentPropsWithoutRef<'nav'>) {
   return <nav {...props} className={clsx(className, 'flex h-full min-h-0 flex-col')} />
@@ -138,5 +139,5 @@ export const SidebarItem = forwardRef(function SidebarItem(
 })
 
 export function SidebarLabel({ className, ...props }: React.ComponentPropsWithoutRef<'span'>) {
-  return <span {...props} className={clsx(className, 'truncate')} />
+  return <span {...props} className={cn(className, 'truncate')} />
 }

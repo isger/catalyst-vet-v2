@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function Settings() {
   return (
-    <form method="post" className="max-w-4xl">
+    <form method="post" className="mx-auto max-w-4xl">
       <Heading>Settings</Heading>
       <Divider className="my-10 mt-6" />
 

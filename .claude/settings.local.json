@@ -12,7 +12,9 @@
       "Bash(supabase migration:*)",
       "Bash(npm run:*)",
       "Bash(npx supabase:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

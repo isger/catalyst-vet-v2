@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Heading } from '@/components/ui/heading'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/ui/page-header'
@@ -17,7 +18,9 @@ export default function Customers() {
           actions={
             <>
               <Button outline>Export</Button>
-              <Button className="ml-3">Add Customer</Button>
+              <Link href="/customers/new">
+                <Button className="ml-3">Add Customer</Button>
+              </Link>
             </>
           }
         />
