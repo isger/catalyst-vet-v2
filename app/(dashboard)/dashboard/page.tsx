@@ -7,6 +7,28 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Get user's tenant membership information
+  let tenantInfo = null
+  if (user) {
+    const { data: membershipData } = await supabase
+      .from('TenantMembership')
+      .select(`
+        tenantId,
+        role,
+        status,
+        Tenant (
+          id,
+          name,
+          subdomain
+        )
+      `)
+      .eq('userId', user.id)
+      .eq('status', 'active')
+      .single()
+
+    tenantInfo = membershipData
+  }
+
   return (
     <div className="container mx-auto py-8">
       <div className="mb-8 flex items-center justify-between">
@@ -26,9 +48,16 @@ export default async function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            User ID: {user?.id}
-          </p>
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <p>User ID: {user?.id}</p>
+            {tenantInfo && (
+              <>
+                <p>Tenant ID: {tenantInfo.tenantId}</p>
+                <p>Organization: {tenantInfo.Tenant?.name}</p>
+                <p>Role: {tenantInfo.role}</p>
+              </>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>

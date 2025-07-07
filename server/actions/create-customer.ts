@@ -6,16 +6,122 @@ import { createClient } from '@/lib/supabase/server'
 import { customerIntakeSchema, type CustomerIntakeData } from '@/lib/schemas/customer-intake'
 import type { Database } from '@/types/supabase'
 
-type ActionResult = {
+export type ActionResult = {
   success: boolean
   error?: string
   customerId?: string
+}
+
+type DuplicateCheckResult = {
+  exists: boolean
+  matches?: {
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+  }[]
+  error?: string
+}
+
+export async function checkForDuplicateCustomer(email: string, phone?: string): Promise<DuplicateCheckResult> {
+  try {
+    console.log(`🔍 Checking for duplicate customer - Email: ${email}, Phone: ${phone || 'N/A'}`)
+    
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.log('❌ Authentication failed:', authError)
+      return {
+        exists: false,
+        error: 'Authentication required'
+      }
+    }
+
+    console.log(`👤 Authenticated user: ${user.id}`)
+
+    // Get user's tenant information
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('TenantMembership')
+      .select('tenantId')
+      .eq('userId', user.id)
+      .eq('status', 'active')
+      .single()
+
+    if (membershipError || !membershipData) {
+      console.log('❌ Tenant membership error:', membershipError)
+      console.log('Membership data:', membershipData)
+      return {
+        exists: false,
+        error: 'Unable to determine your practice association'
+      }
+    }
+
+    console.log(`🏢 User tenant: ${membershipData.tenantId}`)
+
+    // Build query to check for duplicates within current tenant only
+    let query = supabase
+      .from('Owner')
+      .select('id, firstName, lastName, email, phone, tenantId')
+      .eq('tenantId', membershipData.tenantId)
+
+    // Check for email match or phone match using proper Supabase syntax
+    if (phone && phone.trim()) {
+      // Use proper OR syntax with parentheses
+      query = query.or(`email.eq."${email}",phone.eq."${phone}"`)
+      console.log(`🔍 Searching for email: "${email}" OR phone: "${phone}" in tenant: ${membershipData.tenantId}`)
+    } else {
+      query = query.eq('email', email)
+      console.log(`🔍 Searching for email: "${email}" in tenant: ${membershipData.tenantId}`)
+    }
+
+    const { data: existingCustomers, error: queryError } = await query
+
+    if (queryError) {
+      console.error('❌ Database query error:', queryError)
+      return {
+        exists: false,
+        error: 'Failed to check for existing customers'
+      }
+    }
+
+    console.log(`📊 Found ${existingCustomers?.length || 0} matching customers in current tenant:`, existingCustomers)
+
+    return {
+      exists: existingCustomers.length > 0,
+      matches: existingCustomers.length > 0 ? existingCustomers : undefined
+    }
+
+  } catch (error) {
+    console.error('❌ Unexpected error in checkForDuplicateCustomer:', error)
+    return {
+      exists: false,
+      error: 'An unexpected error occurred'
+    }
+  }
 }
 
 export async function createCustomer(data: CustomerIntakeData): Promise<ActionResult> {
   try {
     // Validate the input data
     const validatedData = customerIntakeSchema.parse(data)
+    
+    console.log(`🚀 Creating customer with email: ${validatedData.email}`)
+    
+    // Check for duplicates within current tenant only
+    const duplicateCheck = await checkForDuplicateCustomer(validatedData.email, validatedData.phone)
+    
+    if (duplicateCheck.error) {
+      console.log(`⚠️ Duplicate check failed: ${duplicateCheck.error}`)
+      // Continue anyway, but log the issue
+    } else if (duplicateCheck.exists) {
+      console.log(`🚫 Duplicate customer found:`, duplicateCheck.matches)
+      return {
+        success: false,
+        error: `A customer with this email address already exists: ${duplicateCheck.matches?.[0]?.firstName} ${duplicateCheck.matches?.[0]?.lastName}`
+      }
+    }
     
     // Get the authenticated user and supabase client
     const supabase = await createClient()

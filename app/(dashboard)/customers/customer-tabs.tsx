@@ -262,7 +262,7 @@ export function FollowUp({ searchQuery = '', sortBy = 'name' }: TabProps) {
         case 'name':
           return a.customer.localeCompare(b.customer)
         case 'status':
-          const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1 }
+          const priorityOrder: Record<string, number> = { 'High': 3, 'Medium': 2, 'Low': 1 }
           return priorityOrder[b.priority] - priorityOrder[a.priority]
         default:
           return 0

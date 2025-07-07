@@ -2,7 +2,6 @@
 
 import { useTheme } from 'next-themes'
 import { SidebarItem, SidebarLabel } from '@/components/ui/sidebar'
-import { MoonIcon, SunIcon } from '@heroicons/react/16/solid'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()

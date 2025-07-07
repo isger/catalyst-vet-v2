@@ -12,7 +12,8 @@ import {TextArea} from "@/components/ui/text-area";
 import {EmergencyContactForm} from "@/components/forms/emergency-contact-form";
 import React, { useState, useActionState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
-import { createCustomerFromForm } from '@/server/actions/create-customer'
+import { createCustomerFromForm, checkForDuplicateCustomer } from '@/server/actions/create-customer'
+import type { ActionResult } from '@/server/actions/create-customer'
 import { customerIntakeSchema } from '@/lib/schemas/customer-intake'
 import { PlusIcon } from '@heroicons/react/16/solid'
 
@@ -22,12 +23,25 @@ interface EmergencyContact {
   relationship: string
 }
 
+interface DuplicateMatch {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+}
+
 export default function NewCustomerPage() {
-  const [state, formAction, isPending] = useActionState(createCustomerFromForm, null)
+  const [state, formAction, isPending] = useActionState(async (prevState: ActionResult | null, formData: FormData) => {
+    return await createCustomerFromForm(formData)
+  }, null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([
     { name: '', phone: '', relationship: '' }
   ])
+  const [duplicateMatches, setDuplicateMatches] = useState<DuplicateMatch[]>([])
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false)
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false)
   const router = useRouter()
 
   // Functions to manage emergency contacts
@@ -47,6 +61,28 @@ export default function NewCustomerPage() {
     const updated = [...emergencyContacts]
     updated[index] = { ...updated[index], [field]: value }
     setEmergencyContacts(updated)
+  }
+
+  // Function to check for duplicate customers
+  const checkForDuplicates = async (email: string, phone: string) => {
+    if (!email && !phone) return
+    
+    setCheckingDuplicates(true)
+    setShowDuplicateWarning(false)
+    setDuplicateMatches([])
+    
+    try {
+      const result = await checkForDuplicateCustomer(email, phone)
+      
+      if (result.exists && result.matches) {
+        setDuplicateMatches(result.matches)
+        setShowDuplicateWarning(true)
+      }
+    } catch (error) {
+      console.error('Error checking for duplicates:', error)
+    } finally {
+      setCheckingDuplicates(false)
+    }
   }
 
   // Redirect on successful submission
@@ -98,10 +134,11 @@ export default function NewCustomerPage() {
       
       // If validation passes, submit to server action
       return formAction(formData)
-    } catch (error: any) {
-      if (error.errors) {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const zodError = error as { errors: { path: string[]; message: string }[] }
         const fieldErrors: Record<string, string> = {}
-        error.errors.forEach((err: any) => {
+        zodError.errors.forEach((err) => {
           const field = err.path.join('.')
           fieldErrors[field] = err.message
         })
@@ -128,6 +165,20 @@ export default function NewCustomerPage() {
             </div>
           )}
 
+          {showDuplicateWarning && duplicateMatches.length > 0 && (
+            <div className="mb-6 rounded-lg bg-yellow-50 border border-yellow-200 p-4">
+              <Text className="text-yellow-800 font-medium mb-2">⚠️ Potential duplicate customers found:</Text>
+              {duplicateMatches.map((match) => (
+                <div key={match.id} className="text-yellow-700 text-sm mb-1">
+                  • {match.firstName} {match.lastName} - {match.email} - {match.phone}
+                </div>
+              ))}
+              <Text className="text-yellow-700 text-sm mt-2">
+                Please verify this is not a duplicate before continuing.
+              </Text>
+            </div>
+          )}
+
           <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
               <div className="space-y-1">
                   <Subheading>Customer Details</Subheading>
@@ -144,12 +195,25 @@ export default function NewCustomerPage() {
                   </div>
                   <div>
                     <Input type="email" label="Email" aria-label="Customer Email" name="email"
-                           placeholder="john.doe@example.com"/>
+                           placeholder="john.doe@example.com"
+                           onBlur={(e) => {
+                             const email = e.target.value
+                             const phone = (document.querySelector('input[name="phone"]') as HTMLInputElement)?.value
+                             if (email) checkForDuplicates(email, phone)
+                           }}/>
                     {errors.email && <Text className="text-red-600 text-sm mt-1">{errors.email}</Text>}
+                    {checkingDuplicates && (
+                      <Text className="text-blue-600 text-sm mt-1">Checking for existing customers...</Text>
+                    )}
                   </div>
                   <div>
                     <Input type="tel" label="Phone Number" aria-label="Customer Phone Number" name="phone"
-                           placeholder="(555) 123-4567"/>
+                           placeholder="(555) 123-4567"
+                           onBlur={(e) => {
+                             const phone = e.target.value
+                             const email = (document.querySelector('input[name="email"]') as HTMLInputElement)?.value
+                             if (phone) checkForDuplicates(email, phone)
+                           }}/>
                     {errors.phone && <Text className="text-red-600 text-sm mt-1">{errors.phone}</Text>}
                   </div>
               </div>
