@@ -125,7 +125,7 @@ export function ApplicationLayout({
                 <Avatar 
                   src={userAvatar || "/users/default-avatar.jpg"} 
                   initials={!userAvatar ? userName.charAt(0).toUpperCase() : undefined}
-                  square 
+                  square={true}
                 />
               </DropdownButton>
               <AccountDropdownMenu anchor="bottom end" />
@@ -141,6 +141,7 @@ export function ApplicationLayout({
                 <Avatar 
                   src={tenantLogo || "/teams/catalyst.svg"} 
                   initials={!tenantLogo ? tenantName.charAt(0).toUpperCase() : undefined}
+                  square={true}
                 />
                 <SidebarLabel>{tenantName}</SidebarLabel>
                 <ChevronDownIcon />
@@ -156,6 +157,7 @@ export function ApplicationLayout({
                     slot="icon" 
                     src={tenantLogo || "/teams/catalyst.svg"} 
                     initials={!tenantLogo ? tenantName.charAt(0).toUpperCase() : undefined}
+                    square={true}
                   />
                   <DropdownLabel>{tenantName}</DropdownLabel>
                 </DropdownItem>

@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { useCustomerStats } from '@/hooks/use-customers'
 
 export default function Customers() {
-  const [activeTab, setActiveTab] = useState('consultations');
+  const [activeTab, setActiveTab] = useState('active');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const { stats, loading: statsLoading } = useCustomerStats();
@@ -62,7 +62,7 @@ export default function Customers() {
       <div className="mt-8">
         <TabsV2 
           tabs={tabs} 
-          defaultValue="consultations" 
+          defaultValue="active" 
           onTabChange={setActiveTab} 
         />
 
