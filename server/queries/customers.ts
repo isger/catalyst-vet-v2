@@ -100,9 +100,12 @@ export async function getCustomerStats() {
     .select(`
       id,
       createdAt,
-      Appointment (
-        status,
-        scheduledAt
+      Patient (
+        id,
+        Appointment (
+          status,
+          scheduledAt
+        )
       )
     `)
 
@@ -126,10 +129,16 @@ export async function getCustomerStats() {
 
   owners.forEach(owner => {
     const createdDate = new Date(owner.createdAt)
-    const hasRecentAppointment = owner.Appointment?.some(apt => 
+    
+    // Get all appointments from all patients
+    const allAppointments = owner.Patient?.flatMap(patient => 
+      patient.Appointment || []
+    ) || []
+    
+    const hasRecentAppointment = allAppointments.some(apt => 
       new Date(apt.scheduledAt) > thirtyDaysAgo
     )
-    const hasUpcomingAppointment = owner.Appointment?.some(apt => 
+    const hasUpcomingAppointment = allAppointments.some(apt => 
       apt.status === 'scheduled' && new Date(apt.scheduledAt) > now
     )
 

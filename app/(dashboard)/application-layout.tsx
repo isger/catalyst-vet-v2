@@ -80,7 +80,7 @@ function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' })
 type Tenant = {
   id: string
   name: string
-  logo?: string
+  logo: string | null
 }
 
 type Membership = {

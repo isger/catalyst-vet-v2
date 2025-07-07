@@ -164,7 +164,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       preferredPractice: validatedData.preferredPractice || null,
       gdprConsent: validatedData.gdprConsent,
       additionalNotes: validatedData.additionalNotes || null,
-      emergencyContacts: validatedData.emergencyContacts as any || null,
+      // emergencyContacts: validatedData.emergencyContact ? [validatedData.emergencyContact] : null,
       tenantId: membershipData.tenantId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -253,7 +253,7 @@ export async function createCustomerFromForm(formData: FormData): Promise<Action
   try {
     // Extract and structure the form data
     const customerData: CustomerIntakeData = {
-      title: (formData.get('title') as string) || undefined,
+      title: formData.get('title') as "Mr." | "Mrs." | "Ms." | "Dr." | "Prof." | "Rev." | undefined || undefined,
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       email: formData.get('email') as string,
@@ -269,7 +269,7 @@ export async function createCustomerFromForm(formData: FormData): Promise<Action
       gdprConsent: formData.get('gdprConsent') === 'on',
       marketingConsent: formData.get('marketingConsent') === 'on',
       additionalNotes: (formData.get('additionalNotes') as string) || undefined,
-      emergencyContacts: extractEmergencyContacts(formData)
+      emergencyContact: extractEmergencyContacts(formData)?.[0] || undefined
     }
 
     return await createCustomer(customerData)

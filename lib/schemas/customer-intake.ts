@@ -72,12 +72,12 @@ export const customerIntakeSchema = z.object({
   // Marketing preferences (optional)
   marketingConsent: z.boolean().default(false),
   
-  // Emergency contacts (optional but recommended, up to 5 contacts)
-  emergencyContacts: z.array(z.object({
+  // Emergency contact (optional but recommended)
+  emergencyContact: z.object({
     name: z.string().max(100, 'Emergency contact name must not exceed 100 characters').optional(),
     phone: z.string().optional(),
     relationship: z.string().max(50, 'Relationship must not exceed 50 characters').optional()
-  })).max(5, 'Maximum 5 emergency contacts allowed').optional(),
+  }).optional(),
 })
 
 // Type inference for TypeScript
@@ -96,7 +96,7 @@ export const personalInfoSchema = customerIntakeSchema.pick({
 export const addressPreferencesSchema = customerIntakeSchema.pick({
   address: true,
   preferredPractice: true,
-  emergencyContacts: true
+  emergencyContact: true
 })
 
 export const consentNotesSchema = customerIntakeSchema.pick({
@@ -110,13 +110,17 @@ export type AddressPreferencesData = z.infer<typeof addressPreferencesSchema>
 export type ConsentNotesData = z.infer<typeof consentNotesSchema>
 
 // Default values for form initialization
-export const defaultCustomerIntake: Partial<CustomerIntakeData> = {
+export const defaultCustomerIntake = {
   gdprConsent: false,
   marketingConsent: false,
   address: {
-    country: 'US'
+    country: 'US',
+    street: '',
+    city: '',
+    state: '',
+    zipCode: ''
   }
-}
+} as const
 
 // Helper function to format phone number for display
 export const formatPhoneNumber = (phone: string): string => {

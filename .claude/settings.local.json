@@ -17,7 +17,9 @@
       "Bash(mkdir:*)",
       "Bash(pkill:*)",
       "Bash(supabase db reset:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git restore:*)"
     ],
     "deny": []
   }

@@ -50,9 +50,7 @@ export function useActiveCustomers() {
         // Transform the data to match our interface
         const transformedCustomers: CustomerWithPets[] = data.map(owner => {
           // Get the most recent appointment across all pets
-          const allAppointments = owner.Patient?.flatMap(patient => 
-            patient.Appointment?.filter(apt => apt.status === 'completed') || []
-          ) || []
+          const allAppointments = owner.Patient?.flatMap(patient => patient.Appointment?.filter(apt => apt.status === 'completed') || []) || []
           
           const lastVisit = allAppointments.length > 0 
             ? allAppointments
