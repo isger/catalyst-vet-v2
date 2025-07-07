@@ -9,7 +9,8 @@ export default async function AuthLayout({
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  // Redirect to dashboard if already authenticated
+  // Fallback protection - redirect to dashboard if already authenticated
+  // This should rarely happen due to middleware, but provides extra security
   if (user) {
     redirect('/dashboard')
   }

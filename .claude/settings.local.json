@@ -14,7 +14,9 @@
       "Bash(npx supabase:*)",
       "Bash(rm:*)",
       "Bash(find:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(pkill:*)",
+      "Bash(supabase db reset:*)"
     ],
     "deny": []
   }

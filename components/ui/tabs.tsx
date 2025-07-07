@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
-
+import { ChevronDownIcon } from '@heroicons/react/16/solid'
 import { cn } from "@/lib/utils"
 
+// Original shadcn/ui tabs components
 function Tabs({
   className,
   ...props
@@ -63,4 +64,95 @@ function TabsContent({
   )
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent }
+// New custom tabs component with your style
+interface Tab {
+  name: string
+  href: string
+  count?: string
+  current: boolean
+}
+
+interface CustomTabsProps {
+  tabs: Tab[]
+  onTabChange?: (tab: Tab) => void
+  className?: string
+}
+
+function classNames(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ')
+}
+
+function CustomTabs({ tabs, onTabChange, className }: CustomTabsProps) {
+  const currentTab = tabs.find(tab => tab.current)
+  
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTab = tabs.find(tab => tab.name === event.target.value)
+    if (selectedTab && onTabChange) {
+      onTabChange(selectedTab)
+    }
+  }
+
+  const handleTabClick = (tab: Tab) => {
+    if (onTabChange) {
+      onTabChange(tab)
+    }
+  }
+
+  return (
+    <div className={className}>
+      <div className="grid grid-cols-1 sm:hidden">
+        <select
+          defaultValue={currentTab?.name}
+          onChange={handleSelectChange}
+          aria-label="Select a tab"
+          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+        >
+          {tabs.map((tab) => (
+            <option key={tab.name}>{tab.name}</option>
+          ))}
+        </select>
+        <ChevronDownIcon
+          aria-hidden="true"
+          className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end fill-gray-500"
+        />
+      </div>
+      <div className="hidden sm:block">
+        <div className="border-b border-gray-200">
+          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
+            {tabs.map((tab) => (
+              <a
+                key={tab.name}
+                href={tab.href}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleTabClick(tab)
+                }}
+                aria-current={tab.current ? 'page' : undefined}
+                className={classNames(
+                  tab.current
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700',
+                  'flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap',
+                )}
+              >
+                {tab.name}
+                {tab.count ? (
+                  <span
+                    className={classNames(
+                      tab.current ? 'bg-indigo-100 text-indigo-600' : 'bg-gray-100 text-gray-900',
+                      'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
+                    )}
+                  >
+                    {tab.count}
+                  </span>
+                ) : null}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { Tabs, TabsList, TabsTrigger, TabsContent, CustomTabs }

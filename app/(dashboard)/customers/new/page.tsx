@@ -1,32 +1,259 @@
+'use client'
 
 import {Heading, Subheading} from '@/components/ui/heading'
 import {Divider} from "@/components/ui/divider";
 import {Text} from "@/components/ui/text";
 import {Input} from "@/components/ui/input";
+import {Address} from "@/app/(dashboard)/settings/address";
+import {Checkbox, CheckboxField} from "@/components/ui/checkbox";
+import {Label} from "@/components/ui/fieldset";
+import {Button} from "@/components/ui/button";
+import {TextArea} from "@/components/ui/text-area";
+import {EmergencyContactForm} from "@/components/forms/emergency-contact-form";
+import React, { useState, useActionState, useEffect } from "react";
+import { useRouter } from 'next/navigation'
+import { createCustomerFromForm } from '@/server/actions/create-customer'
+import { customerIntakeSchema } from '@/lib/schemas/customer-intake'
+import { PlusIcon } from '@heroicons/react/16/solid'
 
-export default function NewCustomerPage() {
-  return (
-      <form method="post" className="mx-auto max-w-4xl">
-        <Heading>Add Customer</Heading>
-        <Divider className="my-10 mt-6" />
-
-        <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Subheading>Customer Details</Subheading>
-          </div>
-          <div className="space-y-4">
-              <Input aria-label="First Name" name="first_name" defaultValue="John" />
-              <Input aria-label="Last Name" name="last_name" defaultValue="Doe" />
-              <Input type="email" aria-label="Customer Email" name="email" defaultValue="john.doe@example.com" />
-              <Input type="number" aria-label="Customer Phone Number" name="phone_number" />
-          </div>
-        </section>
-      </form>
-  )
+interface EmergencyContact {
+  name: string
+  phone: string
+  relationship: string
 }
 
-// Metadata for the page
-export const metadata = {
-  title: 'Add New Customer | Catalyst Vet',
-  description: 'Create a new customer profile for pet owners in your veterinary practice.'
+export default function NewCustomerPage() {
+  const [state, formAction, isPending] = useActionState(createCustomerFromForm, null)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([
+    { name: '', phone: '', relationship: '' }
+  ])
+  const router = useRouter()
+
+  // Functions to manage emergency contacts
+  const addEmergencyContact = () => {
+    if (emergencyContacts.length < 5) {
+      setEmergencyContacts([...emergencyContacts, { name: '', phone: '', relationship: '' }])
+    }
+  }
+
+  const removeEmergencyContact = (index: number) => {
+    if (emergencyContacts.length > 1) {
+      setEmergencyContacts(emergencyContacts.filter((_, i) => i !== index))
+    }
+  }
+
+  const updateEmergencyContact = (index: number, field: keyof EmergencyContact, value: string) => {
+    const updated = [...emergencyContacts]
+    updated[index] = { ...updated[index], [field]: value }
+    setEmergencyContacts(updated)
+  }
+
+  // Redirect on successful submission
+  useEffect(() => {
+    if (state?.success && state?.customerId) {
+      router.push(`/customers?new=${state.customerId}`)
+    }
+  }, [state, router])
+
+  const handleSubmit = async (formData: FormData) => {
+    // Clear previous errors
+    setErrors({})
+    
+    // Add emergency contacts to form data
+    emergencyContacts.forEach((contact, index) => {
+      if (contact.name || contact.phone || contact.relationship) {
+        formData.append(`emergencyContacts.${index}.name`, contact.name)
+        formData.append(`emergencyContacts.${index}.phone`, contact.phone)
+        formData.append(`emergencyContacts.${index}.relationship`, contact.relationship)
+      }
+    })
+    
+    // Validate form data with Zod before submission
+    try {
+      const data = {
+        firstName: formData.get('firstName') as string,
+        lastName: formData.get('lastName') as string,
+        email: formData.get('email') as string,
+        phone: formData.get('phone') as string,
+        address: {
+          street: formData.get('address') as string,
+          city: formData.get('city') as string,
+          state: formData.get('region') as string,
+          zipCode: formData.get('postal_code') as string,
+          country: formData.get('country') as string || 'US'
+        },
+        gdprConsent: formData.get('gdprConsent') === 'on',
+        marketingConsent: false,
+        additionalNotes: (formData.get('additionalNotes') as string) || undefined,
+        emergencyContacts: emergencyContacts.filter(contact => 
+          contact.name || contact.phone || contact.relationship
+        ).length > 0 ? emergencyContacts.filter(contact => 
+          contact.name || contact.phone || contact.relationship
+        ) : undefined
+      }
+      
+      // Validate with Zod schema
+      customerIntakeSchema.parse(data)
+      
+      // If validation passes, submit to server action
+      return formAction(formData)
+    } catch (error: any) {
+      if (error.errors) {
+        const fieldErrors: Record<string, string> = {}
+        error.errors.forEach((err: any) => {
+          const field = err.path.join('.')
+          fieldErrors[field] = err.message
+        })
+        setErrors(fieldErrors)
+      }
+      return
+    }
+  }
+
+  return (
+      <form action={handleSubmit} className="mx-auto max-w-4xl">
+          <Heading>Add Customer</Heading>
+          <Divider className="my-10 mt-6"/>
+
+          {state?.error && (
+            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
+              <Text className="text-red-800">{state.error}</Text>
+            </div>
+          )}
+
+          {state?.success && (
+            <div className="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
+              <Text className="text-green-800">Customer created successfully!</Text>
+            </div>
+          )}
+
+          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              <div className="space-y-1">
+                  <Subheading>Customer Details</Subheading>
+                  <Text>All customer data is GDPR compliant.</Text>
+              </div>
+              <div className="space-y-4">
+                  <div>
+                    <Input aria-label="First Name" label="First Name" name="firstName" placeholder="John"/>
+                    {errors.firstName && <Text className="text-red-600 text-sm mt-1">{errors.firstName}</Text>}
+                  </div>
+                  <div>
+                    <Input aria-label="Last Name" label="Last Name" name="lastName" placeholder="Doe"/>
+                    {errors.lastName && <Text className="text-red-600 text-sm mt-1">{errors.lastName}</Text>}
+                  </div>
+                  <div>
+                    <Input type="email" label="Email" aria-label="Customer Email" name="email"
+                           placeholder="john.doe@example.com"/>
+                    {errors.email && <Text className="text-red-600 text-sm mt-1">{errors.email}</Text>}
+                  </div>
+                  <div>
+                    <Input type="tel" label="Phone Number" aria-label="Customer Phone Number" name="phone"
+                           placeholder="(555) 123-4567"/>
+                    {errors.phone && <Text className="text-red-600 text-sm mt-1">{errors.phone}</Text>}
+                  </div>
+              </div>
+          </section>
+
+          <Divider className="my-10" soft/>
+
+          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              <div className="space-y-1">
+                  <Subheading>Address</Subheading>
+                  <Text>Customer&#39;s home address information.</Text>
+              </div>
+              <div>
+                <Address/>
+                {errors['address.street'] && <Text className="text-red-600 text-sm mt-1">{errors['address.street']}</Text>}
+                {errors['address.city'] && <Text className="text-red-600 text-sm mt-1">{errors['address.city']}</Text>}
+                {errors['address.state'] && <Text className="text-red-600 text-sm mt-1">{errors['address.state']}</Text>}
+                {errors['address.zipCode'] && <Text className="text-red-600 text-sm mt-1">{errors['address.zipCode']}</Text>}
+              </div>
+          </section>
+
+          <Divider className="my-10" soft/>
+
+          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              <div className="space-y-1">
+                  <Subheading>Emergency Contacts</Subheading>
+                  <Text>Contact information for emergencies involving the customer or their pets.</Text>
+                  <div className="mt-4">
+                    <Button
+                      type="button"
+                      onClick={addEmergencyContact}
+                      disabled={emergencyContacts.length >= 5}
+                      outline
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <PlusIcon className="h-4 w-4" />
+                      Add Contact
+                    </Button>
+                    {emergencyContacts.length >= 5 && (
+                      <Text className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                        Maximum 5 contacts allowed
+                      </Text>
+                    )}
+                  </div>
+              </div>
+              <div className="space-y-4">
+                {emergencyContacts.map((contact, index) => (
+                  <EmergencyContactForm
+                    key={index}
+                    contact={contact}
+                    index={index}
+                    onUpdate={updateEmergencyContact}
+                    onRemove={removeEmergencyContact}
+                    canRemove={emergencyContacts.length > 1}
+                    errors={errors}
+                  />
+                ))}
+              </div>
+          </section>
+
+          <Divider className="my-10" soft/>
+
+          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+              <div className="space-y-1">
+                  <Subheading>Additional Notes</Subheading>
+                  <Text>Any additional information about the customer or special requirements.</Text>
+              </div>
+              <div>
+                <TextArea
+                  name="additionalNotes"
+                  id="additionalNotes"
+                  rows={4}
+                  maxLength={500}
+                  showCharCount={true}
+                  placeholder="Enter any additional notes, special requirements, or important information about the customer..."
+                />
+                {errors.additionalNotes && <Text className="text-red-600 text-sm mt-1">{errors.additionalNotes}</Text>}
+              </div>
+          </section>
+
+          <Divider className="my-10" soft/>
+
+          <section className="grid gap-x-8 gap-y-6 sm:grid-cols-1">
+              <div>
+                <CheckboxField>
+                    <Checkbox name="gdprConsent"/>
+                    <Label>I consent to the processing of my personal data for veterinary care and related services. This
+                        is required to provide medical care for your pets.</Label>
+                </CheckboxField>
+                {errors.gdprConsent && <Text className="text-red-600 text-sm mt-1">{errors.gdprConsent}</Text>}
+              </div>
+          </section>
+
+          <Divider className="my-10" soft/>
+
+          <section className="flex justify-end gap-4">
+            <Button type="button" outline disabled={isPending} onClick={() => router.back()}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating Customer...' : 'Create Customer'}
+            </Button>
+          </section>
+
+      </form>
+  )
 }

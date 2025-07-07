@@ -72,12 +72,12 @@ export const customerIntakeSchema = z.object({
   // Marketing preferences (optional)
   marketingConsent: z.boolean().default(false),
   
-  // Emergency contact (optional but recommended)
-  emergencyContact: z.object({
+  // Emergency contacts (optional but recommended, up to 5 contacts)
+  emergencyContacts: z.array(z.object({
     name: z.string().max(100, 'Emergency contact name must not exceed 100 characters').optional(),
     phone: z.string().optional(),
     relationship: z.string().max(50, 'Relationship must not exceed 50 characters').optional()
-  }).optional(),
+  })).max(5, 'Maximum 5 emergency contacts allowed').optional(),
 })
 
 // Type inference for TypeScript
@@ -96,7 +96,7 @@ export const personalInfoSchema = customerIntakeSchema.pick({
 export const addressPreferencesSchema = customerIntakeSchema.pick({
   address: true,
   preferredPractice: true,
-  emergencyContact: true
+  emergencyContacts: true
 })
 
 export const consentNotesSchema = customerIntakeSchema.pick({

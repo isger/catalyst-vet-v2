@@ -13,9 +13,6 @@ export function ThemeToggle() {
 
   return (
     <SidebarItem onClick={toggleTheme}>
-      <span suppressHydrationWarning>
-        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-      </span>
       <SidebarLabel suppressHydrationWarning>
         {theme === 'dark' ? 'Light mode' : 'Dark mode'}
       </SidebarLabel>

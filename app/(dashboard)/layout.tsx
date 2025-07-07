@@ -7,7 +7,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  // Redirect to sign-in if not authenticated
+  // Fallback protection - redirect to signin if not authenticated
+  // This should rarely happen due to middleware, but provides extra security
   if (!user) {
     redirect('/signin')
   }
@@ -18,7 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const tenant = {
     id: '1',
     name: 'Catalyst Veterinary',
-    logo: '/teams/catalyst.svg',
+    logo: 'https://nttivargznlzofkcbqtn.supabase.co/storage/v1/object/sign/assets/tenants/logoipsum-356.svg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wNWZkOGRjYS0yNDc3LTRkYzQtOTM3Yy1mNWZlMGY5MmEyOGUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvdGVuYW50cy9sb2dvaXBzdW0tMzU2LnN2ZyIsImlhdCI6MTc1MTgzNTUyMywiZXhwIjo0ODczODk5NTIzfQ.XyQZX2mx5a1ABkwF1hue4KiOzTfBqBkZPp9B_ud8x5Q',
   }
   
   const membership = {

@@ -58,6 +58,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       preferredPractice: validatedData.preferredPractice || null,
       gdprConsent: validatedData.gdprConsent,
       additionalNotes: validatedData.additionalNotes || null,
+      emergencyContacts: validatedData.emergencyContacts as any || null,
       tenantId: membershipData.tenantId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -116,6 +117,31 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
   }
 }
 
+// Helper function to extract emergency contacts from form data
+function extractEmergencyContacts(formData: FormData) {
+  const contacts = []
+  let index = 0
+  
+  // Keep extracting contacts until we find no more
+  while (formData.has(`emergencyContacts.${index}.name`) || 
+         formData.has(`emergencyContacts.${index}.phone`) || 
+         formData.has(`emergencyContacts.${index}.relationship`)) {
+    
+    const name = (formData.get(`emergencyContacts.${index}.name`) as string) || undefined
+    const phone = (formData.get(`emergencyContacts.${index}.phone`) as string) || undefined
+    const relationship = (formData.get(`emergencyContacts.${index}.relationship`) as string) || undefined
+    
+    // Only add contact if at least one field is filled
+    if (name || phone || relationship) {
+      contacts.push({ name, phone, relationship })
+    }
+    
+    index++
+  }
+  
+  return contacts.length > 0 ? contacts : undefined
+}
+
 // Alternative server action that handles form data directly
 export async function createCustomerFromForm(formData: FormData): Promise<ActionResult> {
   try {
@@ -127,21 +153,17 @@ export async function createCustomerFromForm(formData: FormData): Promise<Action
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       address: {
-        street: formData.get('address.street') as string,
-        city: formData.get('address.city') as string,
-        state: formData.get('address.state') as string,
-        zipCode: formData.get('address.zipCode') as string,
-        country: (formData.get('address.country') as string) || 'US'
+        street: formData.get('address') as string,
+        city: formData.get('city') as string,
+        state: formData.get('region') as string,
+        zipCode: formData.get('postal_code') as string,
+        country: (formData.get('country') as string) || 'US'
       },
       preferredPractice: (formData.get('preferredPractice') as string) || undefined,
-      gdprConsent: formData.get('gdprConsent') === 'true',
-      marketingConsent: formData.get('marketingConsent') === 'true',
+      gdprConsent: formData.get('gdprConsent') === 'on',
+      marketingConsent: formData.get('marketingConsent') === 'on',
       additionalNotes: (formData.get('additionalNotes') as string) || undefined,
-      emergencyContact: {
-        name: (formData.get('emergencyContact.name') as string) || undefined,
-        phone: (formData.get('emergencyContact.phone') as string) || undefined,
-        relationship: (formData.get('emergencyContact.relationship') as string) || undefined
-      }
+      emergencyContacts: extractEmergencyContacts(formData)
     }
 
     return await createCustomer(customerData)

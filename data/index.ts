@@ -238,9 +238,9 @@ export async function getOrder(id: string): Promise<Order & {
 
 export function getCountries() {
   return [
+    { code: 'GB', name: 'United Kingdom', flagUrl: 'https://flagcdn.com/gb.svg', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland'] },
     { code: 'US', name: 'United States', flagUrl: 'https://flagcdn.com/us.svg', regions: ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California'] },
     { code: 'CA', name: 'Canada', flagUrl: 'https://flagcdn.com/ca.svg', regions: ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Ontario'] },
-    { code: 'GB', name: 'United Kingdom', flagUrl: 'https://flagcdn.com/gb.svg', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland'] },
     { code: 'AU', name: 'Australia', flagUrl: 'https://flagcdn.com/au.svg', regions: ['New South Wales', 'Victoria', 'Queensland', 'South Australia'] },
     { code: 'DE', name: 'Germany', flagUrl: 'https://flagcdn.com/de.svg', regions: ['Baden-Württemberg', 'Bavaria', 'Berlin', 'Brandenburg'] },
     { code: 'FR', name: 'France', flagUrl: 'https://flagcdn.com/fr.svg', regions: ['Île-de-France', 'Provence-Alpes-Côte d\'Azur', 'Auvergne-Rhône-Alpes', 'Nouvelle-Aquitaine'] },
