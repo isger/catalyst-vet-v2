@@ -181,7 +181,7 @@ export function ApplicationLayout({
                 <SidebarLabel>Dashboard</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/customers" current={pathname.startsWith('/customers')}>
-                <Square2StackIcon />
+                <UserCircleIcon />
                 <SidebarLabel>Customers</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/events" current={pathname.startsWith('/events')}>
