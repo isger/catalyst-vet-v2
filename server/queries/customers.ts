@@ -26,11 +26,42 @@ export interface CustomerWithPets {
   lastVisit?: string
 }
 
-export async function getActiveCustomers(): Promise<CustomerWithPets[]> {
+export interface PaginationParams {
+  page?: number
+  pageSize?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}
+
+export interface PaginatedResult<T> {
+  data: T[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export async function getActiveCustomers(params: PaginationParams = {}): Promise<PaginatedResult<CustomerWithPets>> {
+  const { page = 1, pageSize = 10, search = '', sortBy = 'createdAt', sortOrder = 'desc' } = params
   const supabase = await createClient()
   
-  // Get owners with their patients and latest appointment info
-  const { data, error } = await supabase
+  // Get current user to filter by tenant
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { data: [], total: 0, page, pageSize, totalPages: 0 }
+  
+  // Get user's tenant
+  const { data: tenantData } = await supabase
+    .from('TenantMembership')
+    .select('tenantId')
+    .eq('userId', user.id)
+    .eq('status', 'active')
+    .single()
+  
+  if (!tenantData) return { data: [], total: 0, page, pageSize, totalPages: 0 }
+  
+  // Build base query
+  let query = supabase
     .from('Owner')
     .select(`
       *,
@@ -45,15 +76,35 @@ export async function getActiveCustomers(): Promise<CustomerWithPets[]> {
           status
         )
       )
-    `)
-    .order('createdAt', { ascending: false })
+    `, { count: 'exact' })
+    .eq('tenantId', tenantData.tenantId)
+
+  // Add search filter
+  if (search) {
+    query = query.or(`firstName.ilike.%${search}%,lastName.ilike.%${search}%,email.ilike.%${search}%`)
+  }
+
+  // Add sorting
+  const ascending = sortOrder === 'asc'
+  if (sortBy === 'name') {
+    query = query.order('firstName', { ascending }).order('lastName', { ascending })
+  } else {
+    query = query.order(sortBy, { ascending })
+  }
+
+  // Add pagination
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+  query = query.range(from, to)
+
+  const { data, error, count } = await query
 
   if (error) {
     console.error('Error fetching active customers:', error)
-    return []
+    return { data: [], total: 0, page, pageSize, totalPages: 0 }
   }
 
-  if (!data) return []
+  if (!data) return { data: [], total: 0, page, pageSize, totalPages: 0 }
 
   // Transform the data to match our interface
   const customers: CustomerWithPets[] = data.map(owner => {
@@ -89,11 +140,111 @@ export async function getActiveCustomers(): Promise<CustomerWithPets[]> {
     }
   })
 
-  return customers
+  const total = count || 0
+  const totalPages = Math.ceil(total / pageSize)
+
+  return {
+    data: customers,
+    total,
+    page,
+    pageSize,
+    totalPages
+  }
+}
+
+export async function getCustomerByIdForTenant(customerId: string): Promise<CustomerWithPets | null> {
+  const supabase = await createClient()
+  
+  // Get current user to filter by tenant
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  
+  // Get user's tenant
+  const { data: tenantData } = await supabase
+    .from('TenantMembership')
+    .select('tenantId')
+    .eq('userId', user.id)
+    .eq('status', 'active')
+    .single()
+  
+  if (!tenantData) return null
+  
+  // Get specific customer with their patients and latest appointment info, filtered by tenant
+  const { data, error } = await supabase
+    .from('Owner')
+    .select(`
+      *,
+      Patient (
+        id,
+        name,
+        species,
+        breed,
+        dateOfBirth,
+        Appointment (
+          scheduledAt,
+          status
+        )
+      )
+    `)
+    .eq('id', customerId)
+    .eq('tenantId', tenantData.tenantId)
+    .single()
+
+  if (error) {
+    console.error('Error fetching customer by ID:', error)
+    return null
+  }
+
+  if (!data) return null
+
+  // Get the most recent appointment across all pets
+  const allAppointments = data.Patient?.flatMap(patient => 
+    patient.Appointment?.filter(apt => apt.status === 'completed') || []
+  ) || []
+  
+  const lastVisit = allAppointments.length > 0 
+    ? allAppointments
+        .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0]
+        ?.scheduledAt
+    : undefined
+
+  return {
+    id: data.id,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    address: data.address,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+    tenantId: data.tenantId,
+    patients: data.Patient?.map(patient => ({
+      id: patient.id,
+      name: patient.name,
+      species: patient.species,
+      breed: patient.breed,
+      dateOfBirth: patient.dateOfBirth
+    })) || [],
+    lastVisit
+  }
 }
 
 export async function getCustomerStats() {
   const supabase = await createClient()
+  
+  // Get current user to filter by tenant
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { active: 0, new: 0, consultation: 0, followUp: 0, inactive: 0 }
+  
+  // Get user's tenant
+  const { data: tenantData } = await supabase
+    .from('TenantMembership')
+    .select('tenantId')
+    .eq('userId', user.id)
+    .eq('status', 'active')
+    .single()
+  
+  if (!tenantData) return { active: 0, new: 0, consultation: 0, followUp: 0, inactive: 0 }
   
   const { data: owners, error } = await supabase
     .from('Owner')
@@ -108,6 +259,7 @@ export async function getCustomerStats() {
         )
       )
     `)
+    .eq('tenantId', tenantData.tenantId)
 
   if (error) {
     console.error('Error fetching customer stats:', error)

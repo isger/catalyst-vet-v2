@@ -19,7 +19,9 @@
       "Bash(supabase db reset:*)",
       "Bash(node:*)",
       "Bash(npx tsc:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }
