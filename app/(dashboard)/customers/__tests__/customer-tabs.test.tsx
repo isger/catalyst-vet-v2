@@ -15,22 +15,22 @@ vi.mock('@/hooks/use-pagination', () => ({
 
 // Mock the UI components
 vi.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, color }: any) => (
+  Badge: ({ children, color }: { children: React.ReactNode; color?: string }) => (
     <span data-testid="badge" data-color={color}>{children}</span>
   )
 }))
 
 vi.mock('@/components/ui/table', () => ({
-  Table: ({ children }: any) => <table data-testid="table">{children}</table>,
-  TableBody: ({ children }: any) => <tbody data-testid="table-body">{children}</tbody>,
-  TableCell: ({ children, className }: any) => (
+  Table: ({ children }: { children: React.ReactNode }) => <table data-testid="table">{children}</table>,
+  TableBody: ({ children }: { children: React.ReactNode }) => <tbody data-testid="table-body">{children}</tbody>,
+  TableCell: ({ children, className }: { children: React.ReactNode; className?: string }) => (
     <td data-testid="table-cell" className={className}>{children}</td>
   ),
-  TableHead: ({ children }: any) => <thead data-testid="table-head">{children}</thead>,
-  TableHeader: ({ children, className, onClick }: any) => (
+  TableHead: ({ children }: { children: React.ReactNode }) => <thead data-testid="table-head">{children}</thead>,
+  TableHeader: ({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) => (
     <th data-testid="table-header" className={className} onClick={onClick}>{children}</th>
   ),
-  TableRow: ({ children, href, title, className }: any) => (
+  TableRow: ({ children, href, title, className }: { children: React.ReactNode; href?: string; title?: string; className?: string }) => (
     <tr data-testid="table-row" data-href={href} title={title} className={className}>
       {children}
     </tr>
@@ -38,7 +38,7 @@ vi.mock('@/components/ui/table', () => ({
 }))
 
 vi.mock('@/components/ui/table-pagination', () => ({
-  TablePagination: ({ onPageChange, onPageSizeChange, onNextPage, onPreviousPage, ...props }: any) => (
+  TablePagination: ({ onPageChange, onPageSizeChange, onNextPage, onPreviousPage, ...props }: { onPageChange: (page: number) => void; onPageSizeChange: (size: number) => void; onNextPage: () => void; onPreviousPage: () => void; page: number; totalPages: number; total: number }) => (
     <div data-testid="table-pagination">
       <button onClick={() => onPageChange(2)} data-testid="page-change">Page 2</button>
       <button onClick={() => onPageSizeChange(25)} data-testid="page-size-change">25 per page</button>
@@ -446,10 +446,10 @@ describe('Customer Tabs', () => {
   describe('Common functionality', () => {
     it('should handle empty search results across all tabs', () => {
       const components = [
-        <NewClients searchQuery="nonexistent" />,
-        <Consultation searchQuery="nonexistent" />,
-        <FollowUp searchQuery="nonexistent" />,
-        <Inactive searchQuery="nonexistent" />
+        <NewClients key="new-clients" searchQuery="nonexistent" />,
+        <Consultation key="consultation" searchQuery="nonexistent" />,
+        <FollowUp key="follow-up" searchQuery="nonexistent" />,
+        <Inactive key="inactive" searchQuery="nonexistent" />
       ]
 
       components.forEach(component => {

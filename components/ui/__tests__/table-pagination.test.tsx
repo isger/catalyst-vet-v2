@@ -4,7 +4,7 @@ import { TablePagination } from '../table-pagination'
 
 // Mock the UI components
 vi.mock('../select', () => ({
-  Select: ({ value, onChange, children, className }: any) => (
+  Select: ({ value, onChange, children, className }: { value: string; onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void; children: React.ReactNode; className?: string }) => (
     <select 
       value={value} 
       onChange={onChange} 
@@ -17,8 +17,8 @@ vi.mock('../select', () => ({
 }))
 
 vi.mock('../pagination', () => ({
-  Pagination: ({ children }: any) => <div data-testid="pagination">{children}</div>,
-  PaginationPrevious: ({ href, onClick, children }: any) => (
+  Pagination: ({ children }: { children: React.ReactNode }) => <div data-testid="pagination">{children}</div>,
+  PaginationPrevious: ({ href, onClick, children }: { href?: string; onClick?: () => void; children?: React.ReactNode }) => (
     <button
       onClick={onClick}
       disabled={!href}
@@ -27,7 +27,7 @@ vi.mock('../pagination', () => ({
       {children || 'Previous'}
     </button>
   ),
-  PaginationNext: ({ href, onClick, children }: any) => (
+  PaginationNext: ({ href, onClick, children }: { href?: string; onClick?: () => void; children?: React.ReactNode }) => (
     <button
       onClick={onClick}
       disabled={!href}
@@ -36,8 +36,8 @@ vi.mock('../pagination', () => ({
       {children || 'Next'}
     </button>
   ),
-  PaginationList: ({ children }: any) => <div data-testid="pagination-list">{children}</div>,
-  PaginationPage: ({ href, current, onClick, children }: any) => (
+  PaginationList: ({ children }: { children: React.ReactNode }) => <div data-testid="pagination-list">{children}</div>,
+  PaginationPage: ({ current, onClick, children }: { current?: boolean; onClick?: (e: React.MouseEvent) => void; children: React.ReactNode }) => (
     <button
       onClick={onClick}
       data-testid={`page-${children}`}
@@ -268,7 +268,7 @@ describe('TablePagination', () => {
 
       const pageButton = screen.getByTestId('page-2')
       const clickEvent = new MouseEvent('click', { bubbles: true })
-      const preventDefaultSpy = vi.spyOn(clickEvent, 'preventDefault')
+      vi.spyOn(clickEvent, 'preventDefault')
 
       fireEvent.click(pageButton)
 

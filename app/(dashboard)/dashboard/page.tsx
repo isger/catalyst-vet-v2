@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { signOut } from '@/server/actions/auth'
-import Link from "next/link";
 
 export default async function DashboardPage() {
   const supabase = await createClient()

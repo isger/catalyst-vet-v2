@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { CustomerWithPets, PaginationParams, PaginatedResult } from '@/server/queries/customers'
 import { fetchPaginatedCustomers } from '@/server/actions/customers'
+import { createClient } from '@/lib/supabase/client'
 
 export function usePaginatedCustomers(params: PaginationParams) {
   const [data, setData] = useState<PaginatedResult<CustomerWithPets>>({
