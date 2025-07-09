@@ -40,19 +40,34 @@ function SortableHeader({ children, sortKey, currentSort, onSort }: SortableHead
 
 
 export function ActiveCustomers({}: TabProps) {
-  // Initialize pagination with URL parameters
-  const pagination = usePagination({
-    initialSortBy: 'firstName',
-    initialPageSize: 10,
-    useUrlParams: true
-  })
-
   // Use the new paginated customers hook
   const { 
     customers, 
     total, 
     loading, 
     error 
+  } = usePaginatedCustomers({
+    page: 1,
+    pageSize: 10,
+    search: '',
+    sortBy: 'firstName',
+    sortOrder: 'desc'
+  })
+
+  // Initialize pagination with URL parameters and total
+  const pagination = usePagination({
+    initialSortBy: 'firstName',
+    initialPageSize: 10,
+    total,
+    useUrlParams: true
+  })
+
+  // Re-fetch data when pagination changes
+  const { 
+    customers: paginatedCustomers, 
+    total: paginatedTotal, 
+    loading: paginatedLoading, 
+    error: paginatedError 
   } = usePaginatedCustomers({
     page: pagination.page,
     pageSize: pagination.pageSize,
@@ -61,16 +76,11 @@ export function ActiveCustomers({}: TabProps) {
     sortOrder: pagination.sortOrder
   })
 
-  // Create pagination with total for controls
-  const paginationWithTotal = usePagination({
-    initialPage: pagination.page,
-    initialPageSize: pagination.pageSize,
-    initialSearch: pagination.search,
-    initialSortBy: pagination.sortBy,
-    initialSortOrder: pagination.sortOrder,
-    total,
-    useUrlParams: true
-  })
+  // Use the paginated results
+  const finalCustomers = paginatedCustomers || customers
+  const finalTotal = paginatedTotal || total
+  const finalLoading = paginatedLoading || loading
+  const finalError = paginatedError || error
 
   const handleSort = (key: string) => {
     // Map display column names to database column names
@@ -138,7 +148,7 @@ export function ActiveCustomers({}: TabProps) {
     return phone
   }
 
-  if (loading) {
+  if (finalLoading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -185,7 +195,7 @@ export function ActiveCustomers({}: TabProps) {
     )
   }
 
-  if (error) {
+  if (finalError) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -193,7 +203,7 @@ export function ActiveCustomers({}: TabProps) {
           <Badge color="red">Error</Badge>
         </div>
         <div className="text-center py-8 text-red-500 dark:text-red-400">
-          {error}
+          {finalError}
         </div>
       </div>
     )
@@ -203,10 +213,10 @@ export function ActiveCustomers({}: TabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h4 className="text-lg font-medium text-zinc-950 dark:text-white">Active Customers</h4>
-        <Badge color="green">{total} customers</Badge>
+        <Badge color="green">{finalTotal} customers</Badge>
       </div>
       
-      {customers.length === 0 && !loading ? (
+      {finalCustomers.length === 0 && !finalLoading ? (
         <div className="text-center py-8 text-zinc-500 dark:text-zinc-400">
           {pagination.search ? 'No customers found matching your search.' : 'No active customers found'}
         </div>
@@ -236,7 +246,7 @@ export function ActiveCustomers({}: TabProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {customers.map((customer) => (
+            {finalCustomers.map((customer) => (
               <TableRow 
                 key={customer.id} 
                 href={`/customers/${customer.id}`}
@@ -277,16 +287,16 @@ export function ActiveCustomers({}: TabProps) {
         </Table>
         
         <TablePagination
-          page={paginationWithTotal.page}
-          pageSize={paginationWithTotal.pageSize}
-          total={total}
-          totalPages={paginationWithTotal.totalPages}
-          hasNextPage={paginationWithTotal.hasNextPage}
-          hasPreviousPage={paginationWithTotal.hasPreviousPage}
-          onPageChange={paginationWithTotal.setPage}
-          onPageSizeChange={paginationWithTotal.setPageSize}
-          onPreviousPage={paginationWithTotal.previousPage}
-          onNextPage={paginationWithTotal.nextPage}
+          page={pagination.page}
+          pageSize={pagination.pageSize}
+          total={finalTotal}
+          totalPages={pagination.totalPages}
+          hasNextPage={pagination.hasNextPage}
+          hasPreviousPage={pagination.hasPreviousPage}
+          onPageChange={pagination.setPage}
+          onPageSizeChange={pagination.setPageSize}
+          onPreviousPage={pagination.previousPage}
+          onNextPage={pagination.nextPage}
         />
         </>
       )}
