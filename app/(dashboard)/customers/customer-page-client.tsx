@@ -65,7 +65,7 @@ export default function CustomerPageClient({
 
     switch (activeTab) {
       case 'active':
-        return <ActiveCustomers {...commonProps} initialData={initialCustomers} />
+        return <ActiveCustomers {...commonProps} initialData={initialCustomers} onSearchChange={setSearchQuery} />
       case 'new-customers':
         return <NewClients {...commonProps} />
       case 'consultations':
@@ -75,7 +75,7 @@ export default function CustomerPageClient({
       case 'inactive':
         return <Inactive {...commonProps} />
       default:
-        return <ActiveCustomers {...commonProps} initialData={initialCustomers} />
+        return <ActiveCustomers {...commonProps} initialData={initialCustomers} onSearchChange={setSearchQuery} />
     }
   }
 

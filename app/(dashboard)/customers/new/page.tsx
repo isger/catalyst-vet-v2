@@ -17,6 +17,10 @@ import type { ActionResult } from '@/server/actions/create-customer'
 import { customerIntakeSchema } from '@/lib/schemas/customer-intake'
 import { PlusIcon } from '@heroicons/react/16/solid'
 
+
+
+import { useToast } from '@/hooks/use-toast'
+
 interface EmergencyContact {
   name: string
   phone: string
@@ -32,6 +36,7 @@ interface DuplicateMatch {
 }
 
 export default function NewCustomerPage() {
+  const { toast } = useToast()
   const [state, formAction, isPending] = useActionState(async (prevState: ActionResult | null, formData: FormData) => {
     return await createCustomerFromForm(formData)
   }, null)
@@ -143,6 +148,12 @@ export default function NewCustomerPage() {
           fieldErrors[field] = err.message
         })
         setErrors(fieldErrors)
+
+        toast({
+          title: 'Validation Error',
+          description: 'The form could not be submitted. Please check the fields for errors.',
+          variant: 'destructive',
+        })
       }
       return
     }

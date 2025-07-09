@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { CustomerWithPets, PaginationParams, PaginatedResult } from '@/server/queries/customers'
 import { fetchPaginatedCustomers } from '@/server/actions/customers'
-import { createClient } from '@/lib/supabase/client'
+import { useRequestCache } from './use-request-cache'
 
 export function usePaginatedCustomers(params: PaginationParams) {
   const [data, setData] = useState<PaginatedResult<CustomerWithPets>>({
@@ -15,21 +15,39 @@ export function usePaginatedCustomers(params: PaginationParams) {
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  
+  const { getCached, setCache, getCacheKey } = useRequestCache<PaginatedResult<CustomerWithPets>>(
+    'customers',
+    30000 // 30 second cache
+  )
 
   const fetchCustomers = useCallback(async (fetchParams: PaginationParams) => {
     try {
       setLoading(true)
       setError(null)
       
+      // Check cache first
+      const cacheKey = getCacheKey(fetchParams)
+      const cachedResult = getCached(cacheKey)
+      
+      if (cachedResult) {
+        setData(cachedResult)
+        setLoading(false)
+        return
+      }
+      
       const result = await fetchPaginatedCustomers(fetchParams)
       setData(result)
+      
+      // Cache the result
+      setCache(cacheKey, result)
     } catch (err) {
       console.error('Error fetching customers:', err)
       setError('Failed to fetch customers')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [getCached, setCache, getCacheKey])
 
   useEffect(() => {
     fetchCustomers(params)
@@ -80,111 +98,3 @@ export function useActiveCustomers() {
   return { customers, loading, error }
 }
 
-export function useCustomerStats() {
-  const [stats, setStats] = useState({
-    active: 0,
-    new: 0,
-    consultation: 0,
-    followUp: 0,
-    inactive: 0
-  })
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        setLoading(true)
-        setError(null)
-        
-        const supabase = createClient()
-        
-        const { data: owners, error: supabaseError } = await supabase
-          .from('Owner')
-          .select(`
-            id,
-            createdAt,
-            Patient (
-              Appointment (
-                status,
-                scheduledAt
-              )
-            )
-          `)
-
-        if (supabaseError) {
-          console.error('Error fetching customer stats:', supabaseError)
-          setError('Failed to fetch stats')
-          return
-        }
-
-        if (!owners) {
-          setStats({ active: 0, new: 0, consultation: 0, followUp: 0, inactive: 0 })
-          return
-        }
-
-        const now = new Date()
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-        const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000)
-
-        let active = 0
-        let newClients = 0
-        let consultation = 0
-        let inactive = 0
-
-        owners.forEach(owner => {
-          const createdDate = new Date(owner.createdAt)
-          
-          // Get all appointments from all patients
-          const allAppointments = owner.Patient?.flatMap(patient => 
-            patient.Appointment || []
-          ) || []
-          
-          const hasRecentAppointment = allAppointments.some(apt => 
-            new Date(apt.scheduledAt) > thirtyDaysAgo
-          )
-          const hasUpcomingAppointment = allAppointments.some(apt => 
-            apt.status === 'scheduled' && new Date(apt.scheduledAt) > now
-          )
-
-          // New clients (created in last 30 days)
-          if (createdDate > thirtyDaysAgo) {
-            newClients++
-          }
-          
-          // Consultation (has upcoming appointments)
-          if (hasUpcomingAppointment) {
-            consultation++
-          }
-          
-          // Active (has recent activity)
-          if (hasRecentAppointment || hasUpcomingAppointment) {
-            active++
-          }
-          
-          // Inactive (no activity in 6+ months)
-          if (!hasRecentAppointment && createdDate < sixMonthsAgo) {
-            inactive++
-          }
-        })
-
-        setStats({ 
-          active, 
-          new: newClients, 
-          consultation, 
-          followUp: 0, // We'll implement this later based on appointment follow-up logic
-          inactive 
-        })
-      } catch (err) {
-        console.error('Error fetching stats:', err)
-        setError('Failed to fetch stats')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchStats()
-  }, [])
-
-  return { stats, loading, error }
-}

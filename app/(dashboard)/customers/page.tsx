@@ -7,19 +7,22 @@ import CustomerPageClient from './customer-page-client'
 export default async function CustomersPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1
+  const params = await searchParams
+  const page = typeof params.page === 'string' ? Number(params.page) : 1
   const pageSize =
-    typeof searchParams.pageSize === 'string'
-      ? Number(searchParams.pageSize)
+    typeof params.pageSize === 'string'
+      ? Number(params.pageSize)
       : 10
   const search =
-    typeof searchParams.search === 'string' ? searchParams.search : undefined
+    typeof params.search === 'string' ? params.search : undefined
   const sortBy =
-    typeof searchParams.sortBy === 'string' ? searchParams.sortBy : 'createdAt'
+    typeof params.sortBy === 'string' ? params.sortBy : 'createdAt'
   const sortOrder =
-    typeof searchParams.sortOrder === 'string' ? searchParams.sortOrder : 'desc'
+    typeof params.sortOrder === 'string' && (params.sortOrder === 'asc' || params.sortOrder === 'desc') 
+      ? params.sortOrder 
+      : 'desc'
 
   // Fetch initial data on the server
   const [initialCustomers, stats] = await Promise.all([

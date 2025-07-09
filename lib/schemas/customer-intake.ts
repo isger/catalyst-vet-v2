@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const addressSchema = z.object({
   street: z.string().min(1, 'Street address is required'),
   city: z.string().min(1, 'City is required'),
-  state: z.string().min(2, 'State is required').max(2, 'State must be 2 characters'),
+  state: z.string().min(2, 'State or region is required').max(10, 'State or region must be between 2 and 10 characters'),
   zipCode: z.string().min(5, 'ZIP code must be at least 5 characters'),
   country: z.string().default('US')
 })

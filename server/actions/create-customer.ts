@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidateTag } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { customerIntakeSchema, type CustomerIntakeData } from '@/lib/schemas/customer-intake'
@@ -198,8 +198,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     console.log(`Customer created successfully: ${insertedCustomer.id} by user ${user.id}`)
 
     // Revalidate the customers page to show the new customer
-    revalidatePath('/customers')
-    revalidatePath('/customers/active')
+    revalidateTag('customers')
 
     return {
       success: true,

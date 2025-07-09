@@ -8,7 +8,9 @@ import { useState } from 'react'
 
 export function Address() {
   const countries = getCountries()
-  const [country, setCountry] = useState(countries[0])
+  const [country, setCountry] = useState(
+    () => countries.find((c) => c.code === 'GB') || countries[0]
+  )
 
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -19,10 +21,10 @@ export function Address() {
         className="col-span-2"
       />
       <Input aria-label="City" name="city" placeholder="London" className="col-span-2" />
-      <Listbox aria-label="Region" name="region" placeholder="England">
+      <Listbox aria-label="Region" name="region" placeholder="Select a state...">
         {country.regions.map((region) => (
-          <ListboxOption key={region} value={region}>
-            <ListboxLabel>{region}</ListboxLabel>
+          <ListboxOption key={region.code} value={region.code}>
+            <ListboxLabel>{region.name}</ListboxLabel>
           </ListboxOption>
         ))}
       </Listbox>

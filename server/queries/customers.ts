@@ -16,6 +16,7 @@ export interface CustomerWithPets {
   createdAt: string
   updatedAt: string
   tenantId: string
+  additionalNotes?: string | null
   patients: {
     id: string
     name: string
@@ -60,11 +61,20 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
   
   if (!tenantData) return { data: [], total: 0, page, pageSize, totalPages: 0 }
   
-  // Build base query
+  // Build base query - only select necessary fields and use estimated count for better performance
   let query = supabase
     .from('Owner')
     .select(`
-      *,
+      id,
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      createdAt,
+      updatedAt,
+      tenantId,
+      additionalNotes,
       Patient (
         id,
         name,
@@ -76,7 +86,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
           status
         )
       )
-    `, { count: 'exact' })
+    `, { count: 'estimated' }) // Use estimated count for better performance
     .eq('tenantId', tenantData.tenantId)
 
   // Add search filter
@@ -129,6 +139,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
       createdAt: owner.createdAt,
       updatedAt: owner.updatedAt,
       tenantId: owner.tenantId,
+      additionalNotes: owner.additionalNotes,
       patients: owner.Patient?.map(patient => ({
         id: patient.id,
         name: patient.name,
@@ -218,6 +229,7 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
     createdAt: data.createdAt,
     updatedAt: data.updatedAt,
     tenantId: data.tenantId,
+    additionalNotes: data.additionalNotes,
     patients: data.Patient?.map(patient => ({
       id: patient.id,
       name: patient.name,

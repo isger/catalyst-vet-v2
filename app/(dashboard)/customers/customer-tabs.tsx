@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { usePaginatedCustomers } from '@/hooks/use-customers'
 import { usePagination } from '@/hooks/use-pagination'
 import { TablePagination } from '@/components/ui/table-pagination'
@@ -22,6 +22,10 @@ interface TabProps {
   searchQuery?: string
   sortBy?: string
   initialData?: PaginatedResult<CustomerWithPets>
+}
+
+interface ActiveCustomersProps extends TabProps {
+  onSearchChange?: (search: string) => void
 }
 
 interface SortableHeaderProps {
@@ -55,20 +59,28 @@ function SortableHeader({
   )
 }
 
-export function ActiveCustomers({ initialData }: TabProps) {
+export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersProps) {
   // Initialize pagination with URL parameters and total from initial data
   const pagination = usePagination({
     initialSortBy: 'firstName',
     initialPageSize: 10,
+    initialSearch: searchQuery || '',
     total: initialData?.total || 0,
     useUrlParams: true,
   })
+  
+  // Sync external search query with internal pagination state
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== pagination.search) {
+      pagination.setSearch(searchQuery)
+    }
+  }, [searchQuery, pagination])
 
   // Re-fetch data when pagination changes
   const { customers, total, loading, error } = usePaginatedCustomers({
     page: pagination.page,
     pageSize: pagination.pageSize,
-    search: pagination.search,
+    search: pagination.debouncedSearch, // Use debounced search for API calls
     sortBy: pagination.sortBy,
     sortOrder: pagination.sortOrder,
   })
@@ -171,7 +183,7 @@ export function ActiveCustomers({ initialData }: TabProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {[1, 2, 3].map((i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="h-4 bg-zinc-200 dark:bg-zinc-700 rounded animate-pulse"></div>
@@ -320,18 +332,28 @@ export function ActiveCustomers({ initialData }: TabProps) {
             </TableBody>
           </Table>
 
-          <TablePagination
-            page={pagination.page}
-            pageSize={pagination.pageSize}
-            total={finalTotal}
-            totalPages={pagination.totalPages}
-            hasNextPage={pagination.hasNextPage}
-            hasPreviousPage={pagination.hasPreviousPage}
-            onPageChange={pagination.setPage}
-            onPageSizeChange={pagination.setPageSize}
-            onPreviousPage={pagination.previousPage}
-            onNextPage={pagination.nextPage}
-          />
+          <div className="relative">
+            <TablePagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              total={finalTotal}
+              totalPages={pagination.totalPages}
+              hasNextPage={pagination.hasNextPage}
+              hasPreviousPage={pagination.hasPreviousPage}
+              onPageChange={pagination.setPage}
+              onPageSizeChange={pagination.setPageSize}
+              onPreviousPage={pagination.previousPage}
+              onNextPage={pagination.nextPage}
+            />
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
+                <div className="flex items-center space-x-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-900 border-t-transparent dark:border-white"></div>
+                  <span className="text-sm text-zinc-600 dark:text-zinc-400">Loading...</span>
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>

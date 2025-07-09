@@ -130,6 +130,14 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
               <span className="text-zinc-500 dark:text-zinc-400">No visits yet</span>
             )}
           </DescriptionDetails>
+          <DescriptionTerm>Additional Notes</DescriptionTerm>
+          <DescriptionDetails>
+            {customer.additionalNotes ? (
+              <div className="whitespace-pre-wrap text-sm">{customer.additionalNotes}</div>
+            ) : (
+              <span className="text-zinc-500 dark:text-zinc-400">No additional notes</span>
+            )}
+          </DescriptionDetails>
         </DescriptionList>
       </div>
 
