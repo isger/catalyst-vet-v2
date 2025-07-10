@@ -43,8 +43,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const tenant = tenantData.tenant
   const membership = {
     id: tenantData.membership.id,
-    user_id: tenantData.membership.user_id,
-    tenant_id: tenantData.membership.tenant_id,
+    user_id: tenantData.membership.userId,
+    tenant_id: tenantData.membership.tenantId,
     role: tenantData.membership.role as 'owner' | 'admin' | 'member',
   }
 
