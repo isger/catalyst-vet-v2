@@ -58,13 +58,13 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
       }
     }
 
-    console.log(`🏢 User tenant: ${membershipData.tenantId}`)
+    console.log(`🏢 User tenant: ${membershipData.tenant_id}`)
 
     // Build query to check for duplicates within current tenant only
     let query = supabase
       .from('owner')
       .select('id, first_name, last_name, email, phone, tenant_id')
-      .eq('tenant_id', membershipData.tenantId)
+      .eq('tenant_id', membershipData.tenant_id)
 
     // Check for email match or phone match using proper Supabase syntax
     if (phone && phone.trim()) {
