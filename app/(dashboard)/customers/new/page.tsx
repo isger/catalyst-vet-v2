@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation'
 import { createCustomerFromForm, checkForDuplicateCustomer } from '@/server/actions/create-customer'
 import type { ActionResult } from '@/server/actions/create-customer'
 import { customerIntakeSchema } from '@/lib/schemas/customer-intake'
+import { ZodError } from 'zod'
 import { PlusIcon } from '@heroicons/react/16/solid'
 
 
@@ -90,6 +91,23 @@ export default function NewCustomerPage() {
     }
   }
 
+  // Handle server state changes with toast notifications
+  useEffect(() => {
+    if (state?.error) {
+      toast({
+        title: 'Error',
+        description: state.error,
+        variant: 'destructive',
+      })
+    } else if (state?.success) {
+      toast({
+        title: 'Success',
+        description: 'Customer created successfully!',
+        variant: 'default',
+      })
+    }
+  }, [state, toast])
+
   // Redirect on successful submission
   useEffect(() => {
     if (state?.success && state?.customerId) {
@@ -113,8 +131,8 @@ export default function NewCustomerPage() {
     // Validate form data with Zod before submission
     try {
       const data = {
-        firstName: formData.get('firstName') as string,
-        lastName: formData.get('lastName') as string,
+        first_name: formData.get('firstName') as string,
+        last_name: formData.get('lastName') as string,
         email: formData.get('email') as string,
         phone: formData.get('phone') as string,
         address: {
@@ -127,11 +145,11 @@ export default function NewCustomerPage() {
         gdprConsent: formData.get('gdprConsent') === 'on',
         marketingConsent: false,
         additionalNotes: (formData.get('additionalNotes') as string) || undefined,
-        emergencyContacts: emergencyContacts.filter(contact => 
+        emergencyContact: emergencyContacts.filter(contact => 
           contact.name || contact.phone || contact.relationship
         ).length > 0 ? emergencyContacts.filter(contact => 
           contact.name || contact.phone || contact.relationship
-        ) : undefined
+        )[0] : undefined
       }
       
       // Validate with Zod schema
@@ -140,18 +158,23 @@ export default function NewCustomerPage() {
       // If validation passes, submit to server action
       return formAction(formData)
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const zodError = error as { errors: { path: string[]; message: string }[] }
+      if (error instanceof ZodError) {
         const fieldErrors: Record<string, string> = {}
-        zodError.errors.forEach((err) => {
-          const field = err.path.join('.')
-          fieldErrors[field] = err.message
+        error.issues.forEach((issue) => {
+          const field = issue.path.join('.')
+          fieldErrors[field] = issue.message
         })
         setErrors(fieldErrors)
 
         toast({
           title: 'Validation Error',
           description: 'The form could not be submitted. Please check the fields for errors.',
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Unexpected Error',
+          description: 'An unexpected error occurred. Please try again.',
           variant: 'destructive',
         })
       }
@@ -164,17 +187,6 @@ export default function NewCustomerPage() {
           <Heading>Add Customer</Heading>
           <Divider className="my-10 mt-6"/>
 
-          {state?.error && (
-            <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4">
-              <Text className="text-red-800">{state.error}</Text>
-            </div>
-          )}
-
-          {state?.success && (
-            <div className="mb-6 rounded-lg bg-green-50 border border-green-200 p-4">
-              <Text className="text-green-800">Customer created successfully!</Text>
-            </div>
-          )}
 
           {showDuplicateWarning && duplicateMatches.length > 0 && (
             <div className="mb-6 rounded-lg bg-yellow-50 border border-yellow-200 p-4">

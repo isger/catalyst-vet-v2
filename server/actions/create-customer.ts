@@ -104,8 +104,12 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
 
 export async function createCustomer(data: CustomerIntakeData): Promise<ActionResult> {
   try {
+    console.log('🔍 Starting createCustomer with data:', JSON.stringify(data, null, 2));
+    
     // Validate the input data
+    console.log('✅ Starting Zod validation');
     const validatedData = customerIntakeSchema.parse(data)
+    console.log('✅ Zod validation passed');
     
     console.log(`🚀 Creating customer with email: ${validatedData.email}`)
     
@@ -124,17 +128,22 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     }
     
     // Get the authenticated user and supabase client
+    console.log('🔐 Getting authenticated user');
     const supabase = await createClient()
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
+      console.error('❌ Authentication failed:', authError);
       return {
         success: false,
         error: 'You must be logged in to create customers'
       }
     }
+    
+    console.log('👤 User authenticated:', user.id);
 
     // Get user's tenant information
+    console.log('🏢 Getting user tenant information');
     const { data: membershipData, error: membershipError } = await supabase
       .from('tenant_membership')
       .select('tenant_id')
@@ -143,16 +152,22 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       .single()
 
     if (membershipError || !membershipData) {
+      console.error('❌ Tenant membership error:', membershipError);
+      console.log('📄 Membership data:', membershipData);
       return {
         success: false,
         error: 'Unable to determine your practice association'
       }
     }
+    
+    console.log('🏢 User tenant:', membershipData.tenant_id);
 
     // Generate a unique customer ID
     const customerId = crypto.randomUUID()
+    console.log('🆔 Generated customer ID:', customerId);
 
     // Prepare the owner data for insertion
+    console.log('📋 Preparing owner data for insertion');
     const ownerData: Database['public']['Tables']['owner']['Insert'] = {
       id: customerId,
       first_name: validatedData.first_name,
@@ -169,6 +184,9 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       updated_at: new Date().toISOString()
     }
 
+    console.log('💾 Inserting customer into database');
+    console.log('📊 Owner data to insert:', JSON.stringify(ownerData, null, 2));
+    
     // Insert the new customer
     const { data: insertedCustomer, error: insertError } = await supabase
       .from('owner')
@@ -177,7 +195,14 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       .single()
 
     if (insertError) {
-      console.error('Error creating customer:', insertError)
+      console.error('❌ Database insertion failed:', {
+        error: insertError,
+        code: insertError.code,
+        message: insertError.message,
+        details: insertError.details,
+        hint: insertError.hint
+      });
+      console.log('📊 Data that failed to insert:', JSON.stringify(ownerData, null, 2));
       
       // Handle specific database errors
       if (insertError.code === '23505') { // Unique constraint violation
@@ -249,11 +274,17 @@ function extractEmergencyContacts(formData: FormData) {
 // Alternative server action that handles form data directly
 export async function createCustomerFromForm(formData: FormData): Promise<ActionResult> {
   try {
+    console.log('🚀 createCustomerFromForm server action started');
+    console.log('📦 Raw FormData entries:');
+    for (const [key, value] of formData.entries()) {
+      console.log(`  ${key}: ${value}`);
+    }
+    
     // Extract and structure the form data
     const customerData: CustomerIntakeData = {
       title: formData.get('title') as "Mr." | "Mrs." | "Ms." | "Dr." | "Prof." | "Rev." | undefined || undefined,
-      first_name: formData.get('first_name') as string,
-      last_name: formData.get('last_name') as string,
+      first_name: formData.get('firstName') as string,
+      last_name: formData.get('lastName') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       address: {
@@ -269,6 +300,8 @@ export async function createCustomerFromForm(formData: FormData): Promise<Action
       additionalNotes: (formData.get('additionalNotes') as string) || undefined,
       emergencyContact: extractEmergencyContacts(formData)?.[0] || undefined
     }
+
+    console.log('🔧 Extracted customerData:', JSON.stringify(customerData, null, 2));
 
     return await createCustomer(customerData)
     

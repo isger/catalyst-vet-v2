@@ -24,7 +24,8 @@
       "Bash(npm test:*)",
       "Bash(supabase status:*)",
       "Bash(supabase db pull:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }
