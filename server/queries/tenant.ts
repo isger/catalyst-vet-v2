@@ -5,9 +5,8 @@ import type { Database } from '@/types/supabase'
 type Tenant = Database['public']['Tables']['tenant']['Row']
 type TenantMembership = Database['public']['Tables']['tenant_membership']['Row']
 
-export interface TenantWithMembership {
+export interface TenantWithMembership extends TenantMembership {
   tenant: Tenant
-  membership: TenantMembership
 }
 
 export async function getUserTenantData(userId: string): Promise<TenantWithMembership | null> {
@@ -20,9 +19,9 @@ export async function getUserTenantData(userId: string): Promise<TenantWithMembe
       *,
       tenant (*)
     `)
-    .eq('userId', userId)
+    .eq('user_id', userId)
     .eq('status', 'active')
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error('Error fetching user tenant data:', error)
@@ -34,18 +33,7 @@ export async function getUserTenantData(userId: string): Promise<TenantWithMembe
   }
 
   return {
+    ...data,
     tenant: data.tenant as Tenant,
-    membership: {
-      id: data.id,
-      userId: data.userId,
-      tenantId: data.tenantId,
-      role: data.role,
-      status: data.status,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      invitedAt: data.invitedAt,
-      invitedBy: data.invitedBy,
-      joinedAt: data.joinedAt,
-    }
-  }
+  } as TenantWithMembership
 }

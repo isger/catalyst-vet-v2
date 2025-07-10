@@ -14,247 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      appointment: {
-        Row: {
-          createdAt: string
-          duration: number
-          id: string
-          notes: string | null
-          patientId: string
-          scheduledAt: string
-          status: string
-          tenantId: string
-          type: string
-          updatedAt: string
-          veterinarianId: string
-        }
-        Insert: {
-          createdAt?: string
-          duration: number
-          id: string
-          notes?: string | null
-          patientId: string
-          scheduledAt: string
-          status: string
-          tenantId: string
-          type: string
-          updatedAt: string
-          veterinarianId: string
-        }
-        Update: {
-          createdAt?: string
-          duration?: number
-          id?: string
-          notes?: string | null
-          patientId?: string
-          scheduledAt?: string
-          status?: string
-          tenantId?: string
-          type?: string
-          updatedAt?: string
-          veterinarianId?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Appointment_patientId_fkey"
-            columns: ["patientId"]
-            isOneToOne: false
-            referencedRelation: "patient"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Appointment_tenantId_fkey"
-            columns: ["tenantId"]
-            isOneToOne: false
-            referencedRelation: "tenant"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       emergency_contact: {
         Row: {
-          createdAt: string
+          created_at: string
           email: string | null
-          firstName: string
+          first_name: string
           id: string
-          isAuthorizedForMedicalDecisions: boolean
-          lastName: string
+          is_authorized_for_medical_decisions: boolean
+          last_name: string
           notes: string | null
-          ownerId: string
+          owner_id: string
           phone: string
           relationship: string
-          tenantId: string
-          updatedAt: string
+          tenant_id: string
+          updated_at: string
         }
         Insert: {
-          createdAt?: string
+          created_at?: string
           email?: string | null
-          firstName: string
-          id: string
-          isAuthorizedForMedicalDecisions?: boolean
-          lastName: string
+          first_name: string
+          id?: string
+          is_authorized_for_medical_decisions?: boolean
+          last_name: string
           notes?: string | null
-          ownerId: string
+          owner_id: string
           phone: string
           relationship: string
-          tenantId: string
-          updatedAt: string
+          tenant_id: string
+          updated_at?: string
         }
         Update: {
-          createdAt?: string
+          created_at?: string
           email?: string | null
-          firstName?: string
+          first_name?: string
           id?: string
-          isAuthorizedForMedicalDecisions?: boolean
-          lastName?: string
+          is_authorized_for_medical_decisions?: boolean
+          last_name?: string
           notes?: string | null
-          ownerId?: string
+          owner_id?: string
           phone?: string
           relationship?: string
-          tenantId?: string
-          updatedAt?: string
+          tenant_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "EmergencyContact_ownerId_fkey"
-            columns: ["ownerId"]
+            foreignKeyName: "emergency_contact_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "owner"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "EmergencyContact_tenantId_fkey"
-            columns: ["tenantId"]
-            isOneToOne: false
-            referencedRelation: "tenant"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      invoice: {
-        Row: {
-          appointmentId: string | null
-          createdAt: string
-          dueDate: string
-          id: string
-          items: Json[] | null
-          paidAt: string | null
-          patientId: string
-          status: string
-          subtotal: number
-          tax: number
-          tenantId: string
-          total: number
-          updatedAt: string
-        }
-        Insert: {
-          appointmentId?: string | null
-          createdAt?: string
-          dueDate: string
-          id: string
-          items?: Json[] | null
-          paidAt?: string | null
-          patientId: string
-          status: string
-          subtotal: number
-          tax: number
-          tenantId: string
-          total: number
-          updatedAt: string
-        }
-        Update: {
-          appointmentId?: string | null
-          createdAt?: string
-          dueDate?: string
-          id?: string
-          items?: Json[] | null
-          paidAt?: string | null
-          patientId?: string
-          status?: string
-          subtotal?: number
-          tax?: number
-          tenantId?: string
-          total?: number
-          updatedAt?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Invoice_appointmentId_fkey"
-            columns: ["appointmentId"]
-            isOneToOne: false
-            referencedRelation: "appointment"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Invoice_patientId_fkey"
-            columns: ["patientId"]
-            isOneToOne: false
-            referencedRelation: "patient"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Invoice_tenantId_fkey"
-            columns: ["tenantId"]
-            isOneToOne: false
-            referencedRelation: "tenant"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      medical_record: {
-        Row: {
-          chiefComplaint: string
-          createdAt: string
-          diagnosis: string[] | null
-          id: string
-          notes: string
-          patientId: string
-          prescriptions: Json[] | null
-          tenantId: string
-          treatments: Json[] | null
-          updatedAt: string
-          veterinarianId: string
-          visitDate: string
-        }
-        Insert: {
-          chiefComplaint: string
-          createdAt?: string
-          diagnosis?: string[] | null
-          id: string
-          notes: string
-          patientId: string
-          prescriptions?: Json[] | null
-          tenantId: string
-          treatments?: Json[] | null
-          updatedAt: string
-          veterinarianId: string
-          visitDate: string
-        }
-        Update: {
-          chiefComplaint?: string
-          createdAt?: string
-          diagnosis?: string[] | null
-          id?: string
-          notes?: string
-          patientId?: string
-          prescriptions?: Json[] | null
-          tenantId?: string
-          treatments?: Json[] | null
-          updatedAt?: string
-          veterinarianId?: string
-          visitDate?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "MedicalRecord_patientId_fkey"
-            columns: ["patientId"]
-            isOneToOne: false
-            referencedRelation: "patient"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "MedicalRecord_tenantId_fkey"
-            columns: ["tenantId"]
+            foreignKeyName: "emergency_contact_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
             referencedColumns: ["id"]
@@ -263,54 +76,54 @@ export type Database = {
       }
       owner: {
         Row: {
-          additionalNotes: string | null
+          additional_notes: string | null
           address: Json
-          createdAt: string
+          created_at: string
           email: string
-          firstName: string
-          gdprConsent: boolean
+          first_name: string
+          gdpr_consent: boolean
           id: string
-          lastName: string
+          last_name: string
           phone: string
-          preferredPractice: string | null
-          tenantId: string
+          preferred_practice: string | null
+          tenant_id: string
           title: string | null
-          updatedAt: string
+          updated_at: string
         }
         Insert: {
-          additionalNotes?: string | null
+          additional_notes?: string | null
           address: Json
-          createdAt?: string
+          created_at?: string
           email: string
-          firstName: string
-          gdprConsent?: boolean
-          id: string
-          lastName: string
+          first_name: string
+          gdpr_consent?: boolean
+          id?: string
+          last_name: string
           phone: string
-          preferredPractice?: string | null
-          tenantId: string
+          preferred_practice?: string | null
+          tenant_id: string
           title?: string | null
-          updatedAt: string
+          updated_at?: string
         }
         Update: {
-          additionalNotes?: string | null
+          additional_notes?: string | null
           address?: Json
-          createdAt?: string
+          created_at?: string
           email?: string
-          firstName?: string
-          gdprConsent?: boolean
+          first_name?: string
+          gdpr_consent?: boolean
           id?: string
-          lastName?: string
+          last_name?: string
           phone?: string
-          preferredPractice?: string | null
-          tenantId?: string
+          preferred_practice?: string | null
+          tenant_id?: string
           title?: string | null
-          updatedAt?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "Owner_tenantId_fkey"
-            columns: ["tenantId"]
+            foreignKeyName: "owner_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
             referencedColumns: ["id"]
@@ -320,51 +133,51 @@ export type Database = {
       patient: {
         Row: {
           breed: string | null
-          createdAt: string
-          dateOfBirth: string | null
+          created_at: string
+          date_of_birth: string | null
           id: string
-          microchipId: string | null
+          microchip_id: string | null
           name: string
-          ownerId: string
+          owner_id: string
           species: string
-          tenantId: string
-          updatedAt: string
+          tenant_id: string
+          updated_at: string
         }
         Insert: {
           breed?: string | null
-          createdAt?: string
-          dateOfBirth?: string | null
-          id: string
-          microchipId?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          microchip_id?: string | null
           name: string
-          ownerId: string
+          owner_id: string
           species: string
-          tenantId: string
-          updatedAt: string
+          tenant_id: string
+          updated_at?: string
         }
         Update: {
           breed?: string | null
-          createdAt?: string
-          dateOfBirth?: string | null
+          created_at?: string
+          date_of_birth?: string | null
           id?: string
-          microchipId?: string | null
+          microchip_id?: string | null
           name?: string
-          ownerId?: string
+          owner_id?: string
           species?: string
-          tenantId?: string
-          updatedAt?: string
+          tenant_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "Patient_ownerId_fkey"
-            columns: ["ownerId"]
+            foreignKeyName: "patient_owner_id_fkey"
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "owner"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Patient_tenantId_fkey"
-            columns: ["tenantId"]
+            foreignKeyName: "patient_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
             referencedColumns: ["id"]
@@ -373,88 +186,88 @@ export type Database = {
       }
       tenant: {
         Row: {
-          createdAt: string
-          customDomain: string | null
+          created_at: string
+          custom_domain: string | null
           id: string
           logo: string | null
           name: string
-          primaryColor: string | null
+          primary_color: string | null
           settings: Json
           subdomain: string
-          updatedAt: string
+          updated_at: string
         }
         Insert: {
-          createdAt?: string
-          customDomain?: string | null
-          id: string
+          created_at?: string
+          custom_domain?: string | null
+          id?: string
           logo?: string | null
           name: string
-          primaryColor?: string | null
+          primary_color?: string | null
           settings?: Json
           subdomain: string
-          updatedAt: string
+          updated_at?: string
         }
         Update: {
-          createdAt?: string
-          customDomain?: string | null
+          created_at?: string
+          custom_domain?: string | null
           id?: string
           logo?: string | null
           name?: string
-          primaryColor?: string | null
+          primary_color?: string | null
           settings?: Json
           subdomain?: string
-          updatedAt?: string
+          updated_at?: string
         }
         Relationships: []
       }
       tenant_membership: {
         Row: {
-          createdAt: string
+          created_at: string
           id: string
-          invitedAt: string | null
-          invitedBy: string | null
-          joinedAt: string | null
+          invited_at: string | null
+          invited_by: string | null
+          joined_at: string | null
           role: string
           status: string
-          tenantId: string
-          updatedAt: string
-          userId: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          createdAt?: string
-          id: string
-          invitedAt?: string | null
-          invitedBy?: string | null
-          joinedAt?: string | null
+          created_at?: string
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
           role: string
           status: string
-          tenantId: string
-          updatedAt: string
-          userId: string
+          tenant_id: string
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          createdAt?: string
+          created_at?: string
           id?: string
-          invitedAt?: string | null
-          invitedBy?: string | null
-          joinedAt?: string | null
+          invited_at?: string | null
+          invited_by?: string | null
+          joined_at?: string | null
           role?: string
           status?: string
-          tenantId?: string
-          updatedAt?: string
-          userId?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "TenantMembership_tenantId_fkey"
-            columns: ["tenantId"]
+            foreignKeyName: "tenant_membership_tenant_id_fkey"
+            columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "TenantMembership_userId_fkey"
-            columns: ["userId"]
+            foreignKeyName: "tenant_membership_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "user"
             referencedColumns: ["id"]
@@ -463,31 +276,31 @@ export type Database = {
       }
       user: {
         Row: {
-          createdAt: string
+          created_at: string
           email: string
           id: string
           image: string | null
           name: string | null
           phone: string | null
-          updatedAt: string
+          updated_at: string
         }
         Insert: {
-          createdAt?: string
+          created_at?: string
           email: string
-          id: string
+          id?: string
           image?: string | null
           name?: string | null
           phone?: string | null
-          updatedAt: string
+          updated_at?: string
         }
         Update: {
-          createdAt?: string
+          created_at?: string
           email?: string
           id?: string
           image?: string | null
           name?: string | null
           phone?: string | null
-          updatedAt?: string
+          updated_at?: string
         }
         Relationships: []
       }

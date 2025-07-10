@@ -29,8 +29,8 @@ interface EmergencyContact {
 
 interface DuplicateMatch {
   id: string
-  firstName: string
-  lastName: string
+  first_name: string
+  last_name: string
   email: string
   phone: string
 }
@@ -181,7 +181,7 @@ export default function NewCustomerPage() {
               <Text className="text-yellow-800 font-medium mb-2">⚠️ Potential duplicate customers found:</Text>
               {duplicateMatches.map((match) => (
                 <div key={match.id} className="text-yellow-700 text-sm mb-1">
-                  • {match.firstName} {match.lastName} - {match.email} - {match.phone}
+                  • {match.first_name} {match.last_name} - {match.email} - {match.phone}
                 </div>
               ))}
               <Text className="text-yellow-700 text-sm mt-2">

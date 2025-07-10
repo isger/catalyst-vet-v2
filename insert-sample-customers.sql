@@ -1,12 +1,12 @@
 -- EXECUTE THIS SQL IN YOUR SUPABASE DASHBOARD SQL EDITOR
--- Go to: https://supabase.com/dashboard/project/nttivargznlzofkcbqtn/sql
+-- Go to: https://supabase.com/dashboard/project/YOUR_PROJECT_ID/sql
 
 -- First, check if you have any existing tenants
 -- If you have existing tenants, replace 'sample-tenant-001' with an existing tenant ID
--- You can check with: SELECT id FROM "Tenant" LIMIT 5;
+-- You can check with: SELECT id FROM tenant LIMIT 5;
 
 -- Insert sample tenant (skip if you already have tenants)
-INSERT INTO "Tenant" (id, name, subdomain, settings, "createdAt", "updatedAt") 
+INSERT INTO tenant (id, name, subdomain, settings, created_at, updated_at) 
 VALUES (
   'sample-tenant-001',
   'Catalyst Veterinary Clinic',
@@ -17,7 +17,7 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Insert Sample Owners (Customers)
-INSERT INTO "Owner" (id, "firstName", "lastName", email, phone, address, "tenantId", "createdAt", "updatedAt") VALUES
+INSERT INTO owner (id, first_name, last_name, email, phone, address, tenant_id, created_at, updated_at) VALUES
 ('owner-001', 'Sarah', 'Johnson', 'sarah.johnson@email.com', '555-0123', 
  '{"street": "123 Maple Street", "city": "Springfield", "state": "CA", "zipCode": "90210"}', 
  'sample-tenant-001', NOW() - INTERVAL '45 days', NOW()),
@@ -39,7 +39,7 @@ INSERT INTO "Owner" (id, "firstName", "lastName", email, phone, address, "tenant
  'sample-tenant-001', NOW() - INTERVAL '20 days', NOW());
 
 -- Insert Sample Patients (Pets)
-INSERT INTO "Patient" (id, name, species, breed, "dateOfBirth", "ownerId", "microchipId", "tenantId", "createdAt", "updatedAt") VALUES
+INSERT INTO patient (id, name, species, breed, date_of_birth, owner_id, microchip_id, tenant_id, created_at, updated_at) VALUES
 -- Sarah Johnson's pet
 ('patient-001', 'Max', 'Dog', 'Golden Retriever', '2020-03-15', 'owner-001', 'MC001234567890', 'sample-tenant-001', NOW() - INTERVAL '45 days', NOW()),
 
@@ -58,9 +58,9 @@ INSERT INTO "Patient" (id, name, species, breed, "dateOfBirth", "ownerId", "micr
 ('patient-007', 'Whiskers', 'Cat', 'Maine Coon', '2020-12-03', 'owner-005', 'MC001234567895', 'sample-tenant-001', NOW() - INTERVAL '18 days', NOW());
 
 -- Insert Recent Appointments (to make customers "active")
--- Note: You may need to replace 'vet-001' with an actual user ID from your User table
--- Check existing users with: SELECT id FROM "User" LIMIT 5;
-INSERT INTO "Appointment" (id, "patientId", "veterinarianId", "scheduledAt", duration, type, status, notes, "tenantId", "createdAt", "updatedAt") VALUES
+-- Note: You may need to replace 'vet-001' with an actual user ID from your user table
+-- Check existing users with: SELECT id FROM "user" LIMIT 5;
+INSERT INTO appointment (id, patient_id, veterinarian_id, scheduled_at, duration, type, status, notes, tenant_id, created_at, updated_at) VALUES
 ('appt-001', 'patient-001', 'vet-001', NOW() - INTERVAL '3 days', 60, 'Annual Checkup', 'completed', 'Routine annual examination. Patient in good health.', 'sample-tenant-001', NOW() - INTERVAL '10 days', NOW()),
 
 ('appt-002', 'patient-002', 'vet-001', NOW() - INTERVAL '7 days', 45, 'Vaccination', 'completed', 'Updated vaccinations. No adverse reactions.', 'sample-tenant-001', NOW() - INTERVAL '14 days', NOW()),
@@ -73,13 +73,13 @@ INSERT INTO "Appointment" (id, "patientId", "veterinarianId", "scheduledAt", dur
 
 -- Verify the data was inserted
 SELECT 
-  o."firstName", 
-  o."lastName", 
+  o.first_name, 
+  o.last_name, 
   COUNT(p.id) as pet_count,
-  MAX(a."scheduledAt") as last_appointment
-FROM "Owner" o
-LEFT JOIN "Patient" p ON o.id = p."ownerId"
-LEFT JOIN "Appointment" a ON p.id = a."patientId" AND a.status = 'completed'
+  MAX(a.scheduled_at) as last_appointment
+FROM owner o
+LEFT JOIN patient p ON o.id = p.owner_id
+LEFT JOIN appointment a ON p.id = a.patient_id AND a.status = 'completed'
 WHERE o.id LIKE 'owner-%'
-GROUP BY o.id, o."firstName", o."lastName"
+GROUP BY o.id, o.first_name, o.last_name
 ORDER BY last_appointment DESC;

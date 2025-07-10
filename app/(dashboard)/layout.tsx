@@ -42,10 +42,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Use actual tenant data from database
   const tenant = tenantData.tenant
   const membership = {
-    id: tenantData.membership.id,
-    user_id: tenantData.membership.userId,
-    tenant_id: tenantData.membership.tenantId,
-    role: tenantData.membership.role as 'owner' | 'admin' | 'member',
+    id: tenantData.id,
+    user_id: tenantData.user_id,
+    tenant_id: tenantData.tenant_id,
+    role: tenantData.role as 'owner' | 'admin' | 'member',
   }
 
   return <ApplicationLayout events={events} user={user} tenant={tenant} membership={membership}>{children}</ApplicationLayout>

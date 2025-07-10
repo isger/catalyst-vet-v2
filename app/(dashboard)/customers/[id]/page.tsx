@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const customer = await getCustomerByIdForTenant(id)
 
   return {
-    title: customer && `${customer.firstName} ${customer.lastName}`,
+    title: customer && `${customer.first_name} ${customer.last_name}`,
   }
 }
 
@@ -27,8 +27,8 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
     notFound()
   }
 
-  const customerInitials = `${customer.firstName.charAt(0)}${customer.lastName.charAt(0)}`.toUpperCase()
-  const customerSince = new Date(customer.createdAt).toLocaleDateString('en-US', { 
+  const customerInitials = `${customer.first_name.charAt(0)}${customer.last_name.charAt(0)}`.toUpperCase()
+  const customerSince = new Date(customer.created_at).toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
     day: 'numeric' 
@@ -56,11 +56,11 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
             </div>
             <div className="pt-1.5">
               <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">
-                {customer.firstName} {customer.lastName}
+                {customer.first_name} {customer.last_name}
               </h1>
               <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                 Customer since{' '}
-                <time dateTime={customer.createdAt}>{customerSince}</time>
+                <time dateTime={customer.created_at}>{customerSince}</time>
                 {customer.lastVisit && (
                   <>
                     {' • '}
@@ -103,7 +103,7 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
         <Divider className="mt-4" />
         <DescriptionList>
           <DescriptionTerm>Full Name</DescriptionTerm>
-          <DescriptionDetails>{customer.firstName} {customer.lastName}</DescriptionDetails>
+          <DescriptionDetails>{customer.first_name} {customer.last_name}</DescriptionDetails>
           <DescriptionTerm>Email</DescriptionTerm>
           <DescriptionDetails>{customer.email}</DescriptionDetails>
           <DescriptionTerm>Phone</DescriptionTerm>
@@ -121,7 +121,7 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
             )}
           </DescriptionDetails>
           <DescriptionTerm>Customer Since</DescriptionTerm>
-          <DescriptionDetails>{new Date(customer.createdAt).toLocaleDateString()}</DescriptionDetails>
+          <DescriptionDetails>{new Date(customer.created_at).toLocaleDateString()}</DescriptionDetails>
           <DescriptionTerm>Last Visit</DescriptionTerm>
           <DescriptionDetails>
             {customer.lastVisit ? (
@@ -132,8 +132,8 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
           </DescriptionDetails>
           <DescriptionTerm>Additional Notes</DescriptionTerm>
           <DescriptionDetails>
-            {customer.additionalNotes ? (
-              <div className="whitespace-pre-wrap text-sm">{customer.additionalNotes}</div>
+            {customer.additional_notes ? (
+              <div className="whitespace-pre-wrap text-sm">{customer.additional_notes}</div>
             ) : (
               <span className="text-zinc-500 dark:text-zinc-400">No additional notes</span>
             )}
@@ -152,9 +152,9 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   {pet.species} {pet.breed && `• ${pet.breed}`}
                 </p>
-                {pet.dateOfBirth && (
+                {pet.date_of_birth && (
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Born: {new Date(pet.dateOfBirth).toLocaleDateString()}
+                    Born: {new Date(pet.date_of_birth).toLocaleDateString()}
                   </p>
                 )}
                 <div className="mt-2">

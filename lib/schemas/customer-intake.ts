@@ -38,13 +38,13 @@ export const titleSchema = z.enum(titleOptions).optional()
 export const customerIntakeSchema = z.object({
   // Personal Information
   title: titleSchema,
-  firstName: z.string()
+  first_name: z.string()
     .min(1, 'First name is required')
     .min(2, 'First name must be at least 2 characters')
     .max(50, 'First name must not exceed 50 characters')
     .regex(/^[a-zA-Z\s\-\'\.]+$/, 'First name can only contain letters, spaces, hyphens, and apostrophes'),
   
-  lastName: z.string()
+  last_name: z.string()
     .min(1, 'Last name is required')
     .min(2, 'Last name must be at least 2 characters')
     .max(50, 'Last name must not exceed 50 characters')
@@ -87,8 +87,8 @@ export type AddressData = z.infer<typeof addressSchema>
 // Form step schemas for multi-step validation
 export const personalInfoSchema = customerIntakeSchema.pick({
   title: true,
-  firstName: true,
-  lastName: true,
+  first_name: true,
+  last_name: true,
   email: true,
   phone: true
 })

@@ -4,25 +4,24 @@ import type { Database } from '@/types/supabase'
 // Type helpers for tables
 type Owner = Database['public']['Tables']['owner']['Row']
 type Patient = Database['public']['Tables']['patient']['Row']
-type Appointment = Database['public']['Tables']['appointment']['Row']
 
 export interface CustomerWithPets {
   id: string
-  firstName: string
-  lastName: string
+  first_name: string
+  last_name: string
   email: string
   phone: string
   address: any
-  createdAt: string
-  updatedAt: string
-  tenantId: string
-  additionalNotes?: string | null
+  created_at: string
+  updated_at: string
+  tenant_id: string
+  additional_notes?: string | null
   patients: {
     id: string
     name: string
     species: string
     breed: string | null
-    dateOfBirth: string | null
+    date_of_birth: string | null
   }[]
   lastVisit?: string
 }
@@ -54,8 +53,8 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
   // Get user's tenant
   const { data: tenantData } = await supabase
     .from('tenant_membership')
-    .select('tenantId')
-    .eq('userId', user.id)
+    .select('tenant_id')
+    .eq('user_id', user.id)
     .eq('status', 'active')
     .single()
   
@@ -66,40 +65,41 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
     .from('owner')
     .select(`
       id,
-      firstName,
-      lastName,
+      first_name,
+      last_name,
       email,
       phone,
       address,
-      createdAt,
-      updatedAt,
-      tenantId,
-      additionalNotes,
+      created_at,
+      updated_at,
+      tenant_id,
+      additional_notes,
       patient (
         id,
         name,
         species,
         breed,
-        dateOfBirth,
-        appointment (
-          scheduledAt,
-          status
-        )
+        date_of_birth
       )
     `, { count: 'estimated' }) // Use estimated count for better performance
-    .eq('tenantId', tenantData.tenantId)
+    .eq('tenant_id', tenantData.tenant_id)
 
   // Add search filter
   if (search) {
-    query = query.or(`firstName.ilike.%${search}%,lastName.ilike.%${search}%,email.ilike.%${search}%`)
+    query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`)
   }
 
   // Add sorting
   const ascending = sortOrder === 'asc'
   if (sortBy === 'name') {
-    query = query.order('firstName', { ascending }).order('lastName', { ascending })
+    query = query.order('first_name', { ascending }).order('last_name', { ascending })
   } else {
-    query = query.order(sortBy, { ascending })
+    // Map camelCase to snake_case for sorting
+    const sortField = sortBy === 'createdAt' ? 'created_at' : 
+                      sortBy === 'updatedAt' ? 'updated_at' : 
+                      sortBy === 'firstName' ? 'first_name' :
+                      sortBy === 'lastName' ? 'last_name' : sortBy
+    query = query.order(sortField, { ascending })
   }
 
   // Add pagination
@@ -118,34 +118,26 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
 
   // Transform the data to match our interface
   const customers: CustomerWithPets[] = data.map(owner => {
-    // Get the most recent appointment across all pets
-    const allAppointments = owner.patient?.flatMap(patient => 
-      patient.appointment?.filter(apt => apt.status === 'completed') || []
-    ) || []
-    
-    const lastVisit = allAppointments.length > 0 
-      ? allAppointments
-          .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0]
-          ?.scheduledAt
-      : undefined
+    // TODO: Implement appointment tracking when appointment table is ready
+    const lastVisit = undefined
 
     return {
       id: owner.id,
-      firstName: owner.firstName,
-      lastName: owner.lastName,
+      first_name: owner.first_name,
+      last_name: owner.last_name,
       email: owner.email,
       phone: owner.phone,
       address: owner.address,
-      createdAt: owner.createdAt,
-      updatedAt: owner.updatedAt,
-      tenantId: owner.tenantId,
-      additionalNotes: owner.additionalNotes,
+      created_at: owner.created_at,
+      updated_at: owner.updated_at,
+      tenant_id: owner.tenant_id,
+      additional_notes: owner.additional_notes,
       patients: owner.patient?.map(patient => ({
         id: patient.id,
         name: patient.name,
         species: patient.species,
         breed: patient.breed,
-        dateOfBirth: patient.dateOfBirth
+        date_of_birth: patient.date_of_birth
       })) || [],
       lastVisit
     }
@@ -173,8 +165,8 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
   // Get user's tenant
   const { data: tenantData } = await supabase
     .from('tenant_membership')
-    .select('tenantId')
-    .eq('userId', user.id)
+    .select('tenant_id')
+    .eq('user_id', user.id)
     .eq('status', 'active')
     .single()
   
@@ -190,15 +182,11 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
         name,
         species,
         breed,
-        dateOfBirth,
-        appointment (
-          scheduledAt,
-          status
-        )
+        date_of_birth
       )
     `)
     .eq('id', customerId)
-    .eq('tenantId', tenantData.tenantId)
+    .eq('tenant_id', tenantData.tenant_id)
     .single()
 
   if (error) {
@@ -208,34 +196,26 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
 
   if (!data) return null
 
-  // Get the most recent appointment across all pets
-  const allAppointments = data.patient?.flatMap(patient => 
-    patient.appointment?.filter(apt => apt.status === 'completed') || []
-  ) || []
-  
-  const lastVisit = allAppointments.length > 0 
-    ? allAppointments
-        .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime())[0]
-        ?.scheduledAt
-    : undefined
+  // TODO: Implement appointment tracking when appointment table is ready
+  const lastVisit = undefined
 
   return {
     id: data.id,
-    firstName: data.firstName,
-    lastName: data.lastName,
+    first_name: data.first_name,
+    last_name: data.last_name,
     email: data.email,
     phone: data.phone,
     address: data.address,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
-    tenantId: data.tenantId,
-    additionalNotes: data.additionalNotes,
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+    tenant_id: data.tenant_id,
+    additional_notes: data.additional_notes,
     patients: data.patient?.map(patient => ({
       id: patient.id,
       name: patient.name,
       species: patient.species,
       breed: patient.breed,
-      dateOfBirth: patient.dateOfBirth
+      date_of_birth: patient.date_of_birth
     })) || [],
     lastVisit
   }
@@ -251,8 +231,8 @@ export async function getCustomerStats() {
   // Get user's tenant
   const { data: tenantData } = await supabase
     .from('tenant_membership')
-    .select('tenantId')
-    .eq('userId', user.id)
+    .select('tenant_id')
+    .eq('user_id', user.id)
     .eq('status', 'active')
     .single()
   
@@ -262,16 +242,12 @@ export async function getCustomerStats() {
     .from('owner')
     .select(`
       id,
-      createdAt,
+      created_at,
       patient (
-        id,
-        appointment (
-          status,
-          scheduledAt
-        )
+        id
       )
     `)
-    .eq('tenantId', tenantData.tenantId)
+    .eq('tenant_id', tenantData.tenant_id)
 
   if (error) {
     console.error('Error fetching customer stats:', error)
@@ -292,38 +268,21 @@ export async function getCustomerStats() {
   let inactive = 0
 
   owners.forEach(owner => {
-    const createdDate = new Date(owner.createdAt)
+    const createdDate = new Date(owner.created_at)
     
-    // Get all appointments from all patients
-    const allAppointments = owner.patient?.flatMap(patient => 
-      patient.appointment || []
-    ) || []
+    // TODO: Implement appointment-based statistics when appointment table is ready
+    // For now, just count based on creation date
     
-    const hasRecentAppointment = allAppointments.some(apt => 
-      new Date(apt.scheduledAt) > thirtyDaysAgo
-    )
-    const hasUpcomingAppointment = allAppointments.some(apt => 
-      apt.status === 'scheduled' && new Date(apt.scheduledAt) > now
-    )
-
     // New clients (created in last 30 days)
     if (createdDate > thirtyDaysAgo) {
       newClients++
-    }
-    
-    // Consultation (has upcoming appointments)
-    if (hasUpcomingAppointment) {
-      consultation++
-    }
-    
-    // Active (has recent activity)
-    if (hasRecentAppointment || hasUpcomingAppointment) {
-      active++
-    }
-    
-    // Inactive (no activity in 6+ months)
-    if (!hasRecentAppointment && createdDate < sixMonthsAgo) {
+      active++ // New clients are considered active
+    } else if (createdDate < sixMonthsAgo) {
+      // Inactive (no activity in 6+ months, for now based on creation date)
       inactive++
+    } else {
+      // Active (created within 6 months)
+      active++
     }
   })
 

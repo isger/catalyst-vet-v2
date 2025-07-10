@@ -63,7 +63,7 @@ export function CustomerIntakeForm({
       
       if (result.success && result.customerId) {
         toast.success('Customer created successfully!', {
-          description: `${data.firstName} ${data.lastName} has been added to your practice.`
+          description: `${data.first_name} ${data.last_name} has been added to your practice.`
         })
         
         if (onSuccess) {
@@ -121,28 +121,28 @@ export function CustomerIntakeForm({
 
             <FormField
               label="First Name"
-              id="firstName"
+              id="first_name"
               required
-              error={errors.firstName?.message}
+              error={errors.first_name?.message}
             >
               <Input
-                {...register('firstName')}
+                {...register('first_name')}
                 type="text"
-                error={!!errors.firstName}
+                error={!!errors.first_name}
                 placeholder="John"
               />
             </FormField>
 
             <FormField
               label="Last Name"
-              id="lastName"
+              id="last_name"
               required
-              error={errors.lastName?.message}
+              error={errors.last_name?.message}
             >
               <Input
-                {...register('lastName')}
+                {...register('last_name')}
                 type="text"
-                error={!!errors.lastName}
+                error={!!errors.last_name}
                 placeholder="Doe"
               />
             </FormField>

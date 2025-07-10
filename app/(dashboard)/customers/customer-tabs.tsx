@@ -62,7 +62,7 @@ function SortableHeader({
 export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersProps) {
   // Initialize pagination with URL parameters and total from initial data
   const pagination = usePagination({
-    initialSortBy: 'firstName',
+    initialSortBy: 'first_name',
     initialPageSize: 10,
     initialSearch: searchQuery || '',
     total: initialData?.total || 0,
@@ -92,12 +92,12 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
   const handleSort = (key: string) => {
     // Map display column names to database column names
     const columnMap: Record<string, string> = {
-      name: 'firstName',
+      name: 'first_name',
       email: 'email',
-      lastVisit: 'createdAt', // We'll sort by creation date for now
-      petCount: 'firstName', // Default to name sorting for pet count
+      lastVisit: 'created_at', // We'll sort by creation date for now
+      petCount: 'first_name', // Default to name sorting for pet count
       phone: 'phone',
-      joinDate: 'createdAt',
+      joinDate: 'created_at',
     }
 
     const dbColumn = columnMap[key] || key
@@ -107,12 +107,12 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
   // Helper to determine current sort state for the sortable header
   const getCurrentSort = (column: string) => {
     const columnMap: Record<string, string> = {
-      name: 'firstName',
+      name: 'first_name',
       email: 'email',
-      lastVisit: 'createdAt',
-      petCount: 'firstName',
+      lastVisit: 'created_at',
+      petCount: 'first_name',
       phone: 'phone',
-      joinDate: 'createdAt',
+      joinDate: 'created_at',
     }
 
     const dbColumn = columnMap[column] || column
@@ -296,11 +296,11 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
                 <TableRow
                   key={customer.id}
                   href={`/customers/${customer.id}`}
-                  title={`View ${customer.firstName} ${customer.lastName}'s details`}
+                  title={`View ${customer.first_name} ${customer.last_name}'s details`}
                 >
                   <TableCell>
                     <div className="font-medium text-zinc-950 dark:text-white">
-                      {customer.firstName} {customer.lastName}
+                      {customer.first_name} {customer.last_name}
                     </div>
                   </TableCell>
                   <TableCell className="text-zinc-600 dark:text-zinc-400">
@@ -325,7 +325,7 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
                     {formatLastVisit(customer.lastVisit)}
                   </TableCell>
                   <TableCell className="text-zinc-600 dark:text-zinc-400">
-                    {new Date(customer.createdAt).toLocaleDateString()}
+                    {new Date(customer.created_at).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))}

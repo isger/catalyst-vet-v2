@@ -5,7 +5,7 @@
 -- You may need to update the tenantId values to match your existing tenant
 
 -- Sample tenant (update the ID as needed)
-INSERT INTO "Tenant" (id, name, subdomain, settings, "createdAt", "updatedAt") 
+INSERT INTO tenant (id, name, subdomain, settings, created_at, updated_at) 
 VALUES (
   'tenant-catalyst-vet',
   'Catalyst Veterinary Clinic',
@@ -16,7 +16,7 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Sample Owners (Customers)
-INSERT INTO "Owner" (id, "firstName", "lastName", email, phone, address, "tenantId", "createdAt", "updatedAt") VALUES
+INSERT INTO owner (id, first_name, last_name, email, phone, address, tenant_id, created_at, updated_at) VALUES
 (
   'owner-1',
   'Sarah',
@@ -85,7 +85,7 @@ INSERT INTO "Owner" (id, "firstName", "lastName", email, phone, address, "tenant
 );
 
 -- Sample Patients (Pets)
-INSERT INTO "Patient" (id, name, species, breed, "dateOfBirth", "ownerId", "microchipId", "tenantId", "createdAt", "updatedAt") VALUES
+INSERT INTO patient (id, name, species, breed, date_of_birth, owner_id, microchip_id, tenant_id, created_at, updated_at) VALUES
 -- Sarah Johnson's pets
 (
   'patient-1',
@@ -190,7 +190,7 @@ INSERT INTO "Patient" (id, name, species, breed, "dateOfBirth", "ownerId", "micr
 );
 
 -- Sample Appointments (Recent ones to make customers "active")
-INSERT INTO "Appointment" (id, "patientId", "veterinarianId", "scheduledAt", duration, type, status, notes, "tenantId", "createdAt", "updatedAt") VALUES
+INSERT INTO appointment (id, patient_id, veterinarian_id, scheduled_at, duration, type, status, notes, tenant_id, created_at, updated_at) VALUES
 -- Recent completed appointments
 (
   'appt-1',

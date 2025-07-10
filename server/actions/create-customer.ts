@@ -16,8 +16,8 @@ type DuplicateCheckResult = {
   exists: boolean
   matches?: {
     id: string
-    firstName: string
-    lastName: string
+    first_name: string
+    last_name: string
     email: string
     phone: string
   }[]
@@ -44,8 +44,8 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
     // Get user's tenant information
     const { data: membershipData, error: membershipError } = await supabase
       .from('tenant_membership')
-      .select('tenantId')
-      .eq('userId', user.id)
+      .select('tenant_id')
+      .eq('user_id', user.id)
       .eq('status', 'active')
       .single()
 
@@ -63,17 +63,17 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
     // Build query to check for duplicates within current tenant only
     let query = supabase
       .from('owner')
-      .select('id, firstName, lastName, email, phone, tenantId')
-      .eq('tenantId', membershipData.tenantId)
+      .select('id, first_name, last_name, email, phone, tenant_id')
+      .eq('tenant_id', membershipData.tenantId)
 
     // Check for email match or phone match using proper Supabase syntax
     if (phone && phone.trim()) {
       // Use proper OR syntax with parentheses
       query = query.or(`email.eq."${email}",phone.eq."${phone}"`)
-      console.log(`🔍 Searching for email: "${email}" OR phone: "${phone}" in tenant: ${membershipData.tenantId}`)
+      console.log(`🔍 Searching for email: "${email}" OR phone: "${phone}" in tenant: ${membershipData.tenant_id}`)
     } else {
       query = query.eq('email', email)
-      console.log(`🔍 Searching for email: "${email}" in tenant: ${membershipData.tenantId}`)
+      console.log(`🔍 Searching for email: "${email}" in tenant: ${membershipData.tenant_id}`)
     }
 
     const { data: existingCustomers, error: queryError } = await query
@@ -119,7 +119,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
       console.log(`🚫 Duplicate customer found:`, duplicateCheck.matches)
       return {
         success: false,
-        error: `A customer with this email address already exists: ${duplicateCheck.matches?.[0]?.firstName} ${duplicateCheck.matches?.[0]?.lastName}`
+        error: `A customer with this email address already exists: ${duplicateCheck.matches?.[0]?.first_name} ${duplicateCheck.matches?.[0]?.last_name}`
       }
     }
     
@@ -137,8 +137,8 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     // Get user's tenant information
     const { data: membershipData, error: membershipError } = await supabase
       .from('tenant_membership')
-      .select('tenantId')
-      .eq('userId', user.id)
+      .select('tenant_id')
+      .eq('user_id', user.id)
       .eq('status', 'active')
       .single()
 
@@ -155,19 +155,18 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     // Prepare the owner data for insertion
     const ownerData: Database['public']['Tables']['owner']['Insert'] = {
       id: customerId,
-      firstName: validatedData.firstName,
-      lastName: validatedData.lastName,
+      first_name: validatedData.first_name,
+      last_name: validatedData.last_name,
       email: validatedData.email,
       phone: validatedData.phone,
       title: validatedData.title || null,
       address: validatedData.address,
-      preferredPractice: validatedData.preferredPractice || null,
-      gdprConsent: validatedData.gdprConsent,
-      additionalNotes: validatedData.additionalNotes || null,
-      // emergencyContacts: validatedData.emergencyContact ? [validatedData.emergencyContact] : null,
-      tenantId: membershipData.tenantId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      preferred_practice: validatedData.preferredPractice || null,
+      gdpr_consent: validatedData.gdprConsent,
+      additional_notes: validatedData.additionalNotes || null,
+      tenant_id: membershipData.tenant_id,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
 
     // Insert the new customer
@@ -253,8 +252,8 @@ export async function createCustomerFromForm(formData: FormData): Promise<Action
     // Extract and structure the form data
     const customerData: CustomerIntakeData = {
       title: formData.get('title') as "Mr." | "Mrs." | "Ms." | "Dr." | "Prof." | "Rev." | undefined || undefined,
-      firstName: formData.get('firstName') as string,
-      lastName: formData.get('lastName') as string,
+      first_name: formData.get('first_name') as string,
+      last_name: formData.get('last_name') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       address: {
@@ -312,7 +311,7 @@ export async function getAvailablePractices() {
           subdomain
         )
       `)
-      .eq('userId', user.id)
+      .eq('user_id', user.id)
       .eq('status', 'active')
 
     if (!membershipData) return []

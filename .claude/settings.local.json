@@ -21,7 +21,10 @@
       "Bash(npx tsc:*)",
       "Bash(git restore:*)",
       "Bash(npx eslint:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(supabase status:*)",
+      "Bash(supabase db pull:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
