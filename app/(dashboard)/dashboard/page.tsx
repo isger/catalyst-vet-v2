@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     const { data: membershipData } = await supabase
       .from('tenant_membership')
       .select(`
-        tenant_id,
+        tenantId,
         role,
         status,
         tenant (
@@ -22,7 +22,7 @@ export default async function DashboardPage() {
           subdomain
         )
       `)
-      .eq('user_id', user.id)
+      .eq('userId', user.id)
       .eq('status', 'active')
       .single()
 
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
               <p>User ID: {user?.id}</p>
               {tenantInfo && (
                   <>
-                    <p>Tenant ID: {tenantInfo.tenant_id}</p>
+                    <p>Tenant ID: {tenantInfo.tenantId}</p>
                     <p>Organization: {tenantInfo.tenant?.name}</p>
                     <p>Role: {tenantInfo.role}</p>
                   </>
