@@ -11,18 +11,18 @@ export default async function DashboardPage() {
   let tenantInfo = null
   if (user) {
     const { data: membershipData } = await supabase
-      .from('TenantMembership')
+      .from('tenant_membership')
       .select(`
-        tenantId,
+        tenant_id,
         role,
         status,
-        Tenant (
+        tenant (
           id,
           name,
           subdomain
         )
       `)
-      .eq('userId', user.id)
+      .eq('user_id', user.id)
       .eq('status', 'active')
       .single()
 
@@ -55,8 +55,8 @@ export default async function DashboardPage() {
               <p>User ID: {user?.id}</p>
               {tenantInfo && (
                   <>
-                    <p>Tenant ID: {tenantInfo.tenantId}</p>
-                    <p>Organization: {tenantInfo.Tenant?.name}</p>
+                    <p>Tenant ID: {tenantInfo.tenant_id}</p>
+                    <p>Organization: {tenantInfo.tenant?.name}</p>
                     <p>Role: {tenantInfo.role}</p>
                   </>
               )}

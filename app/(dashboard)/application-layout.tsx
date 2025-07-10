@@ -77,13 +77,13 @@ function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' })
   )
 }
 
-type Tenant = {
+type tenant = {
   id: string
   name: string
   logo: string | null
 }
 
-type Membership = {
+type membership = {
   id: string
   user_id: string
   tenant_id: string
@@ -99,8 +99,8 @@ export function ApplicationLayout({
 }: {
   events: Awaited<ReturnType<typeof getEvents>>
   user: User
-  tenant: Tenant
-  membership: Membership
+  tenant: tenant
+  membership: membership
   children: React.ReactNode
 }) {
   const pathname = usePathname()

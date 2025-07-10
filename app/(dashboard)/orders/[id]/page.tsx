@@ -107,7 +107,7 @@ export default async function Order({ params }: { params: Promise<{ id: string }
           <DescriptionDetails>{order.payment.card.type}</DescriptionDetails>
           <DescriptionTerm>Card expiry</DescriptionTerm>
           <DescriptionDetails>{order.payment.card.expiry}</DescriptionDetails>
-          <DescriptionTerm>Owner</DescriptionTerm>
+          <DescriptionTerm>Customer</DescriptionTerm>
           <DescriptionDetails>{order.customer.name}</DescriptionDetails>
           <DescriptionTerm>Email address</DescriptionTerm>
           <DescriptionDetails>{order.customer.email}</DescriptionDetails>

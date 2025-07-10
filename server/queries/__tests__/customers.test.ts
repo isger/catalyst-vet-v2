@@ -119,14 +119,14 @@ describe('Customer Queries', () => {
                     createdAt: '2023-01-01T00:00:00Z',
                     updatedAt: '2023-01-01T00:00:00Z',
                     tenantId: 'tenant123',
-                    Patient: [
+                    patient: [
                       {
                         id: 'pet1',
                         name: 'Buddy',
                         species: 'Dog',
                         breed: 'Golden Retriever',
                         dateOfBirth: '2020-01-01',
-                        Appointment: [
+                        appointment: [
                           {
                             scheduledAt: '2023-12-01T10:00:00Z',
                             status: 'completed'
@@ -545,17 +545,17 @@ describe('Customer Queries', () => {
         }))
       }
 
-      const mockOwnerQuery = {
+      const mockCustomerQuery = {
         select: vi.fn(() => ({
           eq: vi.fn(() => ({ 
             data: [
               {
                 id: 'owner1',
                 createdAt: twentyDaysAgo.toISOString(),
-                Patient: [
+                patient: [
                   {
                     id: 'pet1',
-                    Appointment: [
+                    appointment: [
                       {
                         status: 'completed',
                         scheduledAt: twentyDaysAgo.toISOString()
@@ -567,10 +567,10 @@ describe('Customer Queries', () => {
               {
                 id: 'owner2',
                 createdAt: twoMonthsAgo.toISOString(),
-                Patient: [
+                patient: [
                   {
                     id: 'pet2',
-                    Appointment: [
+                    appointment: [
                       {
                         status: 'scheduled',
                         scheduledAt: tomorrow.toISOString()
@@ -582,7 +582,7 @@ describe('Customer Queries', () => {
               {
                 id: 'owner3',
                 createdAt: eightMonthsAgo.toISOString(),
-                Patient: []
+                patient: []
               }
             ], 
             error: null 
@@ -592,7 +592,7 @@ describe('Customer Queries', () => {
 
       mockSupabase.from
         .mockReturnValueOnce(mockTenantQuery)
-        .mockReturnValueOnce(mockOwnerQuery)
+        .mockReturnValueOnce(mockCustomerQuery)
 
       const result = await getCustomerStats()
 
@@ -623,7 +623,7 @@ describe('Customer Queries', () => {
         }))
       }
 
-      const mockOwnerQuery = {
+      const mockCustomerQuery = {
         select: vi.fn(() => ({
           eq: vi.fn(() => ({ 
             data: null, 
@@ -634,7 +634,7 @@ describe('Customer Queries', () => {
 
       mockSupabase.from
         .mockReturnValueOnce(mockTenantQuery)
-        .mockReturnValueOnce(mockOwnerQuery)
+        .mockReturnValueOnce(mockCustomerQuery)
 
       const result = await getCustomerStats()
 

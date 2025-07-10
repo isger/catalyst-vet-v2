@@ -2,9 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 // Type helpers for tables
-type Owner = Database['public']['Tables']['Owner']['Row']
-type Patient = Database['public']['Tables']['Patient']['Row']
-type Appointment = Database['public']['Tables']['Appointment']['Row']
+type Owner = Database['public']['Tables']['owner']['Row']
+type Patient = Database['public']['Tables']['patient']['Row']
+type Appointment = Database['public']['Tables']['appointment']['Row']
 
 export interface CustomerWithPets {
   id: string
@@ -53,7 +53,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
   
   // Get user's tenant
   const { data: tenantData } = await supabase
-    .from('TenantMembership')
+    .from('tenant_membership')
     .select('tenantId')
     .eq('userId', user.id)
     .eq('status', 'active')
@@ -63,7 +63,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
   
   // Build base query - only select necessary fields and use estimated count for better performance
   let query = supabase
-    .from('Owner')
+    .from('owner')
     .select(`
       id,
       firstName,
@@ -75,13 +75,13 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
       updatedAt,
       tenantId,
       additionalNotes,
-      Patient (
+      patient (
         id,
         name,
         species,
         breed,
         dateOfBirth,
-        Appointment (
+        appointment (
           scheduledAt,
           status
         )
@@ -119,8 +119,8 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
   // Transform the data to match our interface
   const customers: CustomerWithPets[] = data.map(owner => {
     // Get the most recent appointment across all pets
-    const allAppointments = owner.Patient?.flatMap(patient => 
-      patient.Appointment?.filter(apt => apt.status === 'completed') || []
+    const allAppointments = owner.patient?.flatMap(patient => 
+      patient.appointment?.filter(apt => apt.status === 'completed') || []
     ) || []
     
     const lastVisit = allAppointments.length > 0 
@@ -140,7 +140,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
       updatedAt: owner.updatedAt,
       tenantId: owner.tenantId,
       additionalNotes: owner.additionalNotes,
-      patients: owner.Patient?.map(patient => ({
+      patients: owner.patient?.map(patient => ({
         id: patient.id,
         name: patient.name,
         species: patient.species,
@@ -172,7 +172,7 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
   
   // Get user's tenant
   const { data: tenantData } = await supabase
-    .from('TenantMembership')
+    .from('tenant_membership')
     .select('tenantId')
     .eq('userId', user.id)
     .eq('status', 'active')
@@ -182,16 +182,16 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
   
   // Get specific customer with their patients and latest appointment info, filtered by tenant
   const { data, error } = await supabase
-    .from('Owner')
+    .from('owner')
     .select(`
       *,
-      Patient (
+      patient (
         id,
         name,
         species,
         breed,
         dateOfBirth,
-        Appointment (
+        appointment (
           scheduledAt,
           status
         )
@@ -209,8 +209,8 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
   if (!data) return null
 
   // Get the most recent appointment across all pets
-  const allAppointments = data.Patient?.flatMap(patient => 
-    patient.Appointment?.filter(apt => apt.status === 'completed') || []
+  const allAppointments = data.patient?.flatMap(patient => 
+    patient.appointment?.filter(apt => apt.status === 'completed') || []
   ) || []
   
   const lastVisit = allAppointments.length > 0 
@@ -230,7 +230,7 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
     updatedAt: data.updatedAt,
     tenantId: data.tenantId,
     additionalNotes: data.additionalNotes,
-    patients: data.Patient?.map(patient => ({
+    patients: data.patient?.map(patient => ({
       id: patient.id,
       name: patient.name,
       species: patient.species,
@@ -250,7 +250,7 @@ export async function getCustomerStats() {
   
   // Get user's tenant
   const { data: tenantData } = await supabase
-    .from('TenantMembership')
+    .from('tenant_membership')
     .select('tenantId')
     .eq('userId', user.id)
     .eq('status', 'active')
@@ -259,13 +259,13 @@ export async function getCustomerStats() {
   if (!tenantData) return { active: 0, new: 0, consultation: 0, followUp: 0, inactive: 0 }
   
   const { data: owners, error } = await supabase
-    .from('Owner')
+    .from('owner')
     .select(`
       id,
       createdAt,
-      Patient (
+      patient (
         id,
-        Appointment (
+        appointment (
           status,
           scheduledAt
         )
@@ -295,8 +295,8 @@ export async function getCustomerStats() {
     const createdDate = new Date(owner.createdAt)
     
     // Get all appointments from all patients
-    const allAppointments = owner.Patient?.flatMap(patient => 
-      patient.Appointment || []
+    const allAppointments = owner.patient?.flatMap(patient => 
+      patient.appointment || []
     ) || []
     
     const hasRecentAppointment = allAppointments.some(apt => 

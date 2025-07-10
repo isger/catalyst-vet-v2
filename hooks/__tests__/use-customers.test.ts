@@ -287,13 +287,13 @@ describe('useCustomers hooks', () => {
       const eightMonthsAgo = new Date(now.getTime() - 8 * 30 * 24 * 60 * 60 * 1000)
       const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
-      const mockOwners = [
+      const mockCustomers = [
         {
           id: 'owner1',
           createdAt: twentyDaysAgo.toISOString(),
-          Patient: [
+          patient: [
             {
-              Appointment: [
+              appointment: [
                 {
                   status: 'completed',
                   scheduledAt: twentyDaysAgo.toISOString()
@@ -305,9 +305,9 @@ describe('useCustomers hooks', () => {
         {
           id: 'owner2',
           createdAt: twoMonthsAgo.toISOString(),
-          Patient: [
+          patient: [
             {
-              Appointment: [
+              appointment: [
                 {
                   status: 'scheduled',
                   scheduledAt: tomorrow.toISOString()
@@ -319,12 +319,12 @@ describe('useCustomers hooks', () => {
         {
           id: 'owner3',
           createdAt: eightMonthsAgo.toISOString(),
-          Patient: []
+          patient: []
         }
       ]
 
       mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: mockOwners, error: null }))
+        select: vi.fn(() => ({ data: mockCustomers, error: null }))
       })
 
       const { result } = renderHook(() => useCustomerStats())
@@ -385,17 +385,17 @@ describe('useCustomers hooks', () => {
       expect(result.current.error).toBeNull()
     })
 
-    it('should handle owners with no patients', async () => {
-      const mockOwners = [
+    it('should handle customers with no patients', async () => {
+      const mockCustomers = [
         {
           id: 'owner1',
           createdAt: new Date().toISOString(),
-          Patient: null
+          patient: null
         }
       ]
 
       mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: mockOwners, error: null }))
+        select: vi.fn(() => ({ data: mockCustomers, error: null }))
       })
 
       const { result } = renderHook(() => useCustomerStats())

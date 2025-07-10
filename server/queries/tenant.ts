@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 // Type helpers for tables
-type Tenant = Database['public']['Tables']['Tenant']['Row']
-type TenantMembership = Database['public']['Tables']['TenantMembership']['Row']
+type Tenant = Database['public']['Tables']['tenant']['Row']
+type TenantMembership = Database['public']['Tables']['tenant_membership']['Row']
 
 export interface TenantWithMembership {
   tenant: Tenant
@@ -15,10 +15,10 @@ export async function getUserTenantData(userId: string): Promise<TenantWithMembe
   
   // Get user's active tenant membership with tenant data
   const { data, error } = await supabase
-    .from('TenantMembership')
+    .from('tenant_membership')
     .select(`
       *,
-      Tenant (*)
+      tenant (*)
     `)
     .eq('userId', userId)
     .eq('status', 'active')
@@ -29,12 +29,12 @@ export async function getUserTenantData(userId: string): Promise<TenantWithMembe
     return null
   }
 
-  if (!data || !data.Tenant) {
+  if (!data || !data.tenant) {
     return null
   }
 
   return {
-    tenant: data.Tenant as Tenant,
+    tenant: data.tenant as Tenant,
     membership: {
       id: data.id,
       userId: data.userId,

@@ -43,7 +43,7 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
 
     // Get user's tenant information
     const { data: membershipData, error: membershipError } = await supabase
-      .from('TenantMembership')
+      .from('tenant_membership')
       .select('tenantId')
       .eq('userId', user.id)
       .eq('status', 'active')
@@ -62,7 +62,7 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
 
     // Build query to check for duplicates within current tenant only
     let query = supabase
-      .from('Owner')
+      .from('owner')
       .select('id, firstName, lastName, email, phone, tenantId')
       .eq('tenantId', membershipData.tenantId)
 
@@ -136,7 +136,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
 
     // Get user's tenant information
     const { data: membershipData, error: membershipError } = await supabase
-      .from('TenantMembership')
+      .from('tenant_membership')
       .select('tenantId')
       .eq('userId', user.id)
       .eq('status', 'active')
@@ -153,7 +153,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     const customerId = crypto.randomUUID()
 
     // Prepare the owner data for insertion
-    const ownerData: Database['public']['Tables']['Owner']['Insert'] = {
+    const ownerData: Database['public']['Tables']['owner']['Insert'] = {
       id: customerId,
       firstName: validatedData.firstName,
       lastName: validatedData.lastName,
@@ -172,7 +172,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
 
     // Insert the new customer
     const { data: insertedCustomer, error: insertError } = await supabase
-      .from('Owner')
+      .from('owner')
       .insert(ownerData)
       .select()
       .single()
@@ -304,9 +304,9 @@ export async function getAvailablePractices() {
 
     // Get user's tenant information
     const { data: membershipData } = await supabase
-      .from('TenantMembership')
+      .from('tenant_membership')
       .select(`
-        Tenant (
+        tenant (
           id,
           name,
           subdomain
@@ -318,9 +318,9 @@ export async function getAvailablePractices() {
     if (!membershipData) return []
 
     return membershipData.map(membership => ({
-      id: membership.Tenant.id,
-      name: membership.Tenant.name,
-      subdomain: membership.Tenant.subdomain
+      id: membership.tenant.id,
+      name: membership.tenant.name,
+      subdomain: membership.tenant.subdomain
     }))
 
   } catch (error) {

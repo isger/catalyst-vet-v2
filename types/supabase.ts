@@ -7,9 +7,14 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
-      Appointment: {
+      appointment: {
         Row: {
           createdAt: string
           duration: number
@@ -54,19 +59,79 @@ export type Database = {
             foreignKeyName: "Appointment_patientId_fkey"
             columns: ["patientId"]
             isOneToOne: false
-            referencedRelation: "Patient"
+            referencedRelation: "patient"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "Appointment_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
         ]
       }
-      Invoice: {
+      emergency_contact: {
+        Row: {
+          createdAt: string
+          email: string | null
+          firstName: string
+          id: string
+          isAuthorizedForMedicalDecisions: boolean
+          lastName: string
+          notes: string | null
+          ownerId: string
+          phone: string
+          relationship: string
+          tenantId: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          email?: string | null
+          firstName: string
+          id: string
+          isAuthorizedForMedicalDecisions?: boolean
+          lastName: string
+          notes?: string | null
+          ownerId: string
+          phone: string
+          relationship: string
+          tenantId: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          email?: string | null
+          firstName?: string
+          id?: string
+          isAuthorizedForMedicalDecisions?: boolean
+          lastName?: string
+          notes?: string | null
+          ownerId?: string
+          phone?: string
+          relationship?: string
+          tenantId?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "EmergencyContact_ownerId_fkey"
+            columns: ["ownerId"]
+            isOneToOne: false
+            referencedRelation: "owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "EmergencyContact_tenantId_fkey"
+            columns: ["tenantId"]
+            isOneToOne: false
+            referencedRelation: "tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice: {
         Row: {
           appointmentId: string | null
           createdAt: string
@@ -117,26 +182,26 @@ export type Database = {
             foreignKeyName: "Invoice_appointmentId_fkey"
             columns: ["appointmentId"]
             isOneToOne: false
-            referencedRelation: "Appointment"
+            referencedRelation: "appointment"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "Invoice_patientId_fkey"
             columns: ["patientId"]
             isOneToOne: false
-            referencedRelation: "Patient"
+            referencedRelation: "patient"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "Invoice_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
         ]
       }
-      MedicalRecord: {
+      medical_record: {
         Row: {
           chiefComplaint: string
           createdAt: string
@@ -184,19 +249,19 @@ export type Database = {
             foreignKeyName: "MedicalRecord_patientId_fkey"
             columns: ["patientId"]
             isOneToOne: false
-            referencedRelation: "Patient"
+            referencedRelation: "patient"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "MedicalRecord_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
         ]
       }
-      Owner: {
+      owner: {
         Row: {
           additionalNotes: string | null
           address: Json
@@ -247,12 +312,12 @@ export type Database = {
             foreignKeyName: "Owner_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
         ]
       }
-      Patient: {
+      patient: {
         Row: {
           breed: string | null
           createdAt: string
@@ -294,26 +359,19 @@ export type Database = {
             foreignKeyName: "Patient_ownerId_fkey"
             columns: ["ownerId"]
             isOneToOne: false
-            referencedRelation: "Owner"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "Patient_ownerId_fkey"
-            columns: ["ownerId"]
-            isOneToOne: false
-            referencedRelation: "OwnerDetails"
+            referencedRelation: "owner"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "Patient_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
         ]
       }
-      Tenant: {
+      tenant: {
         Row: {
           createdAt: string
           customDomain: string | null
@@ -349,7 +407,7 @@ export type Database = {
         }
         Relationships: []
       }
-      TenantMembership: {
+      tenant_membership: {
         Row: {
           createdAt: string
           id: string
@@ -391,19 +449,19 @@ export type Database = {
             foreignKeyName: "TenantMembership_tenantId_fkey"
             columns: ["tenantId"]
             isOneToOne: false
-            referencedRelation: "Tenant"
+            referencedRelation: "tenant"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "TenantMembership_userId_fkey"
             columns: ["userId"]
             isOneToOne: false
-            referencedRelation: "User"
+            referencedRelation: "user"
             referencedColumns: ["id"]
           },
         ]
       }
-      User: {
+      user: {
         Row: {
           createdAt: string
           email: string
@@ -435,37 +493,13 @@ export type Database = {
       }
     }
     Views: {
-      OwnerDetails: {
-        Row: {
-          additionalNotes: string | null
-          address: Json | null
-          createdAt: string | null
-          email: string | null
-          firstName: string | null
-          gdprConsent: boolean | null
-          id: string | null
-          lastName: string | null
-          phone: string | null
-          practiceName: string | null
-          practiceSubdomain: string | null
-          preferredPractice: string | null
-          tenantId: string | null
-          title: string | null
-          updatedAt: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Owner_tenantId_fkey"
-            columns: ["tenantId"]
-            isOneToOne: false
-            referencedRelation: "Tenant"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_audit_triggers: {
+        Args: { target_table: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -476,21 +510,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -508,14 +546,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -531,14 +571,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -554,14 +596,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -569,14 +613,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
