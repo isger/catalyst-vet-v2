@@ -184,7 +184,7 @@ export function ApplicationLayout({
                 <UserCircleIcon />
                 <SidebarLabel>Customers</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/orders" current={pathname.startsWith('/orders')}>
+              <SidebarItem href="/animals" current={pathname.startsWith('/orders')}>
                 <HeartIcon />
                 <SidebarLabel>Animals</SidebarLabel>
               </SidebarItem>
