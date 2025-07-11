@@ -157,6 +157,30 @@ body {
   animation: shake 0.5s ease-in-out;
 }
 
+/* Prevent content shifting when scrollbars appear */
+.scrollbar-gutter {
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Fallback for browsers that don't support scrollbar-gutter */
+@supports not (scrollbar-gutter: stable) {
+  .scrollbar-gutter {
+    padding-right: calc(100vw - 100%);
+  }
+}
+
+/* Apply to body to prevent page-level shifting */
+body {
+  scrollbar-gutter: stable;
+}
+
+/* Fallback for body on unsupported browsers */
+@supports not (scrollbar-gutter: stable) {
+  body {
+    margin-right: calc(100vw - 100%);
+  }
+}
+
 /* Reduced motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
   * {

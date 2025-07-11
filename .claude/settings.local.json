@@ -25,7 +25,8 @@
       "Bash(supabase status:*)",
       "Bash(supabase db pull:*)",
       "Bash(mv:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }
