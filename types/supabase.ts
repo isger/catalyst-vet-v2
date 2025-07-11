@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      animal: {
+        Row: {
+          allergies: Json
+          behavioral_notes: string | null
+          breed: string | null
+          color: string | null
+          created_at: string
+          date_of_birth: string | null
+          dietary_requirements: string | null
+          gender: string | null
+          id: string
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          medical_conditions: Json
+          medications: Json
+          microchip_id: string | null
+          name: string
+          owner_id: string
+          species: string
+          tenant_id: string
+          updated_at: string
+          weight_kg: number | null
+        }
+        Insert: {
+          allergies?: Json
+          behavioral_notes?: string | null
+          breed?: string | null
+          color?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary_requirements?: string | null
+          gender?: string | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          medical_conditions?: Json
+          medications?: Json
+          microchip_id?: string | null
+          name: string
+          owner_id: string
+          species: string
+          tenant_id: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Update: {
+          allergies?: Json
+          behavioral_notes?: string | null
+          breed?: string | null
+          color?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          dietary_requirements?: string | null
+          gender?: string | null
+          id?: string
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          medical_conditions?: Json
+          medications?: Json
+          microchip_id?: string | null
+          name?: string
+          owner_id?: string
+          species?: string
+          tenant_id?: string
+          updated_at?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "animal_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animal_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emergency_contact: {
         Row: {
           created_at: string
@@ -74,6 +158,79 @@ export type Database = {
           },
         ]
       }
+      medical_record: {
+        Row: {
+          animal_id: string
+          created_at: string
+          diagnosis: string | null
+          follow_up_date: string | null
+          id: string
+          lab_results: Json | null
+          medications: Json | null
+          notes: string | null
+          tenant_id: string
+          treatment: string | null
+          updated_at: string
+          veterinarian: string
+          visit_date: string
+          visit_type: string
+        }
+        Insert: {
+          animal_id: string
+          created_at?: string
+          diagnosis?: string | null
+          follow_up_date?: string | null
+          id?: string
+          lab_results?: Json | null
+          medications?: Json | null
+          notes?: string | null
+          tenant_id: string
+          treatment?: string | null
+          updated_at?: string
+          veterinarian: string
+          visit_date: string
+          visit_type: string
+        }
+        Update: {
+          animal_id?: string
+          created_at?: string
+          diagnosis?: string | null
+          follow_up_date?: string | null
+          id?: string
+          lab_results?: Json | null
+          medications?: Json | null
+          notes?: string | null
+          tenant_id?: string
+          treatment?: string | null
+          updated_at?: string
+          veterinarian?: string
+          visit_date?: string
+          visit_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medical_record_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animal"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_record_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animal_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "medical_record_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       owner: {
         Row: {
           additional_notes: string | null
@@ -123,60 +280,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "owner_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenant"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      patient: {
-        Row: {
-          breed: string | null
-          created_at: string
-          date_of_birth: string | null
-          id: string
-          microchip_id: string | null
-          name: string
-          owner_id: string
-          species: string
-          tenant_id: string
-          updated_at: string
-        }
-        Insert: {
-          breed?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          id?: string
-          microchip_id?: string | null
-          name: string
-          owner_id: string
-          species: string
-          tenant_id: string
-          updated_at?: string
-        }
-        Update: {
-          breed?: string | null
-          created_at?: string
-          date_of_birth?: string | null
-          id?: string
-          microchip_id?: string | null
-          name?: string
-          owner_id?: string
-          species?: string
-          tenant_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patient_owner_id_fkey"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "owner"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "patient_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
@@ -304,14 +407,149 @@ export type Database = {
         }
         Relationships: []
       }
+      vaccination: {
+        Row: {
+          administered_by: string | null
+          administered_date: string
+          animal_id: string
+          batch_number: string | null
+          created_at: string
+          expiration_date: string | null
+          id: string
+          manufacturer: string | null
+          notes: string | null
+          tenant_id: string
+          updated_at: string
+          vaccine_name: string
+          vaccine_type: string
+        }
+        Insert: {
+          administered_by?: string | null
+          administered_date: string
+          animal_id: string
+          batch_number?: string | null
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          manufacturer?: string | null
+          notes?: string | null
+          tenant_id: string
+          updated_at?: string
+          vaccine_name: string
+          vaccine_type: string
+        }
+        Update: {
+          administered_by?: string | null
+          administered_date?: string
+          animal_id?: string
+          batch_number?: string | null
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          manufacturer?: string | null
+          notes?: string | null
+          tenant_id?: string
+          updated_at?: string
+          vaccine_name?: string
+          vaccine_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccination_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animal"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_animal_id_fkey"
+            columns: ["animal_id"]
+            isOneToOne: false
+            referencedRelation: "animal_with_owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      animal_with_owner: {
+        Row: {
+          allergies: Json | null
+          behavioral_notes: string | null
+          breed: string | null
+          color: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          dietary_requirements: string | null
+          gender: string | null
+          id: string | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          medical_conditions: Json | null
+          medications: Json | null
+          microchip_id: string | null
+          name: string | null
+          owner_email: string | null
+          owner_first_name: string | null
+          owner_id: string | null
+          owner_last_name: string | null
+          owner_phone: string | null
+          species: string | null
+          tenant_id: string | null
+          updated_at: string | null
+          weight_kg: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "animal_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "owner"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animal_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenant"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       add_audit_triggers: {
         Args: { target_table: string }
         Returns: undefined
+      }
+      check_tenant_membership: {
+        Args: { tenant_id: string; user_id: string }
+        Returns: boolean
+      }
+      get_upcoming_vaccinations: {
+        Args: { days_ahead?: number; tenant_id_param?: string }
+        Returns: {
+          animal_id: string
+          animal_name: string
+          species: string
+          breed: string
+          owner_id: string
+          owner_first_name: string
+          owner_last_name: string
+          owner_email: string
+          owner_phone: string
+          vaccine_name: string
+          vaccine_type: string
+          expiration_date: string
+          days_until_expiration: number
+        }[]
       }
     }
     Enums: {

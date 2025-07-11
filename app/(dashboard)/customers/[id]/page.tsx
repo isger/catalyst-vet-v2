@@ -6,6 +6,7 @@ import { Divider } from '@/components/ui/divider'
 import { Subheading } from '@/components/ui/heading'
 import { Link } from '@/components/ui/link'
 import { getCustomerByIdForTenant } from '@/server/queries/customers'
+import { CustomerEditWrapper } from '@/components/features/customers/customer-edit-wrapper'
 import { ChevronLeftIcon, EnvelopeIcon, PhoneIcon } from '@heroicons/react/16/solid'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
@@ -19,8 +20,17 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 }
 
-export default async function CustomerDetail({ params }: { params: Promise<{ id: string }> }) {
+export default async function CustomerDetail({ 
+  params,
+  searchParams 
+}: { 
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const { id } = await params
+  const { tab, edit } = await searchParams
+  const activeTab = typeof tab === 'string' ? tab : 'customer-info'
+  const isEditMode = edit === 'true'
   const customer = await getCustomerByIdForTenant(id)
 
   if (!customer) {
@@ -33,6 +43,19 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
     month: 'long', 
     day: 'numeric' 
   })
+
+  const tabs = [
+    { name: 'Customer Information', value: 'customer-info' },
+    { name: 'Insurance', value: 'insurance' },
+    { name: 'Financial', value: 'financial' },
+    { name: 'Communications', value: 'communications' }
+  ]
+
+  // Convert searchParams to URLSearchParams for client component
+  const currentSearchParams = new URLSearchParams()
+  if (activeTab !== 'customer-info') {
+    currentSearchParams.set('tab', activeTab)
+  }
 
   return (
     <>
@@ -79,129 +102,189 @@ export default async function CustomerDetail({ params }: { params: Promise<{ id:
                   <PhoneIcon className="size-4 shrink-0 fill-zinc-400 dark:fill-zinc-500" />
                   <span>{customer.phone}</span>
                 </span>
-                {customer.patients.length > 0 && (
+                {customer.animals.length > 0 && (
                   <Badge color="lime" className="text-xs">
-                    {customer.patients.length} pet{customer.patients.length !== 1 ? 's' : ''}
+                    {customer.animals.length} pet{customer.animals.length !== 1 ? 's' : ''}
                   </Badge>
                 )}
               </div>
             </div>
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
-            <Button outline>
-              Edit Customer
-            </Button>
+            <CustomerEditWrapper
+              customer={customer}
+              customerId={id}
+              isEditMode={isEditMode}
+              currentSearchParams={currentSearchParams}
+            />
             <Button color="indigo">
-              Schedule Appointment
+              Add Pet
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="mt-12">
-        <Subheading>Customer Information</Subheading>
-        <Divider className="mt-4" />
-        <DescriptionList>
-          <DescriptionTerm>Full Name</DescriptionTerm>
-          <DescriptionDetails>{customer.first_name} {customer.last_name}</DescriptionDetails>
-          <DescriptionTerm>Email</DescriptionTerm>
-          <DescriptionDetails>{customer.email}</DescriptionDetails>
-          <DescriptionTerm>Phone</DescriptionTerm>
-          <DescriptionDetails>{customer.phone}</DescriptionDetails>
-          <DescriptionTerm>Address</DescriptionTerm>
-          <DescriptionDetails>
-            {customer.address ? (
-              <div>
-                <div>{customer.address.street}</div>
-                <div>{customer.address.city}, {customer.address.state} {customer.address.zip}</div>
-                <div>{customer.address.country}</div>
-              </div>
-            ) : (
-              <span className="text-zinc-500 dark:text-zinc-400">No address on file</span>
-            )}
-          </DescriptionDetails>
-          <DescriptionTerm>Customer Since</DescriptionTerm>
-          <DescriptionDetails>{new Date(customer.created_at).toLocaleDateString()}</DescriptionDetails>
-          <DescriptionTerm>Last Visit</DescriptionTerm>
-          <DescriptionDetails>
-            {customer.lastVisit ? (
-              new Date(customer.lastVisit).toLocaleDateString()
-            ) : (
-              <span className="text-zinc-500 dark:text-zinc-400">No visits yet</span>
-            )}
-          </DescriptionDetails>
-          <DescriptionTerm>Additional Notes</DescriptionTerm>
-          <DescriptionDetails>
-            {customer.additional_notes ? (
-              <div className="whitespace-pre-wrap text-sm">{customer.additional_notes}</div>
-            ) : (
-              <span className="text-zinc-500 dark:text-zinc-400">No additional notes</span>
-            )}
-          </DescriptionDetails>
-        </DescriptionList>
-      </div>
-
-      <div className="mt-12">
-        <Subheading>Pets</Subheading>
-        <Divider className="mt-4" />
-        {customer.patients.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {customer.patients.map((pet) => (
-              <div key={pet.id} className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
-                <h4 className="font-medium text-zinc-950 dark:text-white">{pet.name}</h4>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  {pet.species} {pet.breed && `• ${pet.breed}`}
-                </p>
-                {pet.date_of_birth && (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Born: {new Date(pet.date_of_birth).toLocaleDateString()}
-                  </p>
-                )}
-                <div className="mt-2">
-                  <Badge color="zinc" className="text-xs">Pet ID: {pet.id}</Badge>
-                </div>
-              </div>
+      {/* Tab Navigation */}
+      <div className="mt-8">
+        <div className="border-b border-gray-200 dark:border-zinc-700">
+          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
+            {tabs.map((tab) => (
+              <Link
+                key={tab.value}
+                href={`/customers/${id}?tab=${tab.value}`}
+                className={`flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${
+                  tab.value === activeTab
+                    ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:border-zinc-600 dark:hover:text-gray-300'
+                }`}
+              >
+                {tab.name}
+              </Link>
             ))}
-          </div>
-        ) : (
-          <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-            <p className="text-zinc-500 dark:text-zinc-400">No pets registered yet</p>
-            <Button className="mt-4" outline>Add Pet</Button>
-          </div>
+          </nav>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-8">
+        {activeTab === 'customer-info' && (
+          <>
+            <Subheading>Customer Information</Subheading>
+            <Divider className="mt-4" />
+            
+            {isEditMode ? (
+              <div className="mt-6">
+                <CustomerEditWrapper
+                  customer={customer}
+                  customerId={id}
+                  isEditMode={isEditMode}
+                  currentSearchParams={currentSearchParams}
+                />
+              </div>
+            ) : (
+              <DescriptionList>
+                <DescriptionTerm>Additional Notes</DescriptionTerm>
+                <DescriptionDetails>
+                  {customer.additional_notes ? (
+                      <div className="whitespace-pre-wrap text-sm">{customer.additional_notes}</div>
+                  ) : (
+                      <span className="text-zinc-500 dark:text-zinc-400">No additional notes</span>
+                  )}
+                </DescriptionDetails>
+                <DescriptionTerm>Full Name</DescriptionTerm>
+                <DescriptionDetails>{customer.first_name} {customer.last_name}</DescriptionDetails>
+                <DescriptionTerm>Email</DescriptionTerm>
+                <DescriptionDetails>{customer.email}</DescriptionDetails>
+                <DescriptionTerm>Phone</DescriptionTerm>
+                <DescriptionDetails>{customer.phone}</DescriptionDetails>
+                <DescriptionTerm>Address</DescriptionTerm>
+                <DescriptionDetails>
+                  {customer.address ? (
+                    <div>
+                      <div>{customer.address.street}</div>
+                      <div>{customer.address.city}, {customer.address.state} {customer.address.zip}</div>
+                      <div>{customer.address.country}</div>
+                    </div>
+                  ) : (
+                    <span className="text-zinc-500 dark:text-zinc-400">No address on file</span>
+                  )}
+                </DescriptionDetails>
+                <DescriptionTerm>Customer Since</DescriptionTerm>
+                <DescriptionDetails>{new Date(customer.created_at).toLocaleDateString()}</DescriptionDetails>
+                <DescriptionTerm>Last Visit</DescriptionTerm>
+                <DescriptionDetails>
+                  {customer.lastVisit ? (
+                    new Date(customer.lastVisit).toLocaleDateString()
+                  ) : (
+                    <span className="text-zinc-500 dark:text-zinc-400">No visits yet</span>
+                  )}
+                </DescriptionDetails>
+              </DescriptionList>
+            )}
+
+            {!isEditMode && (
+              <div className="mt-12">
+                <Subheading>Pets</Subheading>
+                <Divider className="mt-4" />
+                {customer.animals.length > 0 ? (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {customer.animals.map((pet) => (
+                      <div key={pet.id} className="rounded-lg border border-zinc-200 dark:border-zinc-800 p-4">
+                        <h4 className="font-medium text-zinc-950 dark:text-white">{pet.name}</h4>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                          {pet.species} {pet.breed && `• ${pet.breed}`}
+                        </p>
+                        {pet.date_of_birth && (
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            Born: {new Date(pet.date_of_birth).toLocaleDateString()}
+                          </p>
+                        )}
+                        <div className="mt-2">
+                          <Badge color="zinc" className="text-xs">Pet ID: {pet.id}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                    <p className="text-zinc-500 dark:text-zinc-400">No pets registered yet</p>
+                    <Button className="mt-4" outline>Add Pet</Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
-      </div>
 
-      <div className="mt-12">
-        <Subheading>Appointment History</Subheading>
-        <Divider className="mt-4" />
-        <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-          <p className="text-zinc-500 dark:text-zinc-400">Appointment history coming soon</p>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
-            View and manage all past and upcoming appointments
-          </p>
-        </div>
-      </div>
+        {activeTab === 'insurance' && (
+          <>
+            <Subheading>Insurance Information</Subheading>
+            <Divider className="mt-4" />
+            <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+              <p className="text-zinc-500 dark:text-zinc-400">Insurance information coming soon</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                Manage pet insurance policies, coverage details, and claims
+              </p>
+            </div>
+          </>
+        )}
 
-      <div className="mt-12">
-        <Subheading>Medical Records</Subheading>
-        <Divider className="mt-4" />
-        <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-          <p className="text-zinc-500 dark:text-zinc-400">Medical records coming soon</p>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
-            Access vaccination records, treatments, and medical notes
-          </p>
-        </div>
-      </div>
+        {activeTab === 'financial' && (
+          <>
+            <Subheading>Billing & Payments</Subheading>
+            <Divider className="mt-4" />
+            <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+              <p className="text-zinc-500 dark:text-zinc-400">Billing information coming soon</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                View invoices, payments, and outstanding balances
+              </p>
+            </div>
+          </>
+        )}
 
-      <div className="mt-12">
-        <Subheading>Billing & Payments</Subheading>
-        <Divider className="mt-4" />
-        <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-          <p className="text-zinc-500 dark:text-zinc-400">Billing information coming soon</p>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
-            View invoices, payments, and outstanding balances
-          </p>
-        </div>
+        {activeTab === 'communications' && (
+          <>
+            <Subheading>Appointment History</Subheading>
+            <Divider className="mt-4" />
+            <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+              <p className="text-zinc-500 dark:text-zinc-400">Appointment history coming soon</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                View and manage all past and upcoming appointments
+              </p>
+            </div>
+
+            <div className="mt-12">
+              <Subheading>Communications Log</Subheading>
+              <Divider className="mt-4" />
+              <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                <p className="text-zinc-500 dark:text-zinc-400">Communication logs coming soon</p>
+                <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                  Track emails, calls, and messages with this customer
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   )

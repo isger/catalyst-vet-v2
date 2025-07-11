@@ -3,7 +3,7 @@ import type { Database } from '@/types/supabase'
 
 // Type helpers for tables
 type Owner = Database['public']['Tables']['owner']['Row']
-type Patient = Database['public']['Tables']['patient']['Row']
+type Animal = Database['public']['Tables']['animal']['Row']
 
 export interface CustomerWithPets {
   id: string
@@ -16,7 +16,7 @@ export interface CustomerWithPets {
   updated_at: string
   tenant_id: string
   additional_notes?: string | null
-  patients: {
+  animals: {
     id: string
     name: string
     species: string
@@ -74,7 +74,7 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
       updated_at,
       tenant_id,
       additional_notes,
-      patient (
+      animal (
         id,
         name,
         species,
@@ -132,12 +132,12 @@ export async function getActiveCustomers(params: PaginationParams = {}): Promise
       updated_at: owner.updated_at,
       tenant_id: owner.tenant_id,
       additional_notes: owner.additional_notes,
-      patients: owner.patient?.map(patient => ({
-        id: patient.id,
-        name: patient.name,
-        species: patient.species,
-        breed: patient.breed,
-        date_of_birth: patient.date_of_birth
+      animals: owner.animal?.map(animal => ({
+        id: animal.id,
+        name: animal.name,
+        species: animal.species,
+        breed: animal.breed,
+        date_of_birth: animal.date_of_birth
       })) || [],
       lastVisit
     }
@@ -172,12 +172,12 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
   
   if (!tenantData) return null
   
-  // Get specific customer with their patients and latest appointment info, filtered by tenant
+  // Get specific customer with their animals and latest appointment info, filtered by tenant
   const { data, error } = await supabase
     .from('owner')
     .select(`
       *,
-      patient (
+      animal (
         id,
         name,
         species,
@@ -210,12 +210,12 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
     updated_at: data.updated_at,
     tenant_id: data.tenant_id,
     additional_notes: data.additional_notes,
-    patients: data.patient?.map(patient => ({
-      id: patient.id,
-      name: patient.name,
-      species: patient.species,
-      breed: patient.breed,
-      date_of_birth: patient.date_of_birth
+    animals: data.animal?.map(animal => ({
+      id: animal.id,
+      name: animal.name,
+      species: animal.species,
+      breed: animal.breed,
+      date_of_birth: animal.date_of_birth
     })) || [],
     lastVisit
   }
@@ -243,7 +243,7 @@ export async function getCustomerStats() {
     .select(`
       id,
       created_at,
-      patient (
+      animal (
         id
       )
     `)

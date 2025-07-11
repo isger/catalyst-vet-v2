@@ -142,14 +142,14 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
   }
 
   const formatPets = (
-    patients: { name: string; breed: string | null; species: string }[],
+    animals: { name: string; breed: string | null; species: string }[],
   ) => {
-    if (!patients || patients.length === 0) return 'No pets'
-    if (patients.length === 1) {
-      const pet = patients[0]
+    if (!animals || animals.length === 0) return 'No pets'
+    if (animals.length === 1) {
+      const pet = animals[0]
       return `${pet.name} (${pet.breed || pet.species})`
     }
-    return `${patients.length} pets`
+    return `${animals.length} pets`
   }
 
   const formatPhone = (phone: string) => {
@@ -312,11 +312,11 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
                   <TableCell className="text-zinc-600 dark:text-zinc-400">
                     <div className="flex flex-col">
                       <span className="font-medium">
-                        {formatPets(customer.patients)}
+                        {formatPets(customer.animals)}
                       </span>
-                      {customer.patients.length > 1 && (
+                      {customer.animals.length > 1 && (
                         <span className="text-xs text-zinc-500 dark:text-zinc-500">
-                          {customer.patients.map((p) => p.name).join(', ')}
+                          {customer.animals.map((p) => p.name).join(', ')}
                         </span>
                       )}
                     </div>

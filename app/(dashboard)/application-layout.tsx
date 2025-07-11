@@ -184,13 +184,13 @@ export function ApplicationLayout({
                 <UserCircleIcon />
                 <SidebarLabel>Customers</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/events" current={pathname.startsWith('/events')}>
-                <Square2StackIcon />
-                <SidebarLabel>Events</SidebarLabel>
-              </SidebarItem>
               <SidebarItem href="/orders" current={pathname.startsWith('/orders')}>
                 <HeartIcon />
                 <SidebarLabel>Animals</SidebarLabel>
+              </SidebarItem>
+              <SidebarItem href="/events" current={pathname.startsWith('/events')}>
+                <Square2StackIcon />
+                <SidebarLabel>Events</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/calendar" current={pathname.startsWith('/calendar')}>
                 <CalendarIcon />

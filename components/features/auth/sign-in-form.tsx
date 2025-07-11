@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { useState } from 'react'
 import { signIn } from '@/server/actions/auth'
 import {
   Form,
@@ -16,7 +17,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { useFormStatus } from 'react-dom'
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -25,21 +25,19 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
-  
+function SubmitButton({ isLoading }: { isLoading: boolean }) {
   return (
     <Button 
       type="submit" 
       className="w-full transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98]" 
-      disabled={pending}
+      disabled={isLoading}
     >
       <div className="flex items-center justify-center gap-2">
-        {pending && (
+        {isLoading && (
           <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full"></div>
         )}
-        <span className={`transition-all duration-200 ${pending ? 'opacity-80' : 'opacity-100'}`}>
-          {pending ? 'Signing in...' : 'Sign In'}
+        <span className={`transition-all duration-200 ${isLoading ? 'opacity-80' : 'opacity-100'}`}>
+          {isLoading ? 'Signing in...' : 'Sign In'}
         </span>
       </div>
     </Button>
@@ -49,6 +47,7 @@ function SubmitButton() {
 export function SignInForm() {
   const router = useRouter()
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -59,17 +58,23 @@ export function SignInForm() {
   })
 
   async function onSubmit(data: FormData) {
-    const result = await signIn(data)
+    setIsLoading(true)
     
-    if (result?.error) {
-      toast({
-        title: 'Error',
-        description: result.error,
-        variant: 'destructive',
-      })
-    } else if (result?.success) {
-      router.push('/dashboard')
-      router.refresh()
+    try {
+      const result = await signIn(data)
+      
+      if (result?.error) {
+        toast({
+          title: 'Error',
+          description: result.error,
+          variant: 'destructive',
+        })
+      } else if (result?.success) {
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -112,7 +117,7 @@ export function SignInForm() {
             </FormItem>
           )}
         />
-        <SubmitButton />
+        <SubmitButton isLoading={isLoading} />
       </form>
     </Form>
   )
