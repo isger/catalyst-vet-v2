@@ -334,6 +334,34 @@ export function useAnimalsByOwner(ownerId: string | null) {
   }
 }
 
+// Hook compatible with customer pagination pattern
+export function usePaginatedAnimals(params: {
+  page?: number
+  pageSize?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+}) {
+  const { animals, totalCount, totalPages, currentPage, pageSize, loading, error, refresh } = useAnimals({
+    page: params.page,
+    pageSize: params.pageSize,
+    search: params.search,
+    sortBy: params.sortBy,
+    sortOrder: params.sortOrder,
+  })
+
+  return {
+    animals,
+    total: totalCount,
+    page: currentPage,
+    pageSize,
+    totalPages,
+    loading,
+    error,
+    refetch: refresh
+  }
+}
+
 // Hook for animal statistics
 export function useAnimalStats() {
   const [stats, setStats] = useState({
