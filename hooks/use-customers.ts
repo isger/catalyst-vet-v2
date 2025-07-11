@@ -4,8 +4,17 @@ import { useState, useEffect, useCallback } from 'react'
 import type { CustomerWithPets, PaginationParams, PaginatedResult } from '@/server/queries/customers'
 import { fetchPaginatedCustomers } from '@/server/actions/customers'
 import { useRequestCache } from './use-request-cache'
+import { useRealtimeCustomers } from './use-realtime-customers'
+import type { Database } from '@/types/supabase'
 
-export function usePaginatedCustomers(params: PaginationParams) {
+type CustomerRow = Database['public']['Tables']['customer']['Row']
+
+export interface UsePaginatedCustomersOptions extends PaginationParams {
+  enableRealtime?: boolean
+  tenantId?: string
+}
+
+export function usePaginatedCustomers(params: UsePaginatedCustomersOptions) {
   const [data, setData] = useState<PaginatedResult<CustomerWithPets>>({
     data: [],
     total: 0,
@@ -56,6 +65,46 @@ export function usePaginatedCustomers(params: PaginationParams) {
   const refetch = useCallback(() => {
     fetchCustomers(params)
   }, [fetchCustomers, params])
+
+  // Real-time updates (optional)
+  const { enableRealtime = false, tenantId } = params
+  
+  const handleCustomerAdded = useCallback((customer: CustomerRow) => {
+    // Only add if it matches current filters/search
+    if (!params.search || 
+        customer.name?.toLowerCase().includes(params.search.toLowerCase()) ||
+        customer.email?.toLowerCase().includes(params.search.toLowerCase()) ||
+        customer.phone?.includes(params.search)) {
+      setData(prev => ({
+        ...prev,
+        data: [customer as any, ...prev.data].slice(0, prev.pageSize),
+        total: prev.total + 1
+      }))
+    }
+  }, [params.search])
+
+  const handleCustomerUpdated = useCallback((customer: CustomerRow) => {
+    setData(prev => ({
+      ...prev,
+      data: prev.data.map(c => c.id === customer.id ? { ...c, ...customer } : c)
+    }))
+  }, [])
+
+  const handleCustomerDeleted = useCallback((customerId: string) => {
+    setData(prev => ({
+      ...prev,
+      data: prev.data.filter(c => c.id !== customerId),
+      total: Math.max(0, prev.total - 1)
+    }))
+  }, [])
+
+  useRealtimeCustomers({
+    onCustomerAdded: handleCustomerAdded,
+    onCustomerUpdated: handleCustomerUpdated,
+    onCustomerDeleted: handleCustomerDeleted,
+    tenantId,
+    enabled: enableRealtime
+  })
 
   return { 
     customers: data.data,

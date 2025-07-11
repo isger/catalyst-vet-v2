@@ -3,6 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { fetchPaginatedAnimals } from '@/server/queries/animals'
 import type { PaginatedAnimalsResult, AnimalWithOwner } from '@/server/queries/animals'
+import { useRealtimeAnimals } from './use-realtime-animals'
+import type { Database } from '@/types/supabase'
+
+type AnimalRow = Database['public']['Tables']['animal']['Row']
 
 export interface UseAnimalsOptions {
   page?: number
@@ -11,6 +15,9 @@ export interface UseAnimalsOptions {
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
   initialData?: PaginatedAnimalsResult
+  enableRealtime?: boolean
+  tenantId?: string
+  ownerId?: string
 }
 
 export interface UseAnimalsResult {
@@ -32,7 +39,10 @@ export function useAnimals(options: UseAnimalsOptions = {}): UseAnimalsResult {
     search = '',
     sortBy = 'created_at',
     sortOrder = 'desc',
-    initialData
+    initialData,
+    enableRealtime = false,
+    tenantId,
+    ownerId
   } = options
 
   const [state, setState] = useState<{
@@ -111,6 +121,45 @@ export function useAnimals(options: UseAnimalsOptions = {}): UseAnimalsResult {
   const refresh = useCallback(async () => {
     await fetchAnimals()
   }, [fetchAnimals])
+
+  // Real-time updates (optional)
+  const handleAnimalAdded = useCallback((animal: AnimalRow) => {
+    // Only add if it matches current filters/search
+    if (!search || 
+        animal.name?.toLowerCase().includes(search.toLowerCase()) ||
+        animal.species?.toLowerCase().includes(search.toLowerCase()) ||
+        animal.breed?.toLowerCase().includes(search.toLowerCase())) {
+      setState(prev => ({
+        ...prev,
+        animals: [animal as any, ...prev.animals].slice(0, prev.pageSize),
+        totalCount: prev.totalCount + 1
+      }))
+    }
+  }, [search])
+
+  const handleAnimalUpdated = useCallback((animal: AnimalRow) => {
+    setState(prev => ({
+      ...prev,
+      animals: prev.animals.map(a => a.id === animal.id ? { ...a, ...animal } : a)
+    }))
+  }, [])
+
+  const handleAnimalDeleted = useCallback((animalId: string) => {
+    setState(prev => ({
+      ...prev,
+      animals: prev.animals.filter(a => a.id !== animalId),
+      totalCount: Math.max(0, prev.totalCount - 1)
+    }))
+  }, [])
+
+  useRealtimeAnimals({
+    onAnimalAdded: handleAnimalAdded,
+    onAnimalUpdated: handleAnimalUpdated,
+    onAnimalDeleted: handleAnimalDeleted,
+    ownerId,
+    tenantId,
+    enabled: enableRealtime
+  })
 
   // Fetch data when filters change
   useEffect(() => {

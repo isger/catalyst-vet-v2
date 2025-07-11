@@ -32,7 +32,7 @@ export default async function AnimalsPage({
 
   return (
     <>
-      <div className="md:flex md:items-center md:justify-between">
+      <div className="md:flex md:items-center md:justify-between mb-8">
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl/7 font-bold text-zinc-950 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
             Animal Management
