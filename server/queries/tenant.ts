@@ -9,11 +9,11 @@ export interface TenantWithMembership extends TenantMembership {
   tenant: Tenant
 }
 
-export async function getUserTenantData(userId: string): Promise<TenantWithMembership | null> {
+export async function getUserTenantData(userId: string, tenantId?: string): Promise<TenantWithMembership | null> {
   const supabase = await createClient()
   
   // Get user's active tenant membership with tenant data
-  const { data, error } = await supabase
+  let query = supabase
     .from('tenant_membership')
     .select(`
       *,
@@ -21,7 +21,13 @@ export async function getUserTenantData(userId: string): Promise<TenantWithMembe
     `)
     .eq('user_id', userId)
     .eq('status', 'active')
-    .maybeSingle()
+  
+  // If tenantId is provided, filter by specific tenant
+  if (tenantId) {
+    query = query.eq('tenant_id', tenantId)
+  }
+  
+  const { data, error } = await query.maybeSingle()
 
   if (error) {
     console.error('Error fetching user tenant data:', error)

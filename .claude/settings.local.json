@@ -26,7 +26,9 @@
       "Bash(supabase db pull:*)",
       "Bash(mv:*)",
       "Bash(sed:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git pull:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": []
   }
