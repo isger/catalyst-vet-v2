@@ -176,7 +176,7 @@ export function ApplicationLayout({
 
           <SidebarBody>
             <SidebarSection>
-              <SidebarItem href="/dashboard" current={pathname === '/'}>
+              <SidebarItem href="/dashboard" current={pathname === '/' || pathname === '/dashboard'}>
                 <HomeIcon />
                 <SidebarLabel>Dashboard</SidebarLabel>
               </SidebarItem>
@@ -184,7 +184,7 @@ export function ApplicationLayout({
                 <UserCircleIcon />
                 <SidebarLabel>Customers</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/animals" current={pathname.startsWith('/orders')}>
+              <SidebarItem href="/animals" current={pathname.startsWith('/animals')}>
                 <HeartIcon />
                 <SidebarLabel>Animals</SidebarLabel>
               </SidebarItem>
@@ -196,7 +196,11 @@ export function ApplicationLayout({
                 <CalendarIcon />
                 <SidebarLabel>Calendar</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
+              <SidebarItem href="/orders" current={pathname.startsWith('/orders')}>
+                <Square2StackIcon />
+                <SidebarLabel>Orders</SidebarLabel>
+              </SidebarItem>
+              <SidebarItem href="/financial" current={pathname.startsWith('/financial')}>
                 <BanknotesIcon />
                 <SidebarLabel>Financial</SidebarLabel>
               </SidebarItem>
