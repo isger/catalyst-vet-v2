@@ -110,5 +110,5 @@ export const RESERVED_SUBDOMAINS = [
  * Check if subdomain is reserved
  */
 export function isReservedSubdomain(subdomain: string): boolean {
-  return RESERVED_SUBDOMAINS.includes(subdomain as any)
+  return RESERVED_SUBDOMAINS.includes(subdomain as typeof RESERVED_SUBDOMAINS[number])
 }

@@ -1,4 +1,4 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 import { getSubdomainFromRequest, isReservedSubdomain } from '@/lib/tenant/subdomain'
 import { cachedResolveTenantBySubdomain, cachedResolveTenantByDomain } from '@/lib/tenant/cache'

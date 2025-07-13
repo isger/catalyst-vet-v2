@@ -7,7 +7,7 @@ import { useRequestCache } from './use-request-cache'
 import { useRealtimeCustomers } from './use-realtime-customers'
 import type { Database } from '@/types/supabase'
 
-type CustomerRow = Database['public']['Tables']['customer']['Row']
+type CustomerRow = Database['public']['Tables']['owner']['Row']
 
 export interface UsePaginatedCustomersOptions extends PaginationParams {
   enableRealtime?: boolean
@@ -72,7 +72,8 @@ export function usePaginatedCustomers(params: UsePaginatedCustomersOptions) {
   const handleCustomerAdded = useCallback((customer: CustomerRow) => {
     // Only add if it matches current filters/search
     if (!params.search || 
-        customer.name?.toLowerCase().includes(params.search.toLowerCase()) ||
+        customer.first_name?.toLowerCase().includes(params.search.toLowerCase()) ||
+        customer.last_name?.toLowerCase().includes(params.search.toLowerCase()) ||
         customer.email?.toLowerCase().includes(params.search.toLowerCase()) ||
         customer.phone?.includes(params.search)) {
       setData(prev => ({

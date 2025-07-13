@@ -40,5 +40,6 @@ export {
 } from './cache'
 
 // Re-export types
-export type { Database } from '@/types/supabase'
+import type { Database } from '@/types/supabase'
+export type { Database }
 export type Tenant = Database['public']['Tables']['tenant']['Row']

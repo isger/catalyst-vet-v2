@@ -67,7 +67,7 @@ export function RealtimeExample() {
   // Raw real-time events for demonstration
   useRealtimeCustomers({
     onAnyChange: (payload) => {
-      addEvent(`Customer ${payload.eventType}: ${payload.new?.name || payload.old?.name}`)
+      addEvent(`Customer ${payload.eventType}: ${payload.new?.first_name || payload.old?.first_name}`)
     },
     tenantId: 'your-tenant-id',
     enabled: realtimeEnabled
@@ -99,7 +99,7 @@ export function RealtimeExample() {
         </div>
         <Button 
           onClick={toggleRealtime}
-          variant={realtimeEnabled ? "destructive" : "default"}
+          color={realtimeEnabled ? "red" : "dark/zinc"}
         >
           {realtimeEnabled ? 'Disable' : 'Enable'} Real-time
         </Button>
@@ -112,7 +112,7 @@ export function RealtimeExample() {
             <CardTitle className="flex items-center gap-2">
               Real-time Stats
               {realtimeEnabled && (
-                <Badge variant="secondary" className="animate-pulse">
+                <Badge color="zinc" className="animate-pulse">
                   Live
                 </Badge>
               )}
@@ -151,7 +151,7 @@ export function RealtimeExample() {
             <CardTitle className="flex items-center gap-2">
               Recent Customers
               {realtimeEnabled && (
-                <Badge variant="secondary" className="animate-pulse">
+                <Badge color="zinc" className="animate-pulse">
                   Live
                 </Badge>
               )}
@@ -168,10 +168,10 @@ export function RealtimeExample() {
                 {customers.slice(0, 5).map((customer) => (
                   <div key={customer.id} className="flex justify-between items-center p-2 border rounded">
                     <div>
-                      <p className="font-medium">{customer.name}</p>
+                      <p className="font-medium">{customer.first_name} {customer.last_name}</p>
                       <p className="text-sm text-muted-foreground">{customer.email}</p>
                     </div>
-                    <Badge variant="outline">
+                    <Badge color="zinc">
                       {customer.animals?.length || 0} pets
                     </Badge>
                   </div>
@@ -217,7 +217,7 @@ export function RealtimeExample() {
           <CardTitle className="flex items-center gap-2">
             Recent Animals
             {realtimeEnabled && (
-              <Badge variant="secondary" className="animate-pulse">
+              <Badge color="zinc" className="animate-pulse">
                 Live
               </Badge>
             )}
@@ -235,10 +235,10 @@ export function RealtimeExample() {
                 <div key={animal.id} className="border rounded p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium">{animal.name}</h3>
-                    <Badge variant="outline">{animal.species}</Badge>
+                    <Badge color="zinc">{animal.species}</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Owner: {animal.owner?.name || 'Unknown'}
+                    Owner: {animal.owner ? `${animal.owner.first_name} ${animal.owner.last_name}` : 'Unknown'}
                   </p>
                   {animal.breed && (
                     <p className="text-sm text-muted-foreground">
