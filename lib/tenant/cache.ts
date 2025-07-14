@@ -16,8 +16,8 @@ interface CacheEntry {
 // In-memory cache for tenant resolution
 const tenantCache = new Map<string, CacheEntry>()
 
-// Cache TTL in milliseconds (5 minutes default)
-const DEFAULT_TTL = 5 * 60 * 1000
+// Cache TTL in milliseconds (30 minutes for better performance)
+const DEFAULT_TTL = 30 * 60 * 1000
 
 /**
  * Generate cache key for tenant lookup
@@ -138,7 +138,7 @@ if (typeof window === 'undefined') {
 }
 
 /**
- * Cached tenant resolution functions
+ * Cached tenant resolution functions with optimized imports
  */
 export async function cachedResolveTenantBySubdomain(subdomain: string): Promise<Tenant | null> {
   // Check cache first
@@ -147,11 +147,13 @@ export async function cachedResolveTenantBySubdomain(subdomain: string): Promise
     return cached
   }
   
-  // Cache miss - resolve and cache
+  // Cache miss - resolve and cache with longer TTL for frequently accessed tenants
   const { resolveTenantBySubdomain } = await import('./resolver')
   const tenant = await resolveTenantBySubdomain(subdomain)
   
-  setCachedTenant('subdomain', subdomain, tenant)
+  // Use longer TTL for found tenants, shorter for null results
+  const cacheTTL = tenant ? DEFAULT_TTL : 5 * 60 * 1000 // 5 min for null results
+  setCachedTenant('subdomain', subdomain, tenant, cacheTTL)
   
   return tenant
 }
@@ -167,7 +169,9 @@ export async function cachedResolveTenantByDomain(domain: string): Promise<Tenan
   const { resolveTenantByDomain } = await import('./resolver')
   const tenant = await resolveTenantByDomain(domain)
   
-  setCachedTenant('domain', domain, tenant)
+  // Use longer TTL for found tenants, shorter for null results
+  const cacheTTL = tenant ? DEFAULT_TTL : 5 * 60 * 1000
+  setCachedTenant('domain', domain, tenant, cacheTTL)
   
   return tenant
 }

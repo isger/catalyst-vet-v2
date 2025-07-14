@@ -3,10 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   
-  // Enable experimental features for subdomain support
+  // Enable experimental features for subdomain support and performance
   experimental: {
     // Allow dynamic imports for server-side tenant resolution
-    optimizePackageImports: ['@supabase/supabase-js']
+    optimizePackageImports: ['@supabase/supabase-js', '@supabase/ssr'],
+    // Enable performance optimizations
+    optimisticClientCache: true,
   },
   
   // Configure hostname rewrites for development

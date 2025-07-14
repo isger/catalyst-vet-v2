@@ -2,6 +2,7 @@ import { getEvents } from '@/data'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { connection } from 'next/server'
 import { ApplicationLayout } from './application-layout'
 import { getUserTenantData } from '@/server/queries/tenant'
 import { getTenantById, checkTenantAccess } from '@/lib/tenant/resolver'
@@ -17,17 +18,27 @@ type Membership = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Warm connections early for better performance
+  await connection()
+  
+  // Parallel data fetching for improved performance
+  const [
+    supabaseClient,
+    events,
+    headersList
+  ] = await Promise.all([
+    createClient(),
+    getEvents(),
+    headers()
+  ])
+  
+  const { data: { user } } = await supabaseClient.auth.getUser()
   
   // Fallback protection - redirect to signin if not authenticated
   // This should rarely happen due to middleware, but provides extra security
   if (!user) {
     redirect('/signin')
   }
-  
-  const events = await getEvents()
-  const headersList = await headers()
   
   // Check if we have tenant from subdomain/custom domain (set by middleware)
   const tenantId = headersList.get('x-tenant-id')
@@ -37,16 +48,19 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   let membership: Membership
   
   if (tenantId) {
-    // We have a tenant from subdomain/custom domain
-    tenant = await getTenantById(tenantId)
+    // Parallel tenant operations for better performance
+    const [tenantResult, hasAccess, tenantData] = await Promise.all([
+      getTenantById(tenantId),
+      checkTenantAccess(user.id, tenantId),
+      getUserTenantData(user.id, tenantId)
+    ])
+    
+    tenant = tenantResult
     
     if (!tenant) {
       // Tenant not found
       return new Response('Tenant not found', { status: 404 })
     }
-    
-    // Check if user has access to this tenant
-    const hasAccess = await checkTenantAccess(user.id, tenantId)
     
     if (!hasAccess) {
       // User doesn't have access to this tenant
@@ -54,7 +68,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     }
     
     // Get user's membership for this tenant
-    const tenantData = await getUserTenantData(user.id, tenantId)
     if (tenantData) {
       membership = {
         id: tenantData.id,

@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { signOut } from '@/server/actions/auth'
 
-export default async function DashboardPage() {
+async function UserInfo() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -30,39 +32,61 @@ export default async function DashboardPage() {
   }
 
   return (
-      <>
-        <div className="md:flex md:items-center md:justify-between mb-2">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-2xl/7 font-bold text-zinc-950 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
-              Dashboard
-            </h2>
-          </div>
-          <form onSubmit={signOut}>
-            <Button type="submit">
-              Sign Out
-            </Button>
-          </form>
+    <div className="space-y-1 text-sm text-muted-foreground">
+      <p>User ID: {user?.id}</p>
+      {tenantInfo && (
+        <>
+          <p>Tenant ID: {tenantInfo.tenant_id}</p>
+          <p>Organization: {tenantInfo.tenant?.name}</p>
+          <p>Role: {tenantInfo.role}</p>
+        </>
+      )}
+    </div>
+  )
+}
+
+function UserInfoSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-64" />
+      <Skeleton className="h-4 w-56" />
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="h-4 w-32" />
+    </div>
+  )
+}
+
+export default async function DashboardPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  return (
+    <>
+      <div className="md:flex md:items-center md:justify-between mb-2">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl/7 font-bold text-zinc-950 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
+            Dashboard
+          </h2>
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Welcome!</CardTitle>
-            <CardDescription>
-              You are signed in as {user?.email}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p>User ID: {user?.id}</p>
-              {tenantInfo && (
-                  <>
-                    <p>Tenant ID: {tenantInfo.tenant_id}</p>
-                    <p>Organization: {tenantInfo.tenant?.name}</p>
-                    <p>Role: {tenantInfo.role}</p>
-                  </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </>
+        <form onSubmit={signOut}>
+          <Button type="submit">
+            Sign Out
+          </Button>
+        </form>
+      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome!</CardTitle>
+          <CardDescription>
+            You are signed in as {user?.email}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<UserInfoSkeleton />}>
+            <UserInfo />
+          </Suspense>
+        </CardContent>
+      </Card>
+    </>
   )
 }
