@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { signOut } from '@/server/actions/auth'
+import { DonutChart } from '@/components/charts/donut-chart'
+import { AreaChart } from '@/components/charts/area-chart'
+import { BarChart } from '@/components/charts/bar-chart'
+import { LineChart } from '@/components/charts/line-chart'
+import { RadialBarChart } from '@/components/charts/radial-bar-chart'
 
 async function UserInfo() {
   const supabase = await createClient()
@@ -62,7 +67,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <div className="md:flex md:items-center md:justify-between mb-2">
+      <div className="mb-8 md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl/7 font-bold text-zinc-950 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
             Dashboard
@@ -74,19 +79,33 @@ export default async function DashboardPage() {
           </Button>
         </form>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Welcome!</CardTitle>
-          <CardDescription>
-            You are signed in as {user?.email}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<UserInfoSkeleton />}>
-            <UserInfo />
-          </Suspense>
-        </CardContent>
-      </Card>
+      
+      <div className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Welcome!</CardTitle>
+            <CardDescription>
+              You are signed in as {user?.email}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Suspense fallback={<UserInfoSkeleton />}>
+              <UserInfo />
+            </Suspense>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DonutChart />
+          <AreaChart />
+          <BarChart />
+          <LineChart />
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          <RadialBarChart />
+        </div>
+      </div>
     </>
   )
 }

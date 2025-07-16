@@ -1,6 +1,6 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
+  "name": "catalyst-vet",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
@@ -32,6 +32,7 @@
     "@tailwindcss/forms": "^0.5.10",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "apexcharts": "^5.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -41,6 +42,7 @@
     "next": "15.3.3",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
+    "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
     "sonner": "^2.0.4",
