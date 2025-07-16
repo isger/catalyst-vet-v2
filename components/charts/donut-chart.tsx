@@ -51,7 +51,7 @@ export function DonutChart({
       colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
       stroke: {
         colors: ['transparent'],
-        lineCap: ''
+        lineCap: 'butt' as const
       },
       plotOptions: {
         pie: {
@@ -68,7 +68,7 @@ export function DonutChart({
                 show: true,
                 label: 'Total Visits',
                 fontFamily: 'Inter, sans-serif',
-                formatter: function (w: any) {
+                formatter: function (w: { globals: { seriesTotals: number[] } }) {
                   const sum = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0)
                   return sum.toFixed(0)
                 },
@@ -141,7 +141,7 @@ export function DonutChart({
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
             </svg>
           </div>
-          <Button variant="outline" size="sm">
+          <Button outline>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 18">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
             </svg>
@@ -203,7 +203,7 @@ export function DonutChart({
             <option>Last 90 days</option>
           </select>
           
-          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
+          <Button plain className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
             Patient Analysis
             <svg className="w-2.5 h-2.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 6 10">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>

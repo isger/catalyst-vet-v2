@@ -89,8 +89,7 @@ export function BarChart({
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
         markers: {
-          width: 8,
-          height: 8
+          size: 8
         }
       },
       grid: {
@@ -133,7 +132,7 @@ export function BarChart({
             <CardTitle className="text-xl font-bold">{title}</CardTitle>
             <CardDescription className="mt-1">{description}</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
+          <Button outline>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 18">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
             </svg>
@@ -168,7 +167,7 @@ export function BarChart({
             </div>
           </div>
           
-          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
+          <Button plain className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
             Schedule Report
             <svg className="w-2.5 h-2.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 6 10">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>

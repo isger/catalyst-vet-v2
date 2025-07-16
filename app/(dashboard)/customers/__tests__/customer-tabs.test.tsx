@@ -63,49 +63,49 @@ describe('Customer Tabs', () => {
   const mockCustomers = [
     {
       id: 'customer1',
-      firstName: 'John',
-      lastName: 'Doe',
+      first_name: 'John',
+      last_name: 'Doe',
       email: 'john@example.com',
       phone: '5551234567',
       address: { street: '123 Main St' },
-      createdAt: '2023-01-01T00:00:00Z',
-      updatedAt: '2023-01-01T00:00:00Z',
-      tenantId: 'tenant123',
-      patients: [
+      created_at: '2023-01-01T00:00:00Z',
+      updated_at: '2023-01-01T00:00:00Z',
+      tenant_id: 'tenant123',
+      animals: [
         {
           id: 'pet1',
           name: 'Buddy',
           species: 'Dog',
           breed: 'Golden Retriever',
-          dateOfBirth: '2020-01-01'
+          date_of_birth: '2020-01-01'
         }
       ],
       lastVisit: '2023-12-01T10:00:00Z'
     },
     {
       id: 'customer2',
-      firstName: 'Jane',
-      lastName: 'Smith',
+      first_name: 'Jane',
+      last_name: 'Smith',
       email: 'jane@example.com',
       phone: '5559876543',
       address: { street: '456 Oak Ave' },
-      createdAt: '2023-02-01T00:00:00Z',
-      updatedAt: '2023-02-01T00:00:00Z',
-      tenantId: 'tenant123',
-      patients: [
+      created_at: '2023-02-01T00:00:00Z',
+      updated_at: '2023-02-01T00:00:00Z',
+      tenant_id: 'tenant123',
+      animals: [
         {
           id: 'pet2',
           name: 'Whiskers',
           species: 'Cat',
           breed: 'Persian',
-          dateOfBirth: '2019-03-15'
+          date_of_birth: '2019-03-15'
         },
         {
           id: 'pet3',
           name: 'Mittens',
           species: 'Cat',
           breed: 'Tabby',
-          dateOfBirth: '2021-06-20'
+          date_of_birth: '2021-06-20'
         }
       ]
     }
@@ -115,6 +115,7 @@ describe('Customer Tabs', () => {
     page: 1,
     pageSize: 10,
     search: '',
+    debouncedSearch: '',
     sortBy: 'firstName',
     sortOrder: 'desc' as const,
     totalPages: 1,
@@ -139,6 +140,9 @@ describe('Customer Tabs', () => {
     vi.mocked(usePaginatedCustomers).mockReturnValue({
       customers: mockCustomers,
       total: 2,
+      page: 1,
+      pageSize: 10,
+      totalPages: 1,
       loading: false,
       error: null,
       refetch: vi.fn()
@@ -193,6 +197,9 @@ describe('Customer Tabs', () => {
       vi.mocked(usePaginatedCustomers).mockReturnValue({
         customers: [],
         total: 0,
+        page: 1,
+        pageSize: 10,
+        totalPages: 0,
         loading: true,
         error: null,
         refetch: vi.fn()
@@ -208,6 +215,9 @@ describe('Customer Tabs', () => {
       vi.mocked(usePaginatedCustomers).mockReturnValue({
         customers: [],
         total: 0,
+        page: 1,
+        pageSize: 10,
+        totalPages: 0,
         loading: false,
         error: 'Failed to fetch customers',
         refetch: vi.fn()
@@ -223,6 +233,9 @@ describe('Customer Tabs', () => {
       vi.mocked(usePaginatedCustomers).mockReturnValue({
         customers: [],
         total: 0,
+        page: 1,
+        pageSize: 10,
+        totalPages: 0,
         loading: false,
         error: null,
         refetch: vi.fn()
@@ -236,12 +249,16 @@ describe('Customer Tabs', () => {
     it('should show search empty state', () => {
       vi.mocked(usePagination).mockReturnValue({
         ...mockPagination,
-        search: 'nonexistent'
+        search: 'nonexistent',
+        debouncedSearch: 'nonexistent'
       })
 
       vi.mocked(usePaginatedCustomers).mockReturnValue({
         customers: [],
         total: 0,
+        page: 1,
+        pageSize: 10,
+        totalPages: 0,
         loading: false,
         error: null,
         refetch: vi.fn()

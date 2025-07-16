@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +16,11 @@ export function RadialBarChart({
   title = "Treatment Success Rate", 
   description = "Success rates across different treatment types" 
 }: RadialBarChartProps) {
+  const [lastUpdated, setLastUpdated] = useState<string>('')
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleDateString())
+  }, [])
   
   const getChartOptions = () => {
     return {
@@ -50,7 +56,7 @@ export function RadialBarChart({
             useSeriesColors: true,
             margin: 8,
             fontSize: '16px',
-            formatter: function(seriesName: string, opts: any) {
+            formatter: function(seriesName: string, opts: { w: { globals: { series: number[] } }, seriesIndex: number }) {
               return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex] + "%"
             },
           },
@@ -79,7 +85,7 @@ export function RadialBarChart({
             <CardTitle className="text-xl font-bold">{title}</CardTitle>
             <CardDescription className="mt-1">{description}</CardDescription>
           </div>
-          <Button variant="outline" size="sm">
+          <Button outline>
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 16 18">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 1v11m0 0 4-4m-4 4L4 8m11 4v3a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3"/>
             </svg>
@@ -111,10 +117,10 @@ export function RadialBarChart({
 
         <div className="flex justify-between items-center pt-5 border-t border-gray-200 dark:border-gray-700">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            Last updated: {new Date().toLocaleDateString()}
+            Last updated: {lastUpdated}
           </div>
           
-          <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
+          <Button plain className="text-blue-600 hover:text-blue-700 dark:hover:text-blue-500">
             Quality Report
             <svg className="w-2.5 h-2.5 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 6 10">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
