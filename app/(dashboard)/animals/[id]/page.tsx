@@ -94,30 +94,30 @@ export default async function AnimalDetailPage({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Species</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{animal.species}</dd>
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Species</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.species}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Breed</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{animal.breed || 'Unknown'}</dd>
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Breed</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.breed || 'Unknown'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Color</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{animal.color || 'Not specified'}</dd>
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Color</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.color || 'Not specified'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Gender</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{animal.gender || 'Unknown'}</dd>
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Gender</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.gender || 'Unknown'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Age</dt>
-                  <dd className="text-sm font-semibold text-gray-900">
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Age</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
                     {animal.date_of_birth ? calculateAge(animal.date_of_birth) : 'Unknown'}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Weight</dt>
-                  <dd className="text-sm font-semibold text-gray-900">
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Weight</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
                     {formatWeight(animal.weight_kg)}
                   </dd>
                 </div>
@@ -127,8 +127,8 @@ export default async function AnimalDetailPage({
                 <>
                   <Separator />
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Microchip ID</dt>
-                    <dd className="text-sm font-semibold text-gray-900 font-mono">{animal.microchip_id}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Microchip ID</dt>
+                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white font-mono">{animal.microchip_id}</dd>
                   </div>
                 </>
               )}
@@ -143,21 +143,21 @@ export default async function AnimalDetailPage({
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="text-sm font-semibold text-gray-900">
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Name</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
                     <Link href={`/customers/${animal.owner.id}`} className="hover:underline">
                       {animal.owner.first_name} {animal.owner.last_name}
                     </Link>
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Email</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{animal.owner.email}</dd>
+                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Email</dt>
+                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.owner.email}</dd>
                 </div>
                 {animal.owner.phone && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                    <dd className="text-sm font-semibold text-gray-900">{animal.owner.phone}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Phone</dt>
+                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.owner.phone}</dd>
                   </div>
                 )}
               </div>
@@ -177,7 +177,7 @@ export default async function AnimalDetailPage({
                 {/* Allergies */}
                 {allergies.length > 0 && (
                   <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-3">
+                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
                       <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
                       Allergies
                     </h4>
@@ -204,7 +204,7 @@ export default async function AnimalDetailPage({
                 {/* Medical Conditions */}
                 {medicalConditions.length > 0 && (
                   <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-3">
+                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
                       <HeartIcon className="h-4 w-4 text-orange-500" />
                       Medical Conditions
                     </h4>
@@ -231,7 +231,7 @@ export default async function AnimalDetailPage({
                 {/* Medications */}
                 {medications.length > 0 && (
                   <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-3">
+                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
                       <HeartIcon className="h-4 w-4 text-blue-500" />
                       Current Medications
                     </h4>
@@ -266,14 +266,14 @@ export default async function AnimalDetailPage({
               <CardContent className="space-y-4">
                 {animal.insurance_provider && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Provider</dt>
-                    <dd className="text-sm font-semibold text-gray-900">{animal.insurance_provider}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Provider</dt>
+                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.insurance_provider}</dd>
                   </div>
                 )}
                 {animal.insurance_policy_number && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Policy Number</dt>
-                    <dd className="text-sm font-semibold text-gray-900 font-mono">{animal.insurance_policy_number}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Policy Number</dt>
+                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white font-mono">{animal.insurance_policy_number}</dd>
                   </div>
                 )}
               </CardContent>
@@ -289,14 +289,14 @@ export default async function AnimalDetailPage({
               <CardContent className="space-y-4">
                 {animal.behavioral_notes && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Behavioral Notes</dt>
-                    <dd className="text-sm text-gray-900 whitespace-pre-wrap">{animal.behavioral_notes}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Behavioral Notes</dt>
+                    <dd className="text-sm text-zinc-950 dark:text-white whitespace-pre-wrap">{animal.behavioral_notes}</dd>
                   </div>
                 )}
                 {animal.dietary_requirements && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Dietary Requirements</dt>
-                    <dd className="text-sm text-gray-900 whitespace-pre-wrap">{animal.dietary_requirements}</dd>
+                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Dietary Requirements</dt>
+                    <dd className="text-sm text-zinc-950 dark:text-white whitespace-pre-wrap">{animal.dietary_requirements}</dd>
                   </div>
                 )}
               </CardContent>
@@ -331,14 +331,14 @@ export default async function AnimalDetailPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <dt className="text-sm font-medium text-gray-500">Created</dt>
-                <dd className="text-sm text-gray-900">
+                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Created</dt>
+                <dd className="text-sm text-zinc-950 dark:text-white">
                   {new Date(animal.created_at).toLocaleDateString()}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium text-gray-500">Last Updated</dt>
-                <dd className="text-sm text-gray-900">
+                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Last Updated</dt>
+                <dd className="text-sm text-zinc-950 dark:text-white">
                   {new Date(animal.updated_at).toLocaleDateString()}
                 </dd>
               </div>
