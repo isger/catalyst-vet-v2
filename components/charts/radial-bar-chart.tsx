@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -17,6 +18,7 @@ export function RadialBarChart({
   description = "Success rates across different treatment types" 
 }: RadialBarChartProps) {
   const [lastUpdated, setLastUpdated] = useState<string>('')
+  const { theme } = useTheme()
 
   useEffect(() => {
     setLastUpdated(new Date().toLocaleDateString())
@@ -56,6 +58,8 @@ export function RadialBarChart({
             useSeriesColors: true,
             margin: 8,
             fontSize: '16px',
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151',
             formatter: function(seriesName: string, opts: { w: { globals: { series: number[] } }, seriesIndex: number }) {
               return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex] + "%"
             },

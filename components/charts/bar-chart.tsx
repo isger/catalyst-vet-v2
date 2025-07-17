@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +16,7 @@ export function BarChart({
   title = "Weekly Appointments", 
   description = "Appointment volume by day of the week" 
 }: BarChartProps) {
+  const { theme } = useTheme()
   
   const getChartOptions = () => {
     return {
@@ -48,7 +50,8 @@ export function BarChart({
         labels: {
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         },
         axisBorder: {
@@ -63,13 +66,15 @@ export function BarChart({
           text: 'Number of Appointments',
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            color: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         },
         labels: {
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         }
       },
@@ -88,12 +93,15 @@ export function BarChart({
         horizontalAlign: 'left' as const,
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
+        labels: {
+          colors: theme === 'dark' ? '#e4e4e7' : '#374151'
+        },
         markers: {
           size: 8
         }
       },
       grid: {
-        borderColor: '#e7e7e7',
+        borderColor: theme === 'dark' ? '#374151' : '#e7e7e7',
         strokeDashArray: 3,
         yaxis: {
           lines: {

@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +16,7 @@ export function AreaChart({
   title = "Revenue Trends", 
   description = "Monthly revenue over the past year" 
 }: AreaChartProps) {
+  const { theme } = useTheme()
   
   const getChartOptions = () => {
     return {
@@ -47,7 +49,7 @@ export function AreaChart({
         }
       },
       grid: {
-        borderColor: '#e7e7e7',
+        borderColor: theme === 'dark' ? '#374151' : '#e7e7e7',
         strokeDashArray: 3,
         yaxis: {
           lines: {
@@ -80,7 +82,8 @@ export function AreaChart({
           format: 'MMM yyyy',
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         },
         axisBorder: {
@@ -97,7 +100,8 @@ export function AreaChart({
           },
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         }
       },
@@ -116,6 +120,9 @@ export function AreaChart({
         horizontalAlign: 'left' as const,
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
+        labels: {
+          colors: theme === 'dark' ? '#e4e4e7' : '#374151'
+        },
         markers: {
           size: 8
         }

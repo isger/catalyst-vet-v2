@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -17,6 +18,7 @@ export function DonutChart({
   description = "Distribution of patient visits by type" 
 }: DonutChartProps) {
   const [selectedDevices, setSelectedDevices] = useState<string[]>([])
+  const { theme } = useTheme()
 
   const getChartOptions = () => {
     let series = [35.1, 23.5, 2.4, 5.4] // Default data
@@ -62,12 +64,14 @@ export function DonutChart({
                 show: true,
                 fontFamily: 'Inter, sans-serif',
                 offsetY: 20,
+                color: theme === 'dark' ? '#e4e4e7' : '#374151'
               },
               total: {
                 showAlways: true,
                 show: true,
                 label: 'Total Visits',
                 fontFamily: 'Inter, sans-serif',
+                color: theme === 'dark' ? '#e4e4e7' : '#374151',
                 formatter: function (w: { globals: { seriesTotals: number[] } }) {
                   const sum = w.globals.seriesTotals.reduce((a: number, b: number) => a + b, 0)
                   return sum.toFixed(0)
@@ -77,6 +81,7 @@ export function DonutChart({
                 show: true,
                 fontFamily: 'Inter, sans-serif',
                 offsetY: -20,
+                color: theme === 'dark' ? '#e4e4e7' : '#374151',
                 formatter: function (value: string) {
                   return parseFloat(value).toFixed(1) + '%'
                 },
@@ -100,7 +105,8 @@ export function DonutChart({
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
         labels: {
-          useSeriesColors: true
+          useSeriesColors: true,
+          colors: theme === 'dark' ? '#e4e4e7' : '#374151'
         }
       },
       responsive: [

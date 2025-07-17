@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useTheme } from 'next-themes'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +16,7 @@ export function LineChart({
   title = "Daily Patient Visits", 
   description = "Number of patients seen over the last 30 days" 
 }: LineChartProps) {
+  const { theme } = useTheme()
   
   const getChartOptions = () => {
     return {
@@ -38,7 +40,7 @@ export function LineChart({
       },
       colors: ['#3B82F6', '#EF4444'],
       grid: {
-        borderColor: '#e7e7e7',
+        borderColor: theme === 'dark' ? '#374151' : '#e7e7e7',
         strokeDashArray: 3,
         yaxis: {
           lines: {
@@ -62,7 +64,8 @@ export function LineChart({
           format: 'dd MMM',
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         },
         axisBorder: {
@@ -77,13 +80,15 @@ export function LineChart({
           text: 'Number of Patients',
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            color: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         },
         labels: {
           style: {
             fontSize: '12px',
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            colors: theme === 'dark' ? '#e4e4e7' : '#374151'
           }
         }
       },
@@ -97,6 +102,9 @@ export function LineChart({
         horizontalAlign: 'left' as const,
         fontFamily: 'Inter, sans-serif',
         fontSize: '14px',
+        labels: {
+          colors: theme === 'dark' ? '#e4e4e7' : '#374151'
+        },
         markers: {
           size: 8
         }
@@ -104,7 +112,7 @@ export function LineChart({
       markers: {
         size: 4,
         colors: ['#3B82F6', '#EF4444'],
-        strokeColors: '#fff',
+        strokeColors: theme === 'dark' ? '#1f2937' : '#fff',
         strokeWidth: 2,
         hover: {
           size: 6
