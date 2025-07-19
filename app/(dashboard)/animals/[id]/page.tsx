@@ -13,16 +13,25 @@ import {
   HeartIcon,
   PencilIcon
 } from '@heroicons/react/24/outline'
-import Link from 'next/link'
 import { calculateAge, formatWeight } from '@/lib/schemas/animal-intake'
 import type { MedicalItem } from '@/lib/schemas/animal-intake'
+import { DemoAnimalComments } from '@/components/features/comments/demo-animal-comments'
+import { Link } from '@/components/ui/link'
+import { ChevronLeftIcon } from '@heroicons/react/16/solid'
+import { Divider } from '@/components/ui/divider'
+import { Subheading } from '@/components/ui/heading'
+import { DescriptionDetails, DescriptionList, DescriptionTerm } from '@/components/ui/description-list'
 
 export default async function AnimalDetailPage({
   params,
+  searchParams
 }: {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const { id } = await params
+  const { tab } = await searchParams
+  const activeTab = typeof tab === 'string' ? tab : 'basic-info'
   const animal = await getAnimalById(id)
 
   if (!animal) {
@@ -51,14 +60,30 @@ export default async function AnimalDetailPage({
     return colors[species] || 'bg-gray-100 text-gray-800'
   }
 
+  const tabs = [
+    { name: 'Basic Information', value: 'basic-info' },
+    { name: 'Medical Records', value: 'medical' },
+    { name: 'Activity & Comments', value: 'activity' },
+    { name: 'Appointments', value: 'appointments' },
+    { name: 'Documents', value: 'documents' }
+  ]
+
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <>
+      {/* Breadcrumb */}
+      <div className="max-lg:hidden">
+        <Link href="/animals" className="inline-flex items-center gap-2 text-sm/6 text-zinc-500 dark:text-zinc-400">
+          <ChevronLeftIcon className="size-4 fill-zinc-400 dark:fill-zinc-500" />
+          Animals
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="md:flex md:items-center md:justify-between">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-2xl/7 font-bold text-zinc-950 dark:text-white sm:text-3xl sm:tracking-tight">
+      <div className="mt-4 lg:mt-8">
+        <div className="md:flex md:items-center md:justify-between md:space-x-5">
+          <div className="flex items-start space-x-5">
+            <div className="pt-1.5">
+              <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">
                 {animal.name}
               </h1>
               <div className="flex items-center gap-2 mt-1">
@@ -69,283 +94,273 @@ export default async function AnimalDetailPage({
                   <Badge color="zinc">{animal.breed}</Badge>
                 )}
               </div>
+              <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Age: {animal.date_of_birth ? calculateAge(animal.date_of_birth) : 'Unknown'}
+                </span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Weight: {formatWeight(animal.weight_kg)}
+                </span>
+                <span className="text-sm text-zinc-600 dark:text-zinc-400">
+                  Owner: <Link href={`/customers/${animal.owner.id}`} className="hover:underline">
+                    {animal.owner.first_name} {animal.owner.last_name}
+                  </Link>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mt-4 flex gap-3 md:mt-0 md:ml-4">
-          <Button outline>
-            <PencilIcon className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button>View Medical Records</Button>
+          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
+            <Button outline>
+              <PencilIcon className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <Button color="indigo">
+              <CalendarIcon className="h-4 w-4 mr-2" />
+              Schedule Appointment
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Basic Information */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <HeartIcon className="h-5 w-5" />
-                Basic Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Species</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.species}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Breed</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.breed || 'Unknown'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Color</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.color || 'Not specified'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Gender</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.gender || 'Unknown'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Age</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
-                    {animal.date_of_birth ? calculateAge(animal.date_of_birth) : 'Unknown'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Weight</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
-                    {formatWeight(animal.weight_kg)}
-                  </dd>
-                </div>
-              </div>
+      {/* Tab Navigation */}
+      <div className="mt-8">
+        <div className="border-b border-gray-200 dark:border-zinc-700">
+          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
+            {tabs.map((tab) => (
+              <Link
+                key={tab.value}
+                href={`/animals/${id}${tab.value !== 'basic-info' ? `?tab=${tab.value}` : ''}`}
+                className={`flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${
+                  tab.value === activeTab
+                    ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:border-zinc-600 dark:hover:text-gray-300'
+                }`}
+              >
+                {tab.name}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-8">
+        {activeTab === 'basic-info' && (
+          <>
+            <Subheading>Basic Information</Subheading>
+            <Divider className="mt-4" />
+            
+            <DescriptionList className="mt-6">
+              <DescriptionTerm>Full Name</DescriptionTerm>
+              <DescriptionDetails>{animal.name}</DescriptionDetails>
+              
+              <DescriptionTerm>Species</DescriptionTerm>
+              <DescriptionDetails>{animal.species}</DescriptionDetails>
+              
+              <DescriptionTerm>Breed</DescriptionTerm>
+              <DescriptionDetails>{animal.breed || 'Unknown'}</DescriptionDetails>
+              
+              <DescriptionTerm>Color</DescriptionTerm>
+              <DescriptionDetails>{animal.color || 'Not specified'}</DescriptionDetails>
+              
+              <DescriptionTerm>Gender</DescriptionTerm>
+              <DescriptionDetails>{animal.gender || 'Unknown'}</DescriptionDetails>
+              
+              <DescriptionTerm>Date of Birth</DescriptionTerm>
+              <DescriptionDetails>
+                {animal.date_of_birth ? new Date(animal.date_of_birth).toLocaleDateString() : 'Unknown'}
+              </DescriptionDetails>
+              
+              <DescriptionTerm>Weight</DescriptionTerm>
+              <DescriptionDetails>{formatWeight(animal.weight_kg)}</DescriptionDetails>
               
               {animal.microchip_id && (
                 <>
-                  <Separator />
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Microchip ID</dt>
-                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white font-mono">{animal.microchip_id}</dd>
-                  </div>
+                  <DescriptionTerm>Microchip ID</DescriptionTerm>
+                  <DescriptionDetails className="font-mono">{animal.microchip_id}</DescriptionDetails>
                 </>
               )}
-            </CardContent>
-          </Card>
+              
+              <DescriptionTerm>Owner</DescriptionTerm>
+              <DescriptionDetails>
+                <Link href={`/customers/${animal.owner.id}`} className="hover:underline">
+                  {animal.owner.first_name} {animal.owner.last_name}
+                </Link>
+              </DescriptionDetails>
+              
+              <DescriptionTerm>Owner Email</DescriptionTerm>
+              <DescriptionDetails>{animal.owner.email}</DescriptionDetails>
+              
+              {animal.owner.phone && (
+                <>
+                  <DescriptionTerm>Owner Phone</DescriptionTerm>
+                  <DescriptionDetails>{animal.owner.phone}</DescriptionDetails>
+                </>
+              )}
+              
+              {animal.insurance_provider && (
+                <>
+                  <DescriptionTerm>Insurance Provider</DescriptionTerm>
+                  <DescriptionDetails>{animal.insurance_provider}</DescriptionDetails>
+                </>
+              )}
+              
+              {animal.insurance_policy_number && (
+                <>
+                  <DescriptionTerm>Policy Number</DescriptionTerm>
+                  <DescriptionDetails className="font-mono">{animal.insurance_policy_number}</DescriptionDetails>
+                </>
+              )}
+              
+              {animal.behavioral_notes && (
+                <>
+                  <DescriptionTerm>Behavioral Notes</DescriptionTerm>
+                  <DescriptionDetails className="whitespace-pre-wrap">{animal.behavioral_notes}</DescriptionDetails>
+                </>
+              )}
+              
+              {animal.dietary_requirements && (
+                <>
+                  <DescriptionTerm>Dietary Requirements</DescriptionTerm>
+                  <DescriptionDetails className="whitespace-pre-wrap">{animal.dietary_requirements}</DescriptionDetails>
+                </>
+              )}
+              
+              <DescriptionTerm>Record Created</DescriptionTerm>
+              <DescriptionDetails>{new Date(animal.created_at).toLocaleDateString()}</DescriptionDetails>
+              
+              <DescriptionTerm>Last Updated</DescriptionTerm>
+              <DescriptionDetails>{new Date(animal.updated_at).toLocaleDateString()}</DescriptionDetails>
+            </DescriptionList>
+          </>
+        )}
 
-          {/* Owner Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Owner Information</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Name</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">
-                    <Link href={`/customers/${animal.owner.id}`} className="hover:underline">
-                      {animal.owner.first_name} {animal.owner.last_name}
-                    </Link>
-                  </dd>
+        {activeTab === 'medical' && (
+          <>
+            <Subheading>Medical Records</Subheading>
+            <Divider className="mt-4" />
+            
+            {/* Allergies Section */}
+            {allergies.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-medium text-zinc-950 dark:text-white mb-4 flex items-center gap-2">
+                  <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />
+                  Allergies
+                </h3>
+                <div className="space-y-3">
+                  {allergies.map((allergy, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-red-50 dark:bg-red-950/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-red-800 dark:text-red-200">{allergy.name}</span>
+                        {allergy.severity && (
+                          <Badge color={allergy.severity === 'Severe' ? 'red' : 'zinc'}>
+                            {allergy.severity}
+                          </Badge>
+                        )}
+                      </div>
+                      {allergy.notes && (
+                        <p className="text-sm text-red-600 dark:text-red-300">{allergy.notes}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Email</dt>
-                  <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.owner.email}</dd>
+              </div>
+            )}
+
+            {/* Medical Conditions Section */}
+            {medicalConditions.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-medium text-zinc-950 dark:text-white mb-4 flex items-center gap-2">
+                  <HeartIcon className="h-5 w-5 text-orange-500" />
+                  Medical Conditions
+                </h3>
+                <div className="space-y-3">
+                  {medicalConditions.map((condition, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-orange-50 dark:bg-orange-950/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-orange-800 dark:text-orange-200">{condition.name}</span>
+                        {condition.date_diagnosed && (
+                          <span className="text-sm text-orange-600 dark:text-orange-300">
+                            Diagnosed: {new Date(condition.date_diagnosed).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
+                      {condition.notes && (
+                        <p className="text-sm text-orange-600 dark:text-orange-300">{condition.notes}</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                {animal.owner.phone && (
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Phone</dt>
-                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.owner.phone}</dd>
-                  </div>
-                )}
               </div>
-            </CardContent>
-          </Card>
+            )}
 
-          {/* Medical Information */}
-          {(allergies.length > 0 || medicalConditions.length > 0 || medications.length > 0) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HeartIcon className="h-5 w-5" />
-                  Medical Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Allergies */}
-                {allergies.length > 0 && (
-                  <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
-                      <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
-                      Allergies
-                    </h4>
-                    <div className="space-y-2">
-                      {allergies.map((allergy, index) => (
-                        <div key={index} className="border rounded-lg p-3 bg-red-50">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-red-800">{allergy.name}</span>
-                            {allergy.severity && (
-                              <Badge color={allergy.severity === 'Severe' ? 'red' : 'zinc'}>
-                                {allergy.severity}
-                              </Badge>
-                            )}
-                          </div>
-                          {allergy.notes && (
-                            <p className="text-sm text-red-600 mt-1">{allergy.notes}</p>
-                          )}
-                        </div>
-                      ))}
+            {/* Medications Section */}
+            {medications.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-medium text-zinc-950 dark:text-white mb-4 flex items-center gap-2">
+                  <HeartIcon className="h-5 w-5 text-blue-500" />
+                  Current Medications
+                </h3>
+                <div className="space-y-3">
+                  {medications.map((medication, index) => (
+                    <div key={index} className="border rounded-lg p-4 bg-blue-50 dark:bg-blue-950/20">
+                      <span className="font-medium text-blue-800 dark:text-blue-200">{medication.name}</span>
+                      {medication.notes && (
+                        <p className="text-sm text-blue-600 dark:text-blue-300 mt-1">{medication.notes}</p>
+                      )}
                     </div>
-                  </div>
-                )}
-
-                {/* Medical Conditions */}
-                {medicalConditions.length > 0 && (
-                  <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
-                      <HeartIcon className="h-4 w-4 text-orange-500" />
-                      Medical Conditions
-                    </h4>
-                    <div className="space-y-2">
-                      {medicalConditions.map((condition, index) => (
-                        <div key={index} className="border rounded-lg p-3 bg-orange-50">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-orange-800">{condition.name}</span>
-                            {condition.date_diagnosed && (
-                              <span className="text-sm text-orange-600">
-                                Diagnosed: {new Date(condition.date_diagnosed).toLocaleDateString()}
-                              </span>
-                            )}
-                          </div>
-                          {condition.notes && (
-                            <p className="text-sm text-orange-600 mt-1">{condition.notes}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Medications */}
-                {medications.length > 0 && (
-                  <div>
-                    <h4 className="flex items-center gap-2 text-sm font-medium text-zinc-950 dark:text-white mb-3">
-                      <HeartIcon className="h-4 w-4 text-blue-500" />
-                      Current Medications
-                    </h4>
-                    <div className="space-y-2">
-                      {medications.map((medication, index) => (
-                        <div key={index} className="border rounded-lg p-3 bg-blue-50">
-                          <span className="font-medium text-blue-800">{medication.name}</span>
-                          {medication.notes && (
-                            <p className="text-sm text-blue-600 mt-1">{medication.notes}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Insurance Information */}
-          {(animal.insurance_provider || animal.insurance_policy_number) && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ShieldCheckIcon className="h-5 w-5" />
-                  Insurance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {animal.insurance_provider && (
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Provider</dt>
-                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white">{animal.insurance_provider}</dd>
-                  </div>
-                )}
-                {animal.insurance_policy_number && (
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Policy Number</dt>
-                    <dd className="text-sm font-semibold text-zinc-950 dark:text-white font-mono">{animal.insurance_policy_number}</dd>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Additional Notes */}
-          {(animal.behavioral_notes || animal.dietary_requirements) && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Additional Notes</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {animal.behavioral_notes && (
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Behavioral Notes</dt>
-                    <dd className="text-sm text-zinc-950 dark:text-white whitespace-pre-wrap">{animal.behavioral_notes}</dd>
-                  </div>
-                )}
-                {animal.dietary_requirements && (
-                  <div>
-                    <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Dietary Requirements</dt>
-                    <dd className="text-sm text-zinc-950 dark:text-white whitespace-pre-wrap">{animal.dietary_requirements}</dd>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button className="w-full" outline>
-                <CalendarIcon className="h-4 w-4 mr-2" />
-                Schedule Appointment
-              </Button>
-              <Button className="w-full" outline>
-                <HeartIcon className="h-4 w-4 mr-2" />
-                View Medical History
-              </Button>
-              <Button className="w-full" outline>
-                <ScaleIcon className="h-4 w-4 mr-2" />
-                Update Weight
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Meta Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Record Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Created</dt>
-                <dd className="text-sm text-zinc-950 dark:text-white">
-                  {new Date(animal.created_at).toLocaleDateString()}
-                </dd>
+                  ))}
+                </div>
               </div>
-              <div>
-                <dt className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Last Updated</dt>
-                <dd className="text-sm text-zinc-950 dark:text-white">
-                  {new Date(animal.updated_at).toLocaleDateString()}
-                </dd>
+            )}
+
+            {allergies.length === 0 && medicalConditions.length === 0 && medications.length === 0 && (
+              <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center mt-6">
+                <p className="text-zinc-500 dark:text-zinc-400">No medical records found</p>
+                <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                  Medical information will appear here once added
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </>
+        )}
+
+        {activeTab === 'activity' && (
+          <>
+            <Subheading>Activity & Comments</Subheading>
+            <Divider className="mt-4" />
+            <div className="mt-6">
+              <DemoAnimalComments animalId={animal.id} />
+            </div>
+          </>
+        )}
+
+        {activeTab === 'appointments' && (
+          <>
+            <Subheading>Appointments</Subheading>
+            <Divider className="mt-4" />
+            <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center mt-6">
+              <p className="text-zinc-500 dark:text-zinc-400">Appointment management coming soon</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                View and manage all past and upcoming appointments
+              </p>
+            </div>
+          </>
+        )}
+
+        {activeTab === 'documents' && (
+          <>
+            <Subheading>Documents & Files</Subheading>
+            <Divider className="mt-4" />
+            <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center mt-6">
+              <p className="text-zinc-500 dark:text-zinc-400">Document management coming soon</p>
+              <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-2">
+                Upload and manage photos, medical reports, and other files
+              </p>
+            </div>
+          </>
+        )}
       </div>
-    </div>
+    </>
   )
 }

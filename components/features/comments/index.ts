@@ -1,0 +1,1 @@
+export { AnimalCommentsSection } from './animal-comments-section'

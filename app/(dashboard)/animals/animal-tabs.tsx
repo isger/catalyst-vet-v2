@@ -148,7 +148,7 @@ export function AllAnimals({ initialData, searchQuery }: AllAnimalsProps) {
           </h4>
           <Badge color="green">Loading...</Badge>
         </div>
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <TableHeader>Animal</TableHeader>
@@ -225,7 +225,7 @@ export function AllAnimals({ initialData, searchQuery }: AllAnimalsProps) {
         </div>
       ) : (
         <>
-          <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+          <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
             <TableHead>
               <TableRow>
                 <SortableHeader
@@ -409,7 +409,7 @@ export function BySpecies({ searchQuery = '', sortBy = 'name' }: TabProps) {
             : 'No species data available'}
         </div>
       ) : (
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -541,7 +541,7 @@ export function RecentAdditions({ searchQuery = '', sortBy = 'name' }: TabProps)
             : 'No recent additions found'}
         </div>
       ) : (
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -694,7 +694,7 @@ export function MedicalAlerts({ searchQuery = '', sortBy = 'priority' }: TabProp
             : 'No medical alerts'}
         </div>
       ) : (
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -855,7 +855,7 @@ export function UpcomingAppointments({ searchQuery = '', sortBy = 'time' }: TabP
             : 'No upcoming appointments'}
         </div>
       ) : (
-        <Table className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader

@@ -66,7 +66,7 @@ export default async function Event({ params }: { params: Promise<{ id: string }
         <Stat title="Pageviews" value={event.pageViews} change={event.pageViewsChange} />
       </div>
       <Subheading className="mt-12">Recent orders</Subheading>
-      <Table className="mt-4 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+      <Table striped className="mt-4 [--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
         <TableHead>
           <TableRow>
             <TableHeader>Order number</TableHeader>
