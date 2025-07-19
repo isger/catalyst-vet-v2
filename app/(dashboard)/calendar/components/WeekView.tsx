@@ -17,19 +17,19 @@ export default function WeekView() {
   }, [])
 
   return (
-    <div className="h-full flex flex-col bg-white">
-      <div ref={container} className="isolate flex flex-auto flex-col overflow-auto bg-white">
+    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
+      <div ref={container} className="isolate flex flex-auto flex-col overflow-auto bg-white dark:bg-gray-900">
       <div style={{ width: '165%' }} className="flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full">
         <div
           ref={containerNav}
-          className="sticky top-0 z-30 flex-none bg-white shadow-sm ring-1 ring-black/5 sm:pr-8"
+          className="sticky top-0 z-30 flex-none bg-white dark:bg-gray-800 shadow-sm ring-1 ring-black/5 dark:ring-gray-700 sm:pr-8"
         >
-          <div className="grid grid-cols-7 text-sm/6 text-gray-500 sm:hidden">
+          <div className="grid grid-cols-7 text-sm/6 text-gray-500 dark:text-gray-400 sm:hidden">
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              M <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">10</span>
+              M <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">10</span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              T <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">11</span>
+              T <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">11</span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
               W{' '}
@@ -38,29 +38,29 @@ export default function WeekView() {
               </span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              T <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">13</span>
+              T <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">13</span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              F <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">14</span>
+              F <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">14</span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              S <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">15</span>
+              S <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">15</span>
             </button>
             <button type="button" className="flex flex-col items-center pt-2 pb-3">
-              S <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900">16</span>
+              S <span className="mt-1 flex size-8 items-center justify-center font-semibold text-gray-900 dark:text-gray-100">16</span>
             </button>
           </div>
 
-          <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm/6 text-gray-500 sm:grid">
+          <div className="-mr-px hidden grid-cols-7 divide-x divide-gray-100 dark:divide-gray-600 border-r border-gray-100 dark:border-gray-600 text-sm/6 text-gray-500 dark:text-gray-400 sm:grid">
             <div className="col-end-1 w-14" />
             <div className="flex items-center justify-center py-3">
               <span>
-                Mon <span className="items-center justify-center font-semibold text-gray-900">10</span>
+                Mon <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">10</span>
               </span>
             </div>
             <div className="flex items-center justify-center py-3">
               <span>
-                Tue <span className="items-center justify-center font-semibold text-gray-900">11</span>
+                Tue <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">11</span>
               </span>
             </div>
             <div className="flex items-center justify-center py-3">
@@ -73,175 +73,175 @@ export default function WeekView() {
             </div>
             <div className="flex items-center justify-center py-3">
               <span>
-                Thu <span className="items-center justify-center font-semibold text-gray-900">13</span>
+                Thu <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">13</span>
               </span>
             </div>
             <div className="flex items-center justify-center py-3">
               <span>
-                Fri <span className="items-center justify-center font-semibold text-gray-900">14</span>
+                Fri <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">14</span>
               </span>
             </div>
             <div className="flex items-center justify-center py-3">
               <span>
-                Sat <span className="items-center justify-center font-semibold text-gray-900">15</span>
+                Sat <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">15</span>
               </span>
             </div>
             <div className="flex items-center justify-center py-3">
               <span>
-                Sun <span className="items-center justify-center font-semibold text-gray-900">16</span>
+                Sun <span className="items-center justify-center font-semibold text-gray-900 dark:text-gray-100">16</span>
               </span>
             </div>
           </div>
         </div>
         <div className="flex flex-auto">
-          <div className="sticky left-0 z-10 w-14 flex-none bg-white ring-1 ring-gray-100" />
+          <div className="sticky left-0 z-10 w-14 flex-none bg-white dark:bg-gray-800 ring-1 ring-gray-100 dark:ring-gray-600" />
           <div className="grid flex-auto grid-cols-1 grid-rows-1">
             {/* Horizontal lines */}
             <div
-              className="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100"
+              className="col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100 dark:divide-gray-600"
               style={{ gridTemplateRows: 'repeat(48, minmax(3.5rem, 1fr))' }}
             >
               <div ref={containerOffset} className="row-end-1 h-7"></div>
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   12AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   1AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   2AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   3AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   4AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   5AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   6AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   7AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   8AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   9AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   10AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   11AM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   12PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   1PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   2PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   3PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   4PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   5PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   6PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   7PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   8PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   9PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   10PM
                 </div>
               </div>
               <div />
               <div>
-                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400">
+                <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs/5 text-gray-400 dark:text-gray-500">
                   11PM
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function WeekView() {
             </div>
 
             {/* Vertical lines */}
-            <div className="col-start-1 col-end-2 row-start-1 hidden grid-cols-7 grid-rows-1 divide-x divide-gray-100 sm:grid sm:grid-cols-7">
+            <div className="col-start-1 col-end-2 row-start-1 hidden grid-cols-7 grid-rows-1 divide-x divide-gray-100 dark:divide-gray-600 sm:grid sm:grid-cols-7">
               <div className="col-start-1 row-span-full" />
               <div className="col-start-2 row-span-full" />
               <div className="col-start-3 row-span-full" />

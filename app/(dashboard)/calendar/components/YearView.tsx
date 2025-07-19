@@ -570,14 +570,14 @@ function classNames(...classes: (string | boolean | undefined)[]): string {
 
 export default function YearView() {
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
       <div className="flex-1 overflow-auto">
-        <div className="bg-white">
+        <div className="bg-white dark:bg-gray-900">
         <div className="mx-auto grid max-w-3xl grid-cols-1 gap-x-8 gap-y-16 px-4 py-16 sm:grid-cols-2 sm:px-6 xl:max-w-none xl:grid-cols-3 xl:px-8 2xl:grid-cols-4">
           {months.map((month) => (
             <section key={month.name} className="text-center">
-              <h2 className="text-sm font-semibold text-gray-900">{month.name}</h2>
-              <div className="mt-6 grid grid-cols-7 text-xs/6 text-gray-500">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{month.name}</h2>
+              <div className="mt-6 grid grid-cols-7 text-xs/6 text-gray-500 dark:text-gray-400">
                 <div>M</div>
                 <div>T</div>
                 <div>W</div>
@@ -586,18 +586,18 @@ export default function YearView() {
                 <div>S</div>
                 <div>S</div>
               </div>
-              <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 text-sm shadow-sm ring-1 ring-gray-200">
+              <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg bg-gray-200 dark:bg-gray-700 text-sm shadow-sm ring-1 ring-gray-200 dark:ring-gray-600">
                 {month.days.map((day, dayIdx) => (
                   <button
                     key={day.date}
                     type="button"
                     className={classNames(
-                      day.isCurrentMonth ? 'bg-white text-gray-900' : 'bg-gray-50 text-gray-400',
+                      day.isCurrentMonth ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100' : 'bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500',
                       dayIdx === 0 && 'rounded-tl-lg',
                       dayIdx === 6 && 'rounded-tr-lg',
                       dayIdx === month.days.length - 7 && 'rounded-bl-lg',
                       dayIdx === month.days.length - 1 && 'rounded-br-lg',
-                      'py-1.5 hover:bg-gray-100 focus:z-10',
+                      'py-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 focus:z-10',
                     )}
                   >
                     <time
