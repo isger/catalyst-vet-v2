@@ -28,7 +28,8 @@
       "Bash(sed:*)",
       "Bash(cat:*)",
       "Bash(git pull:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(supabase link:*)"
     ],
     "deny": []
   }
