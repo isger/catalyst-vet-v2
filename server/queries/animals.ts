@@ -5,7 +5,7 @@ import { cache } from 'react'
 import type { Database } from '@/types/supabase'
 
 type Animal = Database['public']['Tables']['animal']['Row']
-type Owner = Database['public']['Tables']['owner']['Row']
+type Owner = Database['public']['Tables']['customer']['Row']
 
 export type AnimalWithOwner = Animal & {
   owner: {

@@ -67,7 +67,7 @@ export function RealtimeExample() {
   // Raw real-time events for demonstration
   useRealtimeCustomers({
     onAnyChange: (payload) => {
-      addEvent(`Customer ${payload.eventType}: ${payload.new?.first_name || payload.old?.first_name}`)
+      addEvent(`Customer ${payload.eventType}: ${(payload.new as Record<string, unknown>)?.first_name || (payload.old as Record<string, unknown>)?.first_name || 'Unknown'}`)
     },
     tenantId: 'your-tenant-id',
     enabled: realtimeEnabled

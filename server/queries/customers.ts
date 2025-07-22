@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 // Type helpers for tables
-type Owner = Database['public']['Tables']['owner']['Row']
+type Owner = Database['public']['Tables']['customer']['Row']
 type Animal = Database['public']['Tables']['animal']['Row']
 
 export interface CustomerWithPets {
@@ -10,7 +10,7 @@ export interface CustomerWithPets {
   first_name: string
   last_name: string
   email: string
-  phone: string
+  phone: string | null
   address: any
   created_at: string
   updated_at: string
@@ -210,7 +210,7 @@ export async function getCustomerByIdForTenant(customerId: string): Promise<Cust
     updated_at: data.updated_at,
     tenant_id: data.tenant_id,
     additional_notes: data.additional_notes,
-    animals: data.animal?.map(animal => ({
+    animals: data.animal?.map((animal: any) => ({
       id: animal.id,
       name: animal.name,
       species: animal.species,

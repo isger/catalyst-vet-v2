@@ -57,7 +57,7 @@ export function EditCustomerForm({ customer, onCancel, onSuccess }: EditCustomer
       first_name: customer.first_name,
       last_name: customer.last_name,
       email: customer.email,
-      phone: customer.phone,
+      phone: customer.phone || '',
       address: customer.address ? {
         street: customer.address.street || '',
         city: customer.address.city || '',

@@ -21,7 +21,7 @@ const appointmentSchema = z.object({
   appointment_type_id: z.string().min(1, 'Appointment type is required'),
   start_time: z.string().min(1, 'Start time is required'),
   end_time: z.string().min(1, 'End time is required'),
-  status: z.string().default('scheduled'),
+  status: z.string().optional(),
   notes: z.string().optional(),
   reason: z.string().optional(),
   staff_profile_ids: z.array(z.string()).min(1, 'At least one staff member is required'),
@@ -223,7 +223,7 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
             appointment_type_id: data.appointment_type_id,
             start_time: startTime.toISOString(),
             end_time: endTime.toISOString(),
-            status: data.status,
+            status: data.status || 'scheduled',
             notes: data.notes,
             reason: data.reason,
             staff_profile_ids: data.staff_profile_ids,
@@ -343,9 +343,11 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Reason for Visit
+              </label>
               <Textarea
                 {...form.register('reason')}
-                label="Reason for Visit"
                 placeholder="Enter the reason for this appointment"
                 rows={2}
               />
@@ -364,8 +366,10 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
                   {...form.register('start_time')}
                   type="datetime-local"
                   label="Start Time"
-                  error={form.formState.errors.start_time?.message}
                 />
+                {form.formState.errors.start_time && (
+                  <p className="mt-1 text-sm text-red-600">{form.formState.errors.start_time.message}</p>
+                )}
               </div>
 
               <div>
@@ -373,8 +377,10 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
                   {...form.register('end_time')}
                   type="datetime-local"
                   label="End Time"
-                  error={form.formState.errors.end_time?.message}
                 />
+                {form.formState.errors.end_time && (
+                  <p className="mt-1 text-sm text-red-600">{form.formState.errors.end_time.message}</p>
+                )}
               </div>
             </div>
           </div>
@@ -417,9 +423,11 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
             </h3>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Internal Notes
+              </label>
               <Textarea
                 {...form.register('notes')}
-                label="Internal Notes"
                 placeholder="Any additional notes for staff (optional)"
                 rows={3}
               />
@@ -430,7 +438,7 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
         <DialogActions>
           <Button 
             type="button" 
-            variant="outline" 
+            outline
             onClick={closeModals}
             disabled={isPending}
           >

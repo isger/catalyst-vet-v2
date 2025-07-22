@@ -307,7 +307,7 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
                     {customer.email}
                   </TableCell>
                   <TableCell className="text-zinc-600 dark:text-zinc-400">
-                    {formatPhone(customer.phone)}
+                    {customer.phone ? formatPhone(customer.phone) : '-'}
                   </TableCell>
                   <TableCell className="text-zinc-600 dark:text-zinc-400">
                     <div className="flex flex-col">

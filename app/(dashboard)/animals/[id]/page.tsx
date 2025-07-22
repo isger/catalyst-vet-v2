@@ -1,14 +1,9 @@
 import { notFound } from 'next/navigation'
 import { getAnimalById } from '@/server/queries/animals'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { 
- 
   CalendarIcon, 
-  ScaleIcon, 
-  ShieldCheckIcon,
   ExclamationTriangleIcon,
   HeartIcon,
   PencilIcon

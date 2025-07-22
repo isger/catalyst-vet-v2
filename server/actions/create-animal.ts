@@ -94,7 +94,7 @@ export async function checkForDuplicateAnimal(name: string, ownerId: string): Pr
       species: animal.species,
       breed: animal.breed,
       owner_id: animal.owner_id,
-      owner_name: `${animal.owner.first_name} ${animal.owner.last_name}`
+      owner_name: `${(animal.owner as any)?.first_name || ''} ${(animal.owner as any)?.last_name || ''}`.trim()
     }))
 
     return {

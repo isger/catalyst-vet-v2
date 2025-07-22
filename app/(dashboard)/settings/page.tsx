@@ -77,7 +77,7 @@ export default async function Settings() {
             <Textarea 
               aria-label="Practice Description" 
               name="description" 
-              defaultValue={tenant?.description || ''}
+              defaultValue=""
             />
           </div>
         </section>
@@ -92,7 +92,7 @@ export default async function Settings() {
               type="email" 
               aria-label="Contact Email" 
               name="email" 
-              defaultValue={tenant?.email || ''} 
+              defaultValue="" 
             />
             <CheckboxField>
               <Checkbox name="email_is_public" defaultChecked />

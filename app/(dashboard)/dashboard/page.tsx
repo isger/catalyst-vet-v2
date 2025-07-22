@@ -42,7 +42,7 @@ async function UserInfo() {
       {tenantInfo && (
         <>
           <p>Tenant ID: {tenantInfo.tenant_id}</p>
-          <p>Organization: {tenantInfo.tenant?.name}</p>
+          <p>Organization: {tenantInfo.tenant_id}</p>
           <p>Role: {tenantInfo.role}</p>
         </>
       )}

@@ -150,7 +150,7 @@ export async function getUserPrimaryTenant(userId: string): Promise<Tenant | nul
       return null
     }
     
-    return data.tenant as Tenant
+    return data.tenant as unknown as Tenant
   } catch (error) {
     console.error('Error getting user primary tenant:', error)
     return null

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import {
   FaceFrownIcon,
@@ -97,9 +98,11 @@ export function AnimalCommentsSection({ activities, currentUser, onAddComment }:
             {activityItem.type === 'commented' ? (
               <>
                 {activityItem.person.imageUrl ? (
-                  <img
+                  <Image
                     alt=""
                     src={activityItem.person.imageUrl}
+                    width={24}
+                    height={24}
                     className="relative mt-3 size-6 flex-none rounded-full bg-gray-50 dark:bg-gray-800"
                   />
                 ) : (
@@ -146,9 +149,11 @@ export function AnimalCommentsSection({ activities, currentUser, onAddComment }:
       {/* New comment form */}
       <div className="mt-6 flex gap-x-3">
         {currentUser.imageUrl ? (
-          <img
+          <Image
             alt=""
             src={currentUser.imageUrl}
+            width={24}
+            height={24}
             className="size-6 flex-none rounded-full bg-gray-50 dark:bg-gray-800"
           />
         ) : (

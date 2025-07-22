@@ -62,7 +62,7 @@ export async function checkForDuplicateCustomer(email: string, phone?: string): 
 
     // Build query to check for duplicates within current tenant only
     let query = supabase
-      .from('owner')
+      .from('customer')
       .select('id, first_name, last_name, email, phone, tenant_id')
       .eq('tenant_id', membershipData.tenant_id)
 
@@ -168,17 +168,12 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
 
     // Prepare the owner data for insertion
     console.log('📋 Preparing owner data for insertion');
-    const ownerData: Database['public']['Tables']['owner']['Insert'] = {
+    const ownerData: Database['public']['Tables']['customer']['Insert'] = {
       id: customerId,
       first_name: validatedData.first_name,
       last_name: validatedData.last_name,
       email: validatedData.email,
       phone: validatedData.phone,
-      title: validatedData.title || null,
-      address: validatedData.address,
-      preferred_practice: validatedData.preferredPractice || null,
-      gdpr_consent: validatedData.gdprConsent,
-      additional_notes: validatedData.additionalNotes || null,
       tenant_id: membershipData.tenant_id,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
@@ -189,7 +184,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
     
     // Insert the new customer
     const { data: insertedCustomer, error: insertError } = await supabase
-      .from('owner')
+      .from('customer')
       .insert(ownerData)
       .select()
       .single()
@@ -350,9 +345,9 @@ export async function getAvailablePractices() {
     if (!membershipData) return []
 
     return membershipData.map(membership => ({
-      id: membership.tenant.id,
-      name: membership.tenant.name,
-      subdomain: membership.tenant.subdomain
+      id: (membership.tenant as any)?.id || '',
+      name: (membership.tenant as any)?.name || '',
+      subdomain: (membership.tenant as any)?.subdomain || ''
     }))
 
   } catch (error) {

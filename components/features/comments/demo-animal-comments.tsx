@@ -67,10 +67,10 @@ interface DemoAnimalCommentsProps {
   animalId: string
 }
 
-export function DemoAnimalComments({ animalId }: DemoAnimalCommentsProps) {
+export function DemoAnimalComments({ }: DemoAnimalCommentsProps) {
   const [activities, setActivities] = useState(initialActivity)
 
-  const handleAddComment = async (content: string, mood?: string) => {
+  const handleAddComment = async (content: string) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500))
     

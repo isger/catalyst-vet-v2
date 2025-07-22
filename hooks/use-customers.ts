@@ -7,7 +7,7 @@ import { useRequestCache } from './use-request-cache'
 import { useRealtimeCustomers } from './use-realtime-customers'
 import type { Database } from '@/types/supabase'
 
-type CustomerRow = Database['public']['Tables']['owner']['Row']
+type CustomerRow = Database['public']['Tables']['customer']['Row']
 
 export interface UsePaginatedCustomersOptions extends PaginationParams {
   enableRealtime?: boolean

@@ -15,7 +15,7 @@ import { StaffMembersSkeleton } from './staff-members-skeleton'
 
 interface StaffMember {
   id: string
-  role: 'owner' | 'admin' | 'member'
+  role: string
   created_at: string
   user: {
     id: string
@@ -34,7 +34,12 @@ export function StaffManagement({ userRole }: StaffManagementProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [showInviteForm, setShowInviteForm] = useState(false)
   
-  const [inviteState, inviteAction] = useActionState(inviteStaffMember, null)
+  const [inviteState, inviteAction] = useActionState(
+    async (prevState: { success: boolean; message: string } | null, formData: FormData) => {
+      return await inviteStaffMember(formData)
+    },
+    null
+  )
 
   useEffect(() => {
     async function loadStaffMembers() {
@@ -84,8 +89,8 @@ export function StaffManagement({ userRole }: StaffManagementProps) {
     switch (role) {
       case 'owner': return 'purple'
       case 'admin': return 'blue'
-      case 'member': return 'gray'
-      default: return 'gray'
+      case 'member': return 'zinc'
+      default: return 'zinc'
     }
   }
 
@@ -135,8 +140,8 @@ export function StaffManagement({ userRole }: StaffManagementProps) {
         <form action={inviteAction} className="rounded-lg border p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
           <Heading level={3}>Invite New Staff Member</Heading>
           
-          {inviteState?.error && (
-            <div className="text-red-600 text-sm">{inviteState.error}</div>
+          {inviteState && !inviteState.success && (
+            <div className="text-red-600 text-sm">{inviteState.message}</div>
           )}
           
           {inviteState?.success && (
