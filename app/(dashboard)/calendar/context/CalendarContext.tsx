@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { AppointmentWithDetails, StaffMember, AppointmentFilters } from '@/server/queries/appointments'
+import { fetchCalendarAppointments, fetchStaffMembers } from '@/server/actions/calendar'
 
 // Calendar view types
 export type CalendarView = 'day' | 'week' | 'month' | 'year'
@@ -395,15 +396,44 @@ export function CalendarProvider({
     dispatch({ type: 'SET_ERROR', payload: null })
 
     try {
-      // This would typically call server actions to fetch data
-      // For now, we'll implement this when we enhance the calendar views
-      console.log('Refreshing calendar data...')
-    } catch {
+      // Get date range for current view
+      const { start, end } = getDateRange()
+      
+      // Build filters based on current state
+      const filters: AppointmentFilters = {
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        ...state.filters
+      }
+
+      // Add staff filtering if not showing all staff
+      if (!state.showAllStaff && state.selectedStaffIds.length > 0) {
+        filters.staffIds = state.selectedStaffIds
+      }
+
+      // Fetch appointments and staff in parallel
+      const [appointments, staff] = await Promise.all([
+        fetchCalendarAppointments(filters),
+        fetchStaffMembers()
+      ])
+
+      // Update state with fetched data
+      dispatch({ type: 'SET_APPOINTMENTS', payload: appointments })
+      dispatch({ type: 'SET_STAFF', payload: staff })
+
+      console.log(`Loaded ${appointments.length} appointments and ${staff.length} staff members`)
+    } catch (error) {
+      console.error('Failed to refresh calendar data:', error)
       dispatch({ type: 'SET_ERROR', payload: 'Failed to load calendar data' })
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false })
     }
-  }, [])
+  }, [state.showAllStaff, state.selectedStaffIds, state.filters, getDateRange])
+
+  // Load data on mount and when dependencies change
+  useEffect(() => {
+    refreshData()
+  }, [state.currentView, state.currentDate, state.showAllStaff, state.selectedStaffIds, refreshData])
 
   // Real-time subscriptions
   useEffect(() => {

@@ -1,84 +1,51 @@
 import { ClockIcon } from '@heroicons/react/20/solid'
+import { useCalendar } from '../context/CalendarContext'
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameDay, isSameMonth, isToday, parseISO } from 'date-fns'
+import { useMemo } from 'react'
 
-const days = [
-  { date: '2021-12-27', events: [] },
-  { date: '2021-12-28', events: [] },
-  { date: '2021-12-29', events: [] },
-  { date: '2021-12-30', events: [] },
-  { date: '2021-12-31', events: [] },
-  { date: '2022-01-01', isCurrentMonth: true, events: [] },
-  { date: '2022-01-02', isCurrentMonth: true, events: [] },
-  {
-    date: '2022-01-03',
-    isCurrentMonth: true,
-    events: [
-      { id: 1, name: 'Design review', time: '10AM', datetime: '2022-01-03T10:00', href: '#' },
-      { id: 2, name: 'Sales meeting', time: '2PM', datetime: '2022-01-03T14:00', href: '#' },
-    ],
-  },
-  { date: '2022-01-04', isCurrentMonth: true, events: [] },
-  { date: '2022-01-05', isCurrentMonth: true, events: [] },
-  { date: '2022-01-06', isCurrentMonth: true, events: [] },
-  {
-    date: '2022-01-07',
-    isCurrentMonth: true,
-    events: [{ id: 3, name: 'Date night', time: '6PM', datetime: '2022-01-07T18:00', href: '#' }],
-  },
-  { date: '2022-01-08', isCurrentMonth: true, events: [] },
-  { date: '2022-01-09', isCurrentMonth: true, events: [] },
-  { date: '2022-01-10', isCurrentMonth: true, events: [] },
-  { date: '2022-01-11', isCurrentMonth: true, events: [] },
-  {
-    date: '2022-01-12',
-    isCurrentMonth: true,
-    isToday: true,
-    events: [{ id: 6, name: "Sam's birthday party", time: '2PM', datetime: '2022-01-12T14:00', href: '#' }],
-  },
-  { date: '2022-01-13', isCurrentMonth: true, events: [] },
-  { date: '2022-01-14', isCurrentMonth: true, events: [] },
-  { date: '2022-01-15', isCurrentMonth: true, events: [] },
-  { date: '2022-01-16', isCurrentMonth: true, events: [] },
-  { date: '2022-01-17', isCurrentMonth: true, events: [] },
-  { date: '2022-01-18', isCurrentMonth: true, events: [] },
-  { date: '2022-01-19', isCurrentMonth: true, events: [] },
-  { date: '2022-01-20', isCurrentMonth: true, events: [] },
-  { date: '2022-01-21', isCurrentMonth: true, events: [] },
-  {
-    date: '2022-01-22',
-    isCurrentMonth: true,
-    isSelected: true,
-    events: [
-      { id: 4, name: 'Maple syrup museum', time: '3PM', datetime: '2022-01-22T15:00', href: '#' },
-      { id: 5, name: 'Hockey game', time: '7PM', datetime: '2022-01-22T19:00', href: '#' },
-    ],
-  },
-  { date: '2022-01-23', isCurrentMonth: true, events: [] },
-  { date: '2022-01-24', isCurrentMonth: true, events: [] },
-  { date: '2022-01-25', isCurrentMonth: true, events: [] },
-  { date: '2022-01-26', isCurrentMonth: true, events: [] },
-  { date: '2022-01-27', isCurrentMonth: true, events: [] },
-  { date: '2022-01-28', isCurrentMonth: true, events: [] },
-  { date: '2022-01-29', isCurrentMonth: true, events: [] },
-  { date: '2022-01-30', isCurrentMonth: true, events: [] },
-  { date: '2022-01-31', isCurrentMonth: true, events: [] },
-  { date: '2022-02-01', events: [] },
-  { date: '2022-02-02', events: [] },
-  { date: '2022-02-03', events: [] },
-  {
-    date: '2022-02-04',
-    events: [{ id: 7, name: 'Cinema with friends', time: '9PM', datetime: '2022-02-04T21:00', href: '#' }],
-  },
-  { date: '2022-02-05', events: [] },
-  { date: '2022-02-06', events: [] },
-]
-
-const selectedDay = days.find((day) => day.isSelected)
+// This will be replaced with dynamic content in the component
 
 function classNames(...classes: (string | boolean | undefined)[]): string {
   return classes.filter(Boolean).join(' ')
 }
 
 export default function MonthView() {
+  const { state, openEditModal, setSelectedDate } = useCalendar()
+
+  // Generate month calendar days based on current date
+  const days = useMemo(() => {
+    const monthStart = startOfMonth(state.currentDate)
+    const monthEnd = endOfMonth(state.currentDate)
+    const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }) // Monday start
+    const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 })
+
+    const allDays = eachDayOfInterval({ start: calendarStart, end: calendarEnd })
+
+    return allDays.map(date => {
+      const dayAppointments = state.appointments.filter(apt => 
+        isSameDay(parseISO(apt.start_time), date)
+      )
+
+      return {
+        date: format(date, 'yyyy-MM-dd'),
+        dateObj: date,
+        isCurrentMonth: isSameMonth(date, state.currentDate),
+        isToday: isToday(date),
+        isSelected: state.selectedDate ? isSameDay(date, state.selectedDate) : false,
+        events: dayAppointments.map(apt => ({
+          id: apt.id,
+          name: apt.title,
+          time: format(parseISO(apt.start_time), 'h:mm a'),
+          datetime: apt.start_time,
+          color: apt.color,
+          appointment: apt
+        }))
+      }
+    })
+  }, [state.currentDate, state.appointments, state.selectedDate])
+
+  const selectedDay = days.find((day) => day.isSelected)
+
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-900">
       <div className="flex-1 overflow-auto">
@@ -131,8 +98,16 @@ export default function MonthView() {
                   <ol className="mt-2">
                     {day.events.slice(0, 2).map((event) => (
                       <li key={event.id}>
-                        <a href={event.href} className="group flex">
-                          <p className="flex-auto truncate font-medium text-gray-900 dark:text-gray-100 group-hover:text-indigo-600">
+                        <button 
+                          onClick={() => {
+                            openEditModal(event.appointment)
+                          }}
+                          className="group flex w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 rounded p-1 -m-1"
+                        >
+                          <p 
+                            className="flex-auto truncate font-medium text-gray-900 dark:text-gray-100 group-hover:text-indigo-600"
+                            style={{ color: event.color || undefined }}
+                          >
                             {event.name}
                           </p>
                           <time
@@ -141,7 +116,7 @@ export default function MonthView() {
                           >
                             {event.time}
                           </time>
-                        </a>
+                        </button>
                       </li>
                     ))}
                     {day.events.length > 2 && <li className="text-gray-500 dark:text-gray-400">+ {day.events.length - 2} more</li>}
@@ -155,6 +130,7 @@ export default function MonthView() {
               <button
                 key={day.date}
                 type="button"
+                onClick={() => setSelectedDate(day.dateObj)}
                 className={classNames(
                   day.isCurrentMonth ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700',
                   (day.isSelected || day.isToday) && 'font-semibold',
@@ -180,7 +156,11 @@ export default function MonthView() {
                 {day.events.length > 0 && (
                   <span className="-mx-0.5 mt-auto flex flex-wrap-reverse">
                     {day.events.map((event) => (
-                      <span key={event.id} className="mx-0.5 mb-1 size-1.5 rounded-full bg-gray-400 dark:bg-gray-500" />
+                      <span 
+                        key={event.id} 
+                        className="mx-0.5 mb-1 size-1.5 rounded-full"
+                        style={{ backgroundColor: event.color || '#6b7280' }}
+                      />
                     ))}
                   </span>
                 )}
@@ -200,13 +180,25 @@ export default function MonthView() {
                     <ClockIcon className="mr-2 size-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                     {event.time}
                   </time>
+                  {event.appointment.owner && (
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                      {event.appointment.owner.first_name} {event.appointment.owner.last_name}
+                    </p>
+                  )}
+                  {event.appointment.animal && (
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
+                      {event.appointment.animal.name} ({event.appointment.animal.species})
+                    </p>
+                  )}
                 </div>
-                <a
-                  href={event.href}
+                <button
+                  onClick={() => {
+                    openEditModal(event.appointment)
+                  }}
                   className="ml-6 flex-none self-center rounded-md bg-white dark:bg-gray-700 px-3 py-2 font-semibold text-gray-900 dark:text-gray-100 opacity-0 shadow-xs ring-1 ring-gray-300 dark:ring-gray-600 ring-inset group-hover:opacity-100 hover:ring-gray-400 dark:hover:ring-gray-500 focus:opacity-100"
                 >
-                  Edit<span className="sr-only">, {event.name}</span>
-                </a>
+                  View<span className="sr-only">, {event.name}</span>
+                </button>
               </li>
             ))}
           </ol>

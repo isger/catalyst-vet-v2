@@ -76,13 +76,55 @@ async function getUserTenant(): Promise<string | null> {
   return tenantData?.tenant_id || null
 }
 
-// Get appointments for calendar views using the appointment_details view
+// Get appointments for calendar views with proper staff filtering
 export async function getAppointmentsForCalendar(filters: AppointmentFilters = {}): Promise<AppointmentWithDetails[]> {
+  console.log('=== getAppointmentsForCalendar Debug ===')
+  
   const tenantId = await getUserTenant()
-  if (!tenantId) return []
+  console.log('Tenant ID:', tenantId)
+  
+  if (!tenantId) {
+    console.log('No tenant ID found, returning empty array')
+    return []
+  }
 
   const supabase = await createClient()
-  
+  console.log('Supabase client created')
+  console.log('Filters received:', filters)
+
+  // If staff filtering is required, use the database function
+  if (filters.staffIds && filters.staffIds.length > 0) {
+    // For staff filtering, we need to call the function for each staff member and combine results
+    // This assumes appointments can have multiple staff members
+    const allAppointments: any[] = []
+    
+    for (const staffId of filters.staffIds) {
+      const { data, error } = await supabase.rpc('get_appointments_in_range', {
+        p_start_date: filters.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
+        p_end_date: filters.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+        p_staff_id: staffId,
+        p_tenant_id: tenantId,
+      })
+
+      if (error) {
+        console.error('Error fetching appointments for staff:', staffId, error)
+        continue
+      }
+
+      if (data) {
+        allAppointments.push(...data)
+      }
+    }
+
+    // Remove duplicates (in case appointment has multiple selected staff)
+    const uniqueAppointments = allAppointments.filter((apt, index, self) => 
+      index === self.findIndex(a => a.appointment_id === apt.appointment_id)
+    )
+
+    return transformRpcResultToAppointments(uniqueAppointments, filters)
+  }
+
+  // For non-staff-filtered queries, use the appointment_details view
   let query = supabase
     .schema('calendar')
     .from('appointment_details')
@@ -112,12 +154,29 @@ export async function getAppointmentsForCalendar(filters: AppointmentFilters = {
 
   if (error) {
     console.error('Error fetching appointments for calendar:', error)
+    console.log('Query that failed:', query)
     return []
   }
 
-  if (!data) return []
+  console.log('Raw data from appointment_details view:')
+  console.log('Data length:', data?.length || 0)
+  console.log('First few raw records:', data?.slice(0, 3))
 
-  // Transform appointment_details view data to AppointmentWithDetails
+  if (!data) {
+    console.log('No data returned from query')
+    return []
+  }
+
+  const transformed = transformViewResultToAppointments(data)
+  console.log('Transformed appointments:', transformed.length)
+  console.log('First transformed appointment:', transformed[0])
+  console.log('=========================================')
+
+  return transformed
+}
+
+// Helper function to transform appointment_details view data
+function transformViewResultToAppointments(data: any[]): AppointmentWithDetails[] {
   return data.map(appointment => ({
     id: appointment.appointment_id || '',
     title: `${appointment.animal_name} - ${appointment.appointment_type_name}`,
@@ -133,10 +192,10 @@ export async function getAppointmentsForCalendar(filters: AppointmentFilters = {
     recurrence_rule: null,
     duration_minutes: appointment.appointment_type_duration,
     staff: {
-      id: '', // Need to get from staff assignments
-      first_name: '',
-      last_name: '',
-      color: appointment.appointment_type_color,
+      id: appointment.staff_id || '',
+      first_name: appointment.staff_first_name || '',
+      last_name: appointment.staff_last_name || '',
+      color: appointment.staff_color || appointment.appointment_type_color,
     },
     owner: appointment.owner_id ? {
       id: appointment.owner_id,
@@ -151,7 +210,56 @@ export async function getAppointmentsForCalendar(filters: AppointmentFilters = {
       species: appointment.animal_species || '',
       breed: appointment.animal_breed,
     } : null,
-  })).filter(apt => filters.staffIds ? false : true) // Filter by staff after getting staff assignments
+  }))
+}
+
+// Helper function to transform RPC result data
+function transformRpcResultToAppointments(data: any[], filters: AppointmentFilters = {}): AppointmentWithDetails[] {
+  let appointments = data.map(appointment => ({
+    id: appointment.appointment_id || '',
+    title: `${appointment.animal_name} - ${appointment.appointment_type_name}`,
+    description: appointment.reason,
+    start_time: appointment.start_time || '',
+    end_time: appointment.end_time || '',
+    all_day: false,
+    appointment_type: appointment.appointment_type_name || '',
+    status: appointment.status || '',
+    location: null,
+    color: appointment.staff_color || appointment.appointment_type_color,
+    notes: appointment.notes,
+    recurrence_rule: null,
+    duration_minutes: appointment.appointment_type_duration,
+    staff: {
+      id: appointment.staff_id || '',
+      first_name: appointment.staff_first_name || '',
+      last_name: appointment.staff_last_name || '',
+      color: appointment.staff_color,
+    },
+    owner: appointment.owner_id ? {
+      id: appointment.owner_id,
+      first_name: appointment.owner_first_name || '',
+      last_name: appointment.owner_last_name || '',
+      email: appointment.owner_email || '',
+      phone: appointment.owner_phone || '',
+    } : null,
+    animal: appointment.animal_id ? {
+      id: appointment.animal_id,
+      name: appointment.animal_name || '',
+      species: appointment.animal_species || '',
+      breed: appointment.animal_breed,
+    } : null,
+  }))
+
+  // Apply additional filters
+  if (filters.status && filters.status.length > 0) {
+    appointments = appointments.filter(apt => filters.status!.includes(apt.status))
+  }
+
+  if (filters.appointmentType && filters.appointmentType.length > 0) {
+    appointments = appointments.filter(apt => filters.appointmentType!.includes(apt.appointment_type))
+  }
+
+  return appointments.sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
 }
 
 // Get appointments in a specific date range using the database function
@@ -266,7 +374,7 @@ export async function getStaffMembers(): Promise<StaffMember[]> {
   // Get user details from public schema
   const userIds = data.map(staff => staff.user_id)
   const { data: users, error: userError } = await supabase
-    .from('user')
+    .from('profiles')
     .select('id, name, email')
     .in('id', userIds)
 

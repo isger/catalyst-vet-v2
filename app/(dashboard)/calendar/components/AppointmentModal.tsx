@@ -14,6 +14,8 @@ import { Label } from '@/components/ui/label'
 import { createAppointment, type CreateAppointmentData } from '@/server/actions/appointments'
 import { useCalendar } from '../context/CalendarContext'
 import type { StaffMember } from '@/server/queries/appointments'
+import CustomerSearchCombobox from './CustomerSearchCombobox'
+import AnimalSearchCombobox from './AnimalSearchCombobox'
 
 // Form validation schema - updated for new calendar schema
 const appointmentSchema = z.object({
@@ -52,21 +54,9 @@ interface AppointmentType {
 interface AppointmentModalProps {
   staff: StaffMember[]
   appointmentTypes: AppointmentType[]
-  customers?: Array<{
-    id: string
-    first_name: string
-    last_name: string
-    email: string
-    animal?: Array<{
-      id: string
-      name: string
-      species: string
-      breed: string | null
-    }>
-  }>
 }
 
-export default function AppointmentModal({ staff, appointmentTypes, customers = [] }: AppointmentModalProps) {
+export default function AppointmentModal({ staff, appointmentTypes }: AppointmentModalProps) {
   const {
     state: { 
       showCreateModal, 
@@ -80,13 +70,34 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
   } = useCalendar()
 
   const [isPending, startTransition] = useTransition()
-  const [selectedCustomer, setSelectedCustomer] = useState<string>('')
-  const [availableAnimals, setAvailableAnimals] = useState<Array<{
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('')
+  const [selectedCustomer, setSelectedCustomer] = useState<{
+    id: string
+    first_name: string
+    last_name: string
+    email: string
+    phone: string | null
+    animals: Array<{
+      id: string
+      name: string
+      species: string
+      breed: string | null
+    }>
+  } | null>(null)
+  const [selectedAnimalId, setSelectedAnimalId] = useState<string>('')
+  const [selectedAnimal, setSelectedAnimal] = useState<{
     id: string
     name: string
     species: string
     breed: string | null
-  }>>([])
+    date_of_birth: string | null
+    owner: {
+      id: string
+      first_name: string
+      last_name: string
+      email: string
+    } | null
+  } | null>(null)
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([])
 
   const isEditing = showEditModal && selectedAppointment
@@ -128,7 +139,8 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
         })
 
         if (selectedAppointment.owner) {
-          setSelectedCustomer(selectedAppointment.owner.id)
+          setSelectedCustomerId(selectedAppointment.owner.id)
+          // Note: We'd need to fetch the full customer object here in a real implementation
         }
       } else {
         // Reset form for new appointment
@@ -145,37 +157,37 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
           reason: '',
           staff_profile_ids: staff.length > 0 ? [staff[0].id] : [],
         })
-        setSelectedCustomer('')
+        setSelectedCustomerId('')
+        setSelectedCustomer(null)
+        setSelectedAnimalId('')
+        setSelectedAnimal(null)
         setSelectedStaffIds(staff.length > 0 ? [staff[0].id] : [])
       }
     } else {
       form.reset()
-      setSelectedCustomer('')
-      setAvailableAnimals([])
+      setSelectedCustomerId('')
+      setSelectedCustomer(null)
+      setSelectedAnimalId('')
+      setSelectedAnimal(null)
       setSelectedStaffIds([])
     }
   }, [isOpen, isEditing, selectedAppointment, selectedDate, currentDate, staff, appointmentTypes, form])
 
-  // Update available animals when customer changes
-  useEffect(() => {
-    if (selectedCustomer) {
-      const customer = customers.find(c => c.id === selectedCustomer)
-      if (customer?.animal) {
-        setAvailableAnimals(customer.animal)
-        // Clear animal selection if it's not available for the new customer
-        const currentAnimalId = form.getValues('animal_id')
-        if (currentAnimalId && !customer.animal.find(a => a.id === currentAnimalId)) {
-          form.setValue('animal_id', '')
-        }
-      } else {
-        setAvailableAnimals([])
-        form.setValue('animal_id', '')
-      }
-    } else {
-      setAvailableAnimals([])
-      form.setValue('animal_id', '')
-    }
-  }, [selectedCustomer, customers, form])
+  // Handle customer selection and animal updates
+  const handleCustomerSelect = (customer: any) => {
+    setSelectedCustomer(customer)
+    
+    // Clear animal selection when customer changes
+    setSelectedAnimalId('')
+    setSelectedAnimal(null)
+    form.setValue('animal_id', '')
+  }
+
+  // Handle animal selection
+  const handleAnimalSelect = (animal: any) => {
+    setSelectedAnimal(animal)
+    form.setValue('animal_id', animal?.id || '')
+  }
 
   // Handle staff selection changes
   const handleStaffToggle = (staffId: string) => {
@@ -270,38 +282,26 @@ export default function AppointmentModal({ staff, appointmentTypes, customers = 
             
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <Label>Customer</Label>
-                <Select 
-                  value={selectedCustomer} 
-                  onChange={(e) => setSelectedCustomer(e.target.value)}
-                >
-                  <option value="">Select a customer</option>
-                  {customers.map(customer => (
-                    <option key={customer.id} value={customer.id}>
-                      {customer.first_name} {customer.last_name}
-                    </option>
-                  ))}
-                </Select>
+                <CustomerSearchCombobox
+                  value={selectedCustomerId}
+                  onChange={setSelectedCustomerId}
+                  onCustomerSelect={handleCustomerSelect}
+                  placeholder="Search for a customer..."
+                  label="Customer"
+                />
               </div>
 
               <div>
-                <Label>Animal</Label>
-                <Select 
-                  {...form.register('animal_id')}
-                  disabled={availableAnimals.length === 0}
-                >
-                  <option value="">Select an animal</option>
-                  {availableAnimals.map(animal => (
-                    <option key={animal.id} value={animal.id}>
-                      {animal.name} ({animal.species})
-                    </option>
-                  ))}
-                </Select>
-                {form.formState.errors.animal_id && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {form.formState.errors.animal_id.message}
-                  </p>
-                )}
+                <AnimalSearchCombobox
+                  value={selectedAnimalId}
+                  onChange={setSelectedAnimalId}
+                  onAnimalSelect={handleAnimalSelect}
+                  placeholder={selectedCustomer ? 'Search animals...' : 'Search all animals...'}
+                  label="Animal"
+                  error={form.formState.errors.animal_id?.message}
+                  disabled={false}
+                  ownerId={selectedCustomer?.id}
+                />
               </div>
             </div>
           </div>

@@ -69,11 +69,23 @@ export function SignInForm() {
           description: result.error,
           variant: 'destructive',
         })
+        setIsLoading(false) // Only clear loading on error
       } else if (result?.success) {
+        // Show success feedback while maintaining loading state
+        toast({
+          title: 'Success!',
+          description: 'Signed in successfully. Redirecting...',
+          variant: 'default',
+        })
+        // Navigate without clearing loading state - it will clear when component unmounts
         router.push('/dashboard')
-        router.refresh()
       }
-    } finally {
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred',
+        variant: 'destructive',
+      })
       setIsLoading(false)
     }
   }

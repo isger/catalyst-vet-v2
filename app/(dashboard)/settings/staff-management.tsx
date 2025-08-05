@@ -44,7 +44,16 @@ export function StaffManagement({ userRole }: StaffManagementProps) {
   useEffect(() => {
     async function loadStaffMembers() {
       try {
+        console.log('=== Staff Management Debug ===')
+        console.log('Loading staff members...')
+        
         const members = await getStaffMembers()
+        
+        console.log('Raw staff members data:', members)
+        console.log('Staff members count:', members.length)
+        console.log('First member (if exists):', members[0])
+        console.log('==============================')
+        
         setStaffMembers(members)
       } catch (error) {
         console.error('Failed to load staff members:', error)

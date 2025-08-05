@@ -7,26 +7,40 @@ import type { Database } from '@/types/supabase'
 type TenantMembership = Database['public']['Tables']['tenant_membership']['Row']
 
 export async function getStaffMembers() {
+  console.log('=== getStaffMembers Server Action Debug ===')
+  
   const supabase = await createClient()
   
   // Get current user's tenant
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
+  console.log('Current user:', user?.id)
+  
+  if (!user) {
+    console.log('No user found, returning empty array')
+    return []
+  }
 
-  const { data: currentMembership } = await supabase
+  const { data: currentMembership, error: membershipError } = await supabase
     .from('tenant_membership')
     .select('tenant_id')
     .eq('user_id', user.id)
     .single()
 
-  if (!currentMembership) return []
+  console.log('Current membership query result:', { currentMembership, membershipError })
+
+  if (!currentMembership) {
+    console.log('No membership found, returning empty array')
+    return []
+  }
+
+  console.log('Tenant ID:', currentMembership.tenant_id)
 
   // Get all staff members for this tenant
   const { data, error } = await supabase
     .from('tenant_membership')
     .select(`
       *,
-      user:user(
+      user:profiles!inner(
         id,
         email,
         name,
@@ -36,7 +50,21 @@ export async function getStaffMembers() {
     .eq('tenant_id', currentMembership.tenant_id)
     .order('created_at', { ascending: false })
 
-  if (error) throw error
+  console.log('Staff members query result:', { data, error })
+  console.log('Staff members count:', data?.length || 0)
+  
+  if (data && data.length > 0) {
+    console.log('First staff member:', data[0])
+    console.log('All staff member IDs:', data.map(m => m.id))
+  }
+  
+  console.log('===============================================')
+
+  if (error) {
+    console.error('Staff members query error:', error)
+    throw error
+  }
+  
   return data || []
 }
 
@@ -66,7 +94,7 @@ export async function inviteStaffMember(formData: FormData) {
 
   // Check if email is already a staff member
   const { data: existingStaff } = await supabase
-    .from('user')
+    .from('profiles')
     .select(`
       id,
       tenant_membership!inner(tenant_id)
@@ -81,7 +109,7 @@ export async function inviteStaffMember(formData: FormData) {
 
   // Look for existing user by email
   const { data: existingUser } = await supabase
-    .from('user')
+    .from('profiles')
     .select('id')
     .eq('email', email)
     .single()

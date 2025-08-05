@@ -11,19 +11,6 @@ import MonthView from './components/MonthView'
 import YearView from './components/YearView'
 import type { StaffMember } from '@/server/queries/appointments'
 
-interface Customer {
-  id: string
-  first_name: string
-  last_name: string
-  email: string
-  animal?: Array<{
-    id: string
-    name: string
-    species: string
-    breed: string | null
-  }>
-}
-
 interface AppointmentType {
   id: string
   name: string
@@ -36,11 +23,10 @@ interface AppointmentType {
 
 interface CalendarContentProps {
   staff: StaffMember[]
-  customers: Customer[]
   appointmentTypes: AppointmentType[]
 }
 
-export default function CalendarContent({ staff, customers, appointmentTypes }: CalendarContentProps) {
+export default function CalendarContent({ staff, appointmentTypes }: CalendarContentProps) {
   const {
     state: { currentView, isLoading, error },
     setView,
@@ -291,7 +277,7 @@ export default function CalendarContent({ staff, customers, appointmentTypes }: 
       </div>
 
       {/* Appointment Modal */}
-      <AppointmentModal staff={staff} customers={customers} appointmentTypes={appointmentTypes} />
+      <AppointmentModal staff={staff} appointmentTypes={appointmentTypes} />
     </>
   )
 }
