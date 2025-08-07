@@ -68,7 +68,11 @@ export async function middleware(request: NextRequest) {
       return new NextResponse('Tenant not found', { status: 404 })
     }
 
-    return handleTenantRequest(request, tenant)
+    return handleTenantRequest(request, {
+      id: tenant.id,
+      subdomain: tenant.subdomain || '',
+      name: tenant.name
+    })
   }
 
   // Handle custom domain
@@ -78,7 +82,11 @@ export async function middleware(request: NextRequest) {
       !cleanHostname.includes('vercel.app')) {
     const tenant = await cachedResolveTenantByDomain(cleanHostname)
     if (tenant) {
-      return handleTenantRequest(request, tenant, true)
+      return handleTenantRequest(request, {
+        id: tenant.id,
+        subdomain: tenant.subdomain || '',
+        name: tenant.name
+      }, true)
     }
   }
 

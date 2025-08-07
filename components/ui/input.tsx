@@ -35,7 +35,7 @@ export const Input = forwardRef(function Input(
 ) {
   return (
       <div>
-          {props.label && <label htmlFor={props.name} className="block text-sm/6 font-medium">
+          {props.label && <label htmlFor={props.name} className="block text-sm/6 font-medium mb-2">
               {props.label}
           </label>}
           <span
@@ -81,7 +81,7 @@ export const Input = forwardRef(function Input(
               // Typography
               'text-base/6 text-zinc-950 placeholder:text-zinc-500 sm:text-sm/6 dark:text-white',
               // Border
-              'border border-zinc-950/10 data-hover:border-zinc-950/20 dark:border-white/10 dark:data-hover:border-white/20',
+              'border border-zinc-300 data-hover:border-zinc-400 dark:border-white/10 dark:data-hover:border-white/20',
               // Background color
               'bg-transparent dark:bg-white/5',
               // Hide default focus styles

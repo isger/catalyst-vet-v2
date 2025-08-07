@@ -5,7 +5,7 @@ import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOption
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { UserIcon } from '@heroicons/react/24/outline'
 // Simple debounce utility
-function debounce<T extends (...args: any[]) => any>(func: T, wait: number) {
+function debounce<T extends (...args: never[]) => unknown>(func: T, wait: number) {
   let timeout: NodeJS.Timeout | null = null
   
   const debounced = (...args: Parameters<T>) => {
@@ -142,7 +142,7 @@ export default function CustomerSearchCombobox({
     return () => {
       debouncedSearch.cancel()
     }
-  }, [query])
+  }, [query, debouncedSearch])
 
   // Find customer by ID when value changes
   useEffect(() => {
@@ -185,8 +185,8 @@ export default function CustomerSearchCombobox({
         </Label>
         <div className="relative mt-2">
           <ComboboxInput
-            className={`block w-full rounded-md bg-white dark:bg-gray-800 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
-              error ? 'outline-red-500 focus:outline-red-500' : ''
+            className={`block w-full rounded-md bg-white dark:bg-gray-800 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm/6 ${
+              error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
             }`}
             onChange={(event) => setQuery(event.target.value)}
             onBlur={() => {
@@ -220,7 +220,7 @@ export default function CustomerSearchCombobox({
             
             {!isLoading && query.length > 0 && displayCustomers.length === 0 && (
               <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
-                No customers found for "{query}"
+                No customers found for &quot;{query}&quot;
               </div>
             )}
 
@@ -240,29 +240,29 @@ export default function CustomerSearchCombobox({
               <ComboboxOption
                 key={customer.id}
                 value={customer}
-                className="cursor-default px-3 py-2 text-gray-900 dark:text-gray-100 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                className="group cursor-default px-3 py-2 text-gray-900 dark:text-gray-100 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
               >
                 <div className="flex items-center">
-                  <UserIcon className="size-5 text-gray-400 mr-3 flex-shrink-0" />
+                  <UserIcon className="size-5 text-gray-400 group-data-[focus]:text-white/80 mr-3 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="block truncate font-medium">
+                      <span className="block truncate font-medium group-data-[focus]:text-white">
                         {customer.first_name} {customer.last_name}
                       </span>
                       {customer.animals.length > 0 && (
-                        <span className="ml-2 text-xs text-gray-500 data-focus:text-white/80">
+                        <span className="ml-2 text-xs text-gray-500 group-data-[focus]:text-white/80">
                           {customer.animals.length} pet{customer.animals.length !== 1 ? 's' : ''}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 data-focus:text-white/80">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 group-data-[focus]:text-white/80">
                       <span className="truncate">{customer.email}</span>
                       {customer.phone && (
                         <span className="truncate">{customer.phone}</span>
                       )}
                     </div>
                     {customer.animals.length > 0 && (
-                      <div className="mt-1 text-xs text-gray-400 data-focus:text-white/60">
+                      <div className="mt-1 text-xs text-gray-400 group-data-[focus]:text-white/60">
                         Pets: {customer.animals.map(a => `${a.name} (${a.species})`).join(', ')}
                       </div>
                     )}

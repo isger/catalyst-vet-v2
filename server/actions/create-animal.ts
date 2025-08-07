@@ -195,7 +195,7 @@ export async function createAnimal(data: AnimalIntakeData): Promise<ActionResult
 
     // Prepare the animal data for insertion
     console.log('📋 Preparing animal data for insertion')
-    const animalData: Database['public']['Tables']['animal']['Insert'] = {
+    const animalData: any = {
       id: animalId,
       name: validatedData.name,
       species: validatedData.species,

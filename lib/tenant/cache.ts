@@ -90,7 +90,9 @@ export function invalidateTenantCache(
  */
 export function invalidateAllTenantCache(tenant: Tenant): void {
   invalidateTenantCache('id', tenant.id)
-  invalidateTenantCache('subdomain', tenant.subdomain)
+  if (tenant.subdomain) {
+    invalidateTenantCache('subdomain', tenant.subdomain)
+  }
   
   if (tenant.custom_domain) {
     invalidateTenantCache('domain', tenant.custom_domain)

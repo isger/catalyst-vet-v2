@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Label } from '@headlessui/react'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { HeartIcon } from '@heroicons/react/24/outline'
 
 // Simple debounce utility
-function debounce<T extends (...args: any[]) => any>(func: T, wait: number) {
+function debounce<T extends (...args: never[]) => unknown>(func: T, wait: number) {
   let timeout: NodeJS.Timeout | null = null
   
   const debounced = (...args: Parameters<T>) => {
@@ -108,7 +108,7 @@ export default function AnimalSearchCombobox({
   const [selectedAnimal, setSelectedAnimal] = useState<Animal | null>(null)
 
   // Function to load animals (either initial or by owner)
-  const loadAnimals = async (searchQuery: string = '', isInitial: boolean = false) => {
+  const loadAnimals = useCallback(async (searchQuery: string = '', isInitial: boolean = false) => {
     setIsLoading(true)
     try {
       const results = await searchAnimals(searchQuery, isInitial, ownerId)
@@ -119,7 +119,7 @@ export default function AnimalSearchCombobox({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [ownerId])
 
   // Debounced search function
   const debouncedSearch = debounce(async (searchQuery: string) => {
@@ -145,7 +145,7 @@ export default function AnimalSearchCombobox({
     // Clear selection when owner changes
     setSelectedAnimal(null)
     onChange('')
-  }, [ownerId])
+  }, [ownerId, onChange, loadAnimals])
 
   // Effect to trigger search when query changes
   useEffect(() => {
@@ -164,7 +164,7 @@ export default function AnimalSearchCombobox({
     return () => {
       debouncedSearch.cancel()
     }
-  }, [query, ownerId])
+  }, [query, ownerId, debouncedSearch, loadAnimals])
 
   // Find animal by ID when value changes
   useEffect(() => {
@@ -223,8 +223,8 @@ export default function AnimalSearchCombobox({
         </Label>
         <div className="relative mt-2">
           <ComboboxInput
-            className={`block w-full rounded-md bg-white dark:bg-gray-800 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 ${
-              error ? 'outline-red-500 focus:outline-red-500' : ''
+            className={`block w-full rounded-md bg-white dark:bg-gray-800 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm/6 ${
+              error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onChange={(event) => setQuery(event.target.value)}
             onBlur={() => {
@@ -258,7 +258,7 @@ export default function AnimalSearchCombobox({
             
             {!isLoading && !ownerId && query.length > 0 && displayAnimals.length === 0 && (
               <div className="px-3 py-2 text-gray-500 dark:text-gray-400">
-                No animals found for "{query}"
+                No animals found for &quot;{query}&quot;
               </div>
             )}
 
@@ -278,34 +278,34 @@ export default function AnimalSearchCombobox({
               <ComboboxOption
                 key={animal.id}
                 value={animal}
-                className="cursor-default px-3 py-2 text-gray-900 dark:text-gray-100 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
+                className="group cursor-default px-3 py-2 text-gray-900 dark:text-gray-100 select-none data-focus:bg-indigo-600 data-focus:text-white data-focus:outline-hidden"
               >
                 <div className="flex items-center">
-                  <HeartIcon className="size-5 text-gray-400 mr-3 flex-shrink-0" />
+                  <HeartIcon className="size-5 text-gray-400 group-data-[focus]:text-white/80 mr-3 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="block truncate font-medium">
+                      <span className="block truncate font-medium group-data-[focus]:text-white">
                         {animal.name}
                       </span>
                       {animal.date_of_birth && (
-                        <span className="ml-2 text-xs text-gray-500 data-focus:text-white/80">
+                        <span className="ml-2 text-xs text-gray-500 group-data-[focus]:text-white/80">
                           {calculateAge(animal.date_of_birth)}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-500 data-focus:text-white/80">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 group-data-[focus]:text-white/80">
                       <span className="truncate">{animal.species}</span>
                       {animal.breed && (
                         <span className="truncate">{animal.breed}</span>
                       )}
                     </div>
                     {animal.owner && !ownerId && (
-                      <div className="mt-1 text-xs text-gray-400 data-focus:text-white/60">
+                      <div className="mt-1 text-xs text-gray-400 group-data-[focus]:text-white/60">
                         Owner: {animal.owner.first_name} {animal.owner.last_name}
                       </div>
                     )}
                     {!animal.owner && !ownerId && (
-                      <div className="mt-1 text-xs text-gray-400 data-focus:text-white/60">
+                      <div className="mt-1 text-xs text-gray-400 group-data-[focus]:text-white/60">
                         Owner info not available
                       </div>
                     )}

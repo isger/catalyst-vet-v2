@@ -1,5 +1,14 @@
 // Mock data utilities - replace with actual API calls in production
 
+export type QuickAction = {
+  id: string
+  name: string
+  description: string
+  url?: string
+  action?: string
+  icon: string
+}
+
 export type Event = {
   id: string
   name: string
@@ -44,6 +53,40 @@ export type Order = {
       expiry: string
     }
   }
+}
+
+export async function getQuickActions(): Promise<QuickAction[]> {
+  // Quick actions for veterinary practice
+  return [
+    {
+      id: '1',
+      name: 'Create Appointment',
+      description: 'Schedule a new appointment',
+      url: '/calendar?action=create',
+      icon: 'CalendarPlusIcon',
+    },
+    {
+      id: '2',
+      name: 'Register Customer',
+      description: 'Add a new customer',
+      url: '/customers?action=create',
+      icon: 'UserPlusIcon',
+    },
+    {
+      id: '3',
+      name: 'Order Medication',
+      description: 'Place medication order',
+      url: '/orders?action=create&type=medication',
+      icon: 'BeakerIcon',
+    },
+    {
+      id: '4',
+      name: 'Quick Search Animal',
+      description: 'Find animal records',
+      action: 'search-animal',
+      icon: 'MagnifyingGlassIcon',
+    },
+  ]
 }
 
 export async function getEvents(): Promise<Event[]> {

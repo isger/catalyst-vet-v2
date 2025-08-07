@@ -6,7 +6,8 @@ import type { PaginatedAnimalsResult, AnimalWithOwner } from '@/server/queries/a
 import { useRealtimeAnimals } from './use-realtime-animals'
 import type { Database } from '@/types/supabase'
 
-type AnimalRow = Database['public']['Tables']['animal']['Row']
+// Note: Animal table type not yet generated in supabase types
+// type AnimalRow = Database['public']['Tables']['animal']['Row']
 
 export interface UseAnimalsOptions {
   page?: number
@@ -123,7 +124,7 @@ export function useAnimals(options: UseAnimalsOptions = {}): UseAnimalsResult {
   }, [fetchAnimals])
 
   // Real-time updates (optional)
-  const handleAnimalAdded = useCallback((animal: AnimalRow) => {
+  const handleAnimalAdded = useCallback((animal: any) => {
     // Only add if it matches current filters/search
     if (!search || 
         animal.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -137,7 +138,7 @@ export function useAnimals(options: UseAnimalsOptions = {}): UseAnimalsResult {
     }
   }, [search])
 
-  const handleAnimalUpdated = useCallback((animal: AnimalRow) => {
+  const handleAnimalUpdated = useCallback((animal: any) => {
     setState(prev => ({
       ...prev,
       animals: prev.animals.map(a => a.id === animal.id ? { ...a, ...animal } : a)

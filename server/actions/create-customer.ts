@@ -168,7 +168,7 @@ export async function createCustomer(data: CustomerIntakeData): Promise<ActionRe
 
     // Prepare the owner data for insertion
     console.log('📋 Preparing owner data for insertion');
-    const ownerData: Database['public']['Tables']['customer']['Insert'] = {
+    const ownerData: any = {
       id: customerId,
       first_name: validatedData.first_name,
       last_name: validatedData.last_name,

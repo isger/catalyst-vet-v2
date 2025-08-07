@@ -7,7 +7,8 @@ import { useRequestCache } from './use-request-cache'
 import { useRealtimeCustomers } from './use-realtime-customers'
 import type { Database } from '@/types/supabase'
 
-type CustomerRow = Database['public']['Tables']['customer']['Row']
+// Note: Customer table type not yet generated in supabase types
+// type CustomerRow = Database['public']['Tables']['customer']['Row']
 
 export interface UsePaginatedCustomersOptions extends PaginationParams {
   enableRealtime?: boolean
@@ -69,7 +70,7 @@ export function usePaginatedCustomers(params: UsePaginatedCustomersOptions) {
   // Real-time updates (optional)
   const { enableRealtime = false, tenantId } = params
   
-  const handleCustomerAdded = useCallback((customer: CustomerRow) => {
+  const handleCustomerAdded = useCallback((customer: any) => {
     // Only add if it matches current filters/search
     if (!params.search || 
         customer.first_name?.toLowerCase().includes(params.search.toLowerCase()) ||
@@ -84,7 +85,7 @@ export function usePaginatedCustomers(params: UsePaginatedCustomersOptions) {
     }
   }, [params.search])
 
-  const handleCustomerUpdated = useCallback((customer: CustomerRow) => {
+  const handleCustomerUpdated = useCallback((customer: any) => {
     setData(prev => ({
       ...prev,
       data: prev.data.map(c => c.id === customer.id ? { ...c, ...customer } : c)

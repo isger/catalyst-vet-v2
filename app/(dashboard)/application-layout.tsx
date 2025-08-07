@@ -24,7 +24,7 @@ import {
   SidebarSpacer,
 } from '@/components/ui/sidebar'
 import { SidebarLayout } from '@/components/ui/sidebar-layout'
-import { getEvents } from '@/data'
+import { getQuickActions } from '@/data'
 import { ThemeToggle } from '@/components/theme-toggle'
 import {
   ArrowRightStartOnRectangleIcon,
@@ -44,9 +44,10 @@ import {
   SparklesIcon,
   Square2StackIcon,
   HeartIcon,
-  BanknotesIcon
+  BanknotesIcon,
 } from '@heroicons/react/20/solid'
 import { usePathname } from 'next/navigation'
+import { QuickActionItem } from '@/components/features/sidebar/QuickActionItem'
 
 function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
   const handleSignOut = async () => {
@@ -91,13 +92,13 @@ type membership = {
 }
 
 export function ApplicationLayout({
-  events,
+  quickActions,
   user,
   tenant,
   membership,
   children,
 }: {
-  events: Awaited<ReturnType<typeof getEvents>>
+  quickActions: Awaited<ReturnType<typeof getQuickActions>>
   user: User
   tenant: tenant
   membership: membership
@@ -211,11 +212,9 @@ export function ApplicationLayout({
             </SidebarSection>
 
             <SidebarSection className="max-lg:hidden">
-              <SidebarHeading>Upcoming Events</SidebarHeading>
-              {events.map((event) => (
-                <SidebarItem key={event.id} href={event.url}>
-                  {event.name}
-                </SidebarItem>
+              <SidebarHeading>Quick Actions</SidebarHeading>
+              {quickActions.map((action) => (
+                <QuickActionItem key={action.id} action={action} />
               ))}
             </SidebarSection>
 

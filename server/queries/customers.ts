@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 // Type helpers for tables
-type Owner = Database['public']['Tables']['customer']['Row']
-type Animal = Database['public']['Tables']['animal']['Row']
+type Owner = any
+type Animal = any
 
 export interface CustomerWithPets {
   id: string

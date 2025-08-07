@@ -8,7 +8,8 @@ import type { Database } from '@/types/supabase'
 type Appointment = Database['calendar']['Tables']['appointment']['Row']
 type AppointmentInsert = Database['calendar']['Tables']['appointment']['Insert']
 type AppointmentUpdate = Database['calendar']['Tables']['appointment']['Update']
-type AppointmentStaff = Database['calendar']['Tables']['appointment_staff']['Insert']
+// Note: Appointment staff table type not yet available in calendar schema
+// type AppointmentStaff = Database['calendar']['Tables']['appointment_staff']['Insert']
 
 // Validation schemas
 const createAppointmentSchema = z.object({
@@ -182,7 +183,7 @@ export async function createAppointment(data: CreateAppointmentData) {
     }
 
     // Create staff assignments
-    const staffAssignments: AppointmentStaff[] = validData.staff_profile_ids.map(staffProfileId => ({
+    const staffAssignments: any[] = validData.staff_profile_ids.map(staffProfileId => ({
       appointment_id: appointment.id,
       staff_profile_id: staffProfileId,
       role: 'primary', // Default role

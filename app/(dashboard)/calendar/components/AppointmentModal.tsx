@@ -16,6 +16,7 @@ import { useCalendar } from '../context/CalendarContext'
 import type { StaffMember } from '@/server/queries/appointments'
 import CustomerSearchCombobox from './CustomerSearchCombobox'
 import AnimalSearchCombobox from './AnimalSearchCombobox'
+import StaffSelectionCombobox from './StaffSelectionCombobox'
 
 // Form validation schema - updated for new calendar schema
 const appointmentSchema = z.object({
@@ -85,19 +86,6 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
     }>
   } | null>(null)
   const [selectedAnimalId, setSelectedAnimalId] = useState<string>('')
-  const [selectedAnimal, setSelectedAnimal] = useState<{
-    id: string
-    name: string
-    species: string
-    breed: string | null
-    date_of_birth: string | null
-    owner: {
-      id: string
-      first_name: string
-      last_name: string
-      email: string
-    } | null
-  } | null>(null)
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([])
 
   const isEditing = showEditModal && selectedAppointment
@@ -160,7 +148,6 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
         setSelectedCustomerId('')
         setSelectedCustomer(null)
         setSelectedAnimalId('')
-        setSelectedAnimal(null)
         setSelectedStaffIds(staff.length > 0 ? [staff[0].id] : [])
       }
     } else {
@@ -168,35 +155,28 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
       setSelectedCustomerId('')
       setSelectedCustomer(null)
       setSelectedAnimalId('')
-      setSelectedAnimal(null)
       setSelectedStaffIds([])
     }
   }, [isOpen, isEditing, selectedAppointment, selectedDate, currentDate, staff, appointmentTypes, form])
 
   // Handle customer selection and animal updates
-  const handleCustomerSelect = (customer: any) => {
-    setSelectedCustomer(customer)
+  const handleCustomerSelect = (customer: unknown) => {
+    setSelectedCustomer(customer as typeof selectedCustomer)
     
     // Clear animal selection when customer changes
     setSelectedAnimalId('')
-    setSelectedAnimal(null)
     form.setValue('animal_id', '')
   }
 
   // Handle animal selection
-  const handleAnimalSelect = (animal: any) => {
-    setSelectedAnimal(animal)
+  const handleAnimalSelect = (animal: { id: string } | null) => {
     form.setValue('animal_id', animal?.id || '')
   }
 
   // Handle staff selection changes
-  const handleStaffToggle = (staffId: string) => {
-    const newSelection = selectedStaffIds.includes(staffId)
-      ? selectedStaffIds.filter(id => id !== staffId)
-      : [...selectedStaffIds, staffId]
-    
-    setSelectedStaffIds(newSelection)
-    form.setValue('staff_profile_ids', newSelection)
+  const handleStaffSelectionChange = (staffIds: string[]) => {
+    setSelectedStaffIds(staffIds)
+    form.setValue('staff_profile_ids', staffIds)
   }
 
   // Format date for datetime-local input
@@ -261,7 +241,7 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
   }
 
   return (
-    <Dialog open={isOpen} onClose={closeModals} size="xl">
+    <Dialog open={isOpen} onClose={closeModals} size="4xl">
       <DialogTitle>
         {isEditing ? 'Edit Appointment' : 'Create New Appointment'}
       </DialogTitle>
@@ -276,10 +256,6 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
         <DialogBody className="space-y-6">
           {/* Customer and Animal Selection */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Patient Information
-            </h3>
-            
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <CustomerSearchCombobox
@@ -308,13 +284,9 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
 
           {/* Appointment Details */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Appointment Details
-            </h3>
-            
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <Label>Appointment Type</Label>
+                <Label className="block mb-2">Appointment Type</Label>
                 <Select {...form.register('appointment_type_id')}>
                   <option value="">Select appointment type</option>
                   {appointmentTypes.map(type => (
@@ -331,7 +303,7 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
               </div>
 
               <div>
-                <Label>Status</Label>
+                <Label className="block mb-2">Status</Label>
                 <Select {...form.register('status')}>
                   {appointmentStatuses.map(status => (
                     <option key={status.value} value={status.value}>
@@ -356,10 +328,6 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
 
           {/* Date and Time */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Date & Time
-            </h3>
-
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <Input
@@ -387,41 +355,19 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
 
           {/* Staff Assignment */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Staff Assignment
-            </h3>
-
             <div>
-              <Label>Assigned Staff (select one or more)</Label>
-              <div className="mt-2 space-y-2">
-                {staff.map(member => (
-                  <label key={member.id} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedStaffIds.includes(member.id)}
-                      onChange={() => handleStaffToggle(member.id)}
-                      className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <span className="text-sm">
-                      {member.first_name} {member.last_name} ({member.role})
-                    </span>
-                  </label>
-                ))}
-              </div>
-              {form.formState.errors.staff_profile_ids && (
-                <p className="mt-1 text-sm text-red-600">
-                  {form.formState.errors.staff_profile_ids.message}
-                </p>
-              )}
+              <StaffSelectionCombobox
+                staff={staff}
+                selectedStaffIds={selectedStaffIds}
+                onSelectionChange={handleStaffSelectionChange}
+                label="Assigned Staff (select one or more)"
+                error={form.formState.errors.staff_profile_ids?.message}
+              />
             </div>
           </div>
 
           {/* Additional Notes */}
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              Additional Notes
-            </h3>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Internal Notes

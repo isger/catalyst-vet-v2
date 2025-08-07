@@ -4,8 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { cache } from 'react'
 import type { Database } from '@/types/supabase'
 
-type Animal = Database['public']['Tables']['animal']['Row']
-type Owner = Database['public']['Tables']['customer']['Row']
+type Animal = any
+type Owner = any
 
 export type AnimalWithOwner = Animal & {
   owner: {

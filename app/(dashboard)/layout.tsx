@@ -1,4 +1,4 @@
-import { getEvents } from '@/data'
+import { getQuickActions } from '@/data'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
@@ -7,6 +7,7 @@ import { ApplicationLayout } from './application-layout'
 import { getUserTenantData } from '@/server/queries/tenant'
 import { getTenantById, checkTenantAccess } from '@/lib/tenant/resolver'
 import { TenantProvider } from '@/components/providers/tenant-provider'
+import { AnimalSearchProvider } from '@/components/features/animals/AnimalSearchProvider'
 import type { Database } from '@/types/supabase'
 
 type Tenant = Database['public']['Tables']['tenant']['Row']
@@ -24,11 +25,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Parallel data fetching for improved performance
   const [
     supabaseClient,
-    events,
+    quickActions,
     headersList
   ] = await Promise.all([
     createClient(),
-    getEvents(),
+    getQuickActions(),
     headers()
   ])
   
@@ -95,6 +96,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       tenant = {
         id: '1',
         name: 'Catalyst Veterinary',
+        slug: 'catalyst-veterinary',
         logo: 'https://nttivargznlzofkcbqtn.supabase.co/storage/v1/object/sign/assets/tenants/logoipsum-356.svg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wNWZkOGRjYS0yNDc3LTRkYzQtOTM3Yy1mNWZlMGY5MmEyOGUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvdGVuYW50cy9sb2dvaXBzdW0tMzU2LnN2ZyIsImlhdCI6MTc1MTgzNTUyMywiZXhwIjo0ODczODk5NTIzfQ.XyQZX2mx5a1ABkwF1hue4KiOzTfBqBkZPp9B_ud8x5Q',
         subdomain: 'default',
         created_at: new Date().toISOString(),
@@ -128,9 +130,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       isSubdomain={!!tenantId && !isCustomDomain}
       isCustomDomain={isCustomDomain}
     >
-      <ApplicationLayout events={events} user={user} tenant={tenant} membership={membership}>
-        {children}
-      </ApplicationLayout>
+      <AnimalSearchProvider>
+        <ApplicationLayout quickActions={quickActions} user={user} tenant={tenant} membership={membership}>
+          {children}
+        </ApplicationLayout>
+      </AnimalSearchProvider>
     </TenantProvider>
   )
 }
