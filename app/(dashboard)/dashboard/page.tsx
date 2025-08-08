@@ -1,5 +1,3 @@
-import { Button } from '@/components/ui/button'
-import { signOut } from '@/server/actions/auth'
 import { DonutChart } from '@/components/charts/donut-chart'
 import { AreaChart } from '@/components/charts/area-chart'
 import { BarChart } from '@/components/charts/bar-chart'
@@ -17,11 +15,6 @@ export default async function DashboardPage() {
             Dashboard
           </h2>
         </div>
-        <form onSubmit={signOut}>
-          <Button type="submit">
-            Sign Out
-          </Button>
-        </form>
       </div>
       
       <div className="space-y-8">

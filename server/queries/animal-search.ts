@@ -51,7 +51,7 @@ export async function searchAnimals(query: string): Promise<AnimalSearchResult[]
       )
     `)
     .eq('tenant_id', membershipData.tenant_id)
-    .or(`name.ilike.%${searchTerm}%,species.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`)
+    .or(`name.ilike.%${searchTerm}%,species.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%,microchip_id.ilike.%${searchTerm}%`)
     .order('name', { ascending: true })
     .limit(20)
 
@@ -70,7 +70,7 @@ export async function searchAnimals(query: string): Promise<AnimalSearchResult[]
         )
       `)
       .eq('tenant_id', membershipData.tenant_id)
-      .or(`name.ilike.%${searchTerm}%,species.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`)
+      .or(`name.ilike.%${searchTerm}%,species.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%,microchip_id.ilike.%${searchTerm}%`)
       .order('name', { ascending: true })
       .limit(20)
     

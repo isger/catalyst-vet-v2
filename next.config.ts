@@ -3,6 +3,22 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   
+  // Configure external image domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'nttivargznlzofkcbqtn.supabase.co',
+        pathname: '/**',
+      },
+    ],
+  },
+  
   // Enable experimental features for subdomain support and performance
   experimental: {
     // Allow dynamic imports for server-side tenant resolution

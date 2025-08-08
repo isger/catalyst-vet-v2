@@ -155,7 +155,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                   <ComboboxInput
                     autoFocus
                     className="col-start-1 row-start-1 h-12 w-full pr-4 pl-11 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm dark:text-gray-100 dark:bg-zinc-900"
-                    placeholder="Search animals by name, species, breed, or owner..."
+                    placeholder="Search animals by name, species, breed, microchip ID, or owner..."
                     onChange={(event) => setQuery(event.target.value)}
                     onBlur={() => setQuery('')}
                   />
@@ -223,6 +223,12 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                                 <dd>{activeOption.ownerPhone}</dd>
                               </>
                             )}
+                            {activeOption.microchip_id && (
+                              <>
+                                <dt className="col-end-1 font-semibold text-gray-900 dark:text-gray-100">Microchip ID</dt>
+                                <dd className="font-mono text-xs">{activeOption.microchip_id}</dd>
+                              </>
+                            )}
                             {activeOption.additional_notes && (
                               <>
                                 <dt className="col-end-1 font-semibold text-gray-900 dark:text-gray-100">Notes</dt>
@@ -247,7 +253,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                   <div className="px-6 py-14 text-center text-sm sm:px-14">
                     <MagnifyingGlassIcon className="mx-auto size-6 text-gray-400" aria-hidden="true" />
                     <p className="mt-4 font-semibold text-gray-900 dark:text-gray-100">Search for animals</p>
-                    <p className="mt-2 text-gray-500 dark:text-gray-400">Start typing to search by name, species, breed, or owner.</p>
+                    <p className="mt-2 text-gray-500 dark:text-gray-400">Start typing to search by name, species, breed, microchip ID, or owner.</p>
                   </div>
                 )}
 
