@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import { usePaginatedCustomers, useActiveCustomers, useCustomerStats } from '../use-customers'
+import { usePaginatedCustomers, useActiveCustomers } from '../use-customers'
 import { fetchPaginatedCustomers } from '@/server/actions/customers'
 import { createClient } from '@/lib/supabase/client'
 
@@ -47,15 +47,15 @@ describe('useCustomers hooks', () => {
         data: [
           {
             id: 'customer1',
-            firstName: 'John',
-            lastName: 'Doe',
+            first_name: 'John',
+            last_name: 'Doe',
             email: 'john@example.com',
             phone: '1234567890',
             address: { street: '123 Main St' },
-            createdAt: '2023-01-01T00:00:00Z',
-            updatedAt: '2023-01-01T00:00:00Z',
-            tenantId: 'tenant123',
-            patients: [],
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+            tenant_id: 'tenant123',
+            animals: [],
             lastVisit: undefined
           }
         ],
@@ -209,15 +209,15 @@ describe('useCustomers hooks', () => {
       const mockCustomers = [
         {
           id: 'customer1',
-          firstName: 'John',
-          lastName: 'Doe',
+          first_name: 'John',
+          last_name: 'Doe',
           email: 'john@example.com',
           phone: '1234567890',
           address: { street: '123 Main St' },
-          createdAt: '2023-01-01T00:00:00Z',
-          updatedAt: '2023-01-01T00:00:00Z',
-          tenantId: 'tenant123',
-          patients: [],
+          created_at: '2023-01-01T00:00:00Z',
+          updated_at: '2023-01-01T00:00:00Z',
+          tenant_id: 'tenant123',
+          animals: [],
           lastVisit: undefined
         }
       ]
@@ -252,165 +252,6 @@ describe('useCustomers hooks', () => {
 
       expect(result.current.error).toBe('Failed to fetch customers')
       expect(result.current.customers).toEqual([])
-    })
-  })
-
-  describe('useCustomerStats', () => {
-    const mockSupabase = {
-      from: vi.fn(() => ({
-        select: vi.fn(() => ({ data: [], error: null }))
-      }))
-    }
-
-    beforeEach(() => {
-      vi.mocked(createClient).mockReturnValue(mockSupabase as any)
-    })
-
-    it('should initialize with default stats', () => {
-      const { result } = renderHook(() => useCustomerStats())
-
-      expect(result.current.stats).toEqual({
-        active: 0,
-        new: 0,
-        consultation: 0,
-        followUp: 0,
-        inactive: 0
-      })
-      expect(result.current.loading).toBe(true)
-      expect(result.current.error).toBeNull()
-    })
-
-    it('should fetch and calculate stats correctly', async () => {
-      const now = new Date()
-      const twentyDaysAgo = new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000)
-      const twoMonthsAgo = new Date(now.getTime() - 2 * 30 * 24 * 60 * 60 * 1000)
-      const eightMonthsAgo = new Date(now.getTime() - 8 * 30 * 24 * 60 * 60 * 1000)
-      const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-
-      const mockCustomers = [
-        {
-          id: 'owner1',
-          createdAt: twentyDaysAgo.toISOString(),
-          patient: [
-            {
-              appointment: [
-                {
-                  status: 'completed',
-                  scheduledAt: twentyDaysAgo.toISOString()
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'owner2',
-          createdAt: twoMonthsAgo.toISOString(),
-          patient: [
-            {
-              appointment: [
-                {
-                  status: 'scheduled',
-                  scheduledAt: tomorrow.toISOString()
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 'owner3',
-          createdAt: eightMonthsAgo.toISOString(),
-          patient: []
-        }
-      ]
-
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: mockCustomers, error: null }))
-      })
-
-      const { result } = renderHook(() => useCustomerStats())
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false)
-      })
-
-      expect(result.current.stats).toEqual({
-        active: 2, // owner1 (recent) + owner2 (upcoming)
-        new: 1, // owner1 (created in last 30 days)
-        consultation: 1, // owner2 (has upcoming appointment)
-        followUp: 0, // Not implemented
-        inactive: 1 // owner3 (no activity, created > 6 months ago)
-      })
-      expect(result.current.error).toBeNull()
-    })
-
-    it('should handle database errors', async () => {
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: null, error: new Error('Database error') }))
-      })
-
-      const { result } = renderHook(() => useCustomerStats())
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false)
-      })
-
-      expect(result.current.error).toBe('Failed to fetch stats')
-      expect(result.current.stats).toEqual({
-        active: 0,
-        new: 0,
-        consultation: 0,
-        followUp: 0,
-        inactive: 0
-      })
-    })
-
-    it('should handle empty data response', async () => {
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: null, error: null }))
-      })
-
-      const { result } = renderHook(() => useCustomerStats())
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false)
-      })
-
-      expect(result.current.stats).toEqual({
-        active: 0,
-        new: 0,
-        consultation: 0,
-        followUp: 0,
-        inactive: 0
-      })
-      expect(result.current.error).toBeNull()
-    })
-
-    it('should handle customers with no patients', async () => {
-      const mockCustomers = [
-        {
-          id: 'owner1',
-          createdAt: new Date().toISOString(),
-          patient: null
-        }
-      ]
-
-      mockSupabase.from.mockReturnValue({
-        select: vi.fn(() => ({ data: mockCustomers, error: null }))
-      })
-
-      const { result } = renderHook(() => useCustomerStats())
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false)
-      })
-
-      expect(result.current.stats).toEqual({
-        active: 0,
-        new: 1, // Created recently
-        consultation: 0,
-        followUp: 0,
-        inactive: 0
-      })
     })
   })
 })

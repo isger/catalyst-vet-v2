@@ -202,7 +202,7 @@ export default function CalendarContent({ staff, appointmentTypes }: CalendarCon
                       onClick={() => openCreateModal()}
                       className="block w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 data-focus:bg-gray-100 dark:data-focus:bg-gray-700 data-focus:text-gray-900 dark:data-focus:text-gray-100 data-focus:outline-hidden"
                     >
-                      Create Appointment
+                      Add Appointment
                     </button>
                   </MenuItem>
                 </div>

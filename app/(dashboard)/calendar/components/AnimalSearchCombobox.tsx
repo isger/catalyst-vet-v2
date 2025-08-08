@@ -223,7 +223,7 @@ export default function AnimalSearchCombobox({
         </Label>
         <div className="relative mt-2">
           <ComboboxInput
-            className={`block w-full rounded-md bg-white dark:bg-gray-800 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm/6 ${
+            className={`block w-full rounded-md bg-white dark:bg-zinc-800/20 py-1.5 pr-12 pl-10 text-base text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm/6 ${
               error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             onChange={(event) => setQuery(event.target.value)}
@@ -248,7 +248,7 @@ export default function AnimalSearchCombobox({
 
           <ComboboxOptions
             transition
-            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
+            className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-zinc-800/20 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/5 focus:outline-hidden data-leave:transition data-leave:duration-100 data-leave:ease-in data-closed:data-leave:opacity-0 sm:text-sm"
           >
             {isLoading && (
               <div className="px-3 py-2 text-gray-500 dark:text-gray-400">

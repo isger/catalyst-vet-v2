@@ -19,6 +19,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Catalyst Vet",
   description: "Veterinary management software",
+  icons: {
+    icon: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

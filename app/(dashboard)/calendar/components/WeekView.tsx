@@ -283,20 +283,20 @@ export default function WeekView() {
                       <button
                         className="group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs/5 transition-colors"
                         style={{
-                          backgroundColor: appointment.color ? `${appointment.color}20` : '#f0f9ff',
-                          borderLeft: appointment.color ? `3px solid ${appointment.color}` : '3px solid #3b82f6'
+                          backgroundColor: appointment.color ? `${appointment.color}20` : 'rgb(244 244 245 / 0.5)', // zinc-100 with opacity
+                          borderLeft: appointment.color ? `3px solid ${appointment.color}` : '3px solid #71717a'
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = appointment.color ? `${appointment.color}30` : '#e0f2fe'
+                          e.currentTarget.style.backgroundColor = appointment.color ? `${appointment.color}30` : 'rgb(228 228 231 / 0.5)' // zinc-200 with opacity
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = appointment.color ? `${appointment.color}20` : '#f0f9ff'
+                          e.currentTarget.style.backgroundColor = appointment.color ? `${appointment.color}20` : 'rgb(244 244 245 / 0.5)' // zinc-100 with opacity
                         }}
                         onClick={() => {
                           openEditModal(appointment)
                         }}
                       >
-                        <p className="order-1 font-semibold truncate" style={{ color: appointment.color || '#1e40af' }}>
+                        <p className="order-1 font-semibold truncate text-zinc-700 dark:text-zinc-300" style={{ color: appointment.color ? appointment.color : undefined }}>
                           {appointment.title}
                         </p>
                         <p className="text-gray-600 dark:text-gray-400 truncate">

@@ -10,6 +10,8 @@ import { CustomerEditWrapper } from '@/components/features/customers/customer-ed
 import { ChevronLeftIcon, EnvelopeIcon, PhoneIcon } from '@heroicons/react/16/solid'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { CustomerDetailClient } from './customer-detail-client'
+import type { Tab } from '@/components/ui/tabs-v2'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
@@ -44,7 +46,7 @@ export default async function CustomerDetail({
     day: 'numeric' 
   })
 
-  const tabs = [
+  const tabs: Tab[] = [
     { name: 'Customer Information', value: 'customer-info' },
     { name: 'Insurance', value: 'insurance' },
     { name: 'Financial', value: 'financial' },
@@ -126,23 +128,11 @@ export default async function CustomerDetail({
 
       {/* Tab Navigation */}
       <div className="mt-8">
-        <div className="border-b border-gray-200 dark:border-zinc-700">
-          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
-            {tabs.map((tab) => (
-              <Link
-                key={tab.value}
-                href={`/customers/${id}?tab=${tab.value}`}
-                className={`flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${
-                  tab.value === activeTab
-                    ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                    : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:border-zinc-600 dark:hover:text-gray-300'
-                }`}
-              >
-                {tab.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        <CustomerDetailClient
+          customerId={id}
+          activeTab={activeTab}
+          tabs={tabs}
+        />
       </div>
 
       {/* Tab Content */}

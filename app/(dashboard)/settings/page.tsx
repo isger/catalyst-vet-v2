@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox, CheckboxField } from '@/components/ui/checkbox'
 import { Divider } from '@/components/ui/divider'
 import { Label } from '@/components/ui/fieldset'
@@ -7,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { Address } from './address'
 import { StaffManagement } from './staff-management'
@@ -14,6 +17,57 @@ import { createClient } from '@/lib/supabase/server'
 
 export const metadata: Metadata = {
   title: 'Settings',
+}
+
+async function UserInfo() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Get user's tenant membership information
+  let tenantInfo = null
+  if (user) {
+    const { data: membershipData } = await supabase
+      .from('tenant_membership')
+      .select(`
+        tenant_id,
+        role,
+        status,
+        tenant (
+          id,
+          name,
+          subdomain
+        )
+      `)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single()
+
+    tenantInfo = membershipData
+  }
+
+  return (
+    <div className="space-y-1 text-sm text-muted-foreground">
+      <p>User ID: {user?.id}</p>
+      {tenantInfo && (
+        <>
+          <p>Tenant ID: {tenantInfo.tenant_id}</p>
+          <p>Organization: {tenantInfo.tenant_id}</p>
+          <p>Role: {tenantInfo.role}</p>
+        </>
+      )}
+    </div>
+  )
+}
+
+function UserInfoSkeleton() {
+  return (
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-64" />
+      <Skeleton className="h-4 w-56" />
+      <Skeleton className="h-4 w-40" />
+      <Skeleton className="h-4 w-32" />
+    </div>
+  )
 }
 
 async function getTenantData() {
@@ -37,6 +91,8 @@ async function getTenantData() {
 export default async function Settings() {
   const tenantData = await getTenantData()
   const tenant = tenantData?.tenant
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
   
   return (
     <div className="mx-auto max-w-4xl space-y-10">
@@ -44,6 +100,20 @@ export default async function Settings() {
         <Heading>Settings</Heading>
         <Text className="mt-2">Manage your practice settings and staff members.</Text>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome!</CardTitle>
+          <CardDescription>
+            You are signed in as {user?.email}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<UserInfoSkeleton />}>
+            <UserInfo />
+          </Suspense>
+        </CardContent>
+      </Card>
 
       <Divider />
 

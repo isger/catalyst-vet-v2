@@ -13,7 +13,7 @@ import { ChevronRightIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid
 import { HeartIcon } from '@heroicons/react/24/outline'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { searchAnimals, getRecentAnimalSearches, type AnimalSearchResult } from '@/server/queries/animal-search'
+import { searchAnimals, type AnimalSearchResult } from '@/server/queries/animal-search'
 
 type Animal = AnimalSearchResult & {
   profileUrl: string
@@ -36,7 +36,6 @@ interface AnimalSearchModalProps {
 export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalProps) {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Animal[]>([])
-  const [recentAnimals, setRecentAnimals] = useState<Animal[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const router = useRouter()
 
@@ -87,14 +86,6 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
     return 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   }
 
-  // Load recent animals when modal opens
-  useEffect(() => {
-    if (open && recentAnimals.length === 0) {
-      getRecentAnimalSearches().then((results) => {
-        setRecentAnimals(results.map(transformAnimal))
-      }).catch(console.error)
-    }
-  }, [open, recentAnimals.length, transformAnimal])
 
   // Debounced search
   useEffect(() => {
@@ -120,7 +111,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
     return () => clearTimeout(timeoutId)
   }, [query, transformAnimal])
 
-  const displayedAnimals = query === '' ? recentAnimals : searchResults
+  const displayedAnimals = searchResults
 
   const handleAnimalSelect = (animal: Animal) => {
     router.push(animal.profileUrl)
@@ -149,7 +140,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto p-4 sm:p-6 md:p-20">
         <DialogPanel
           transition
-          className="mx-auto max-w-3xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in dark:bg-gray-900 dark:divide-gray-800 dark:ring-white/10"
+          className="mx-auto max-w-3xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in dark:bg-zinc-900 dark:divide-gray-800 dark:ring-white/10"
         >
           <Combobox
             onChange={(animal: Animal) => {
@@ -160,10 +151,10 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
           >
             {({ activeOption }: { activeOption: Animal | null }) => (
               <div>
-                <div className="grid grid-cols-1">
+                <div className="grid grid-cols-1 border-b border-gray-100 dark:border-gray-800">
                   <ComboboxInput
                     autoFocus
-                    className="col-start-1 row-start-1 h-12 w-full pr-4 pl-11 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm dark:text-gray-100 dark:bg-gray-900"
+                    className="col-start-1 row-start-1 h-12 w-full pr-4 pl-11 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm dark:text-gray-100 dark:bg-zinc-900"
                     placeholder="Search animals by name, species, breed, or owner..."
                     onChange={(event) => setQuery(event.target.value)}
                     onBlur={() => setQuery('')}
@@ -174,7 +165,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                   />
                 </div>
 
-                {(query === '' || displayedAnimals.length > 0 || isSearching) && (
+                {(query !== '' && (displayedAnimals.length > 0 || isSearching)) && (
                   <ComboboxOptions as="div" static hold className="flex transform-gpu divide-x divide-gray-100 dark:divide-gray-800">
                     <div
                       className={classNames(
@@ -182,9 +173,6 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                         activeOption ? 'sm:h-96' : undefined,
                       )}
                     >
-                      {query === '' && (
-                        <h2 className="mt-2 mb-4 text-xs font-semibold text-gray-500 dark:text-gray-400">Recent searches</h2>
-                      )}
                       <div className="-mx-2 text-sm text-gray-700 dark:text-gray-300">
                         {isSearching && (
                           <div className="flex items-center justify-center py-8">
@@ -196,7 +184,7 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                             as="div"
                             key={animal.id}
                             value={animal}
-                            className="group flex cursor-default items-center rounded-md p-2 select-none data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden dark:data-focus:bg-gray-800 dark:data-focus:text-gray-100"
+                            className="group flex cursor-default items-center rounded-md p-2 select-none data-focus:bg-gray-100 data-focus:text-gray-900 data-focus:outline-hidden dark:data-focus:bg-zinc-700/30 dark:data-focus:text-gray-100"
                           >
                             <img src={animal.imageUrl} alt={`${animal.name} profile`} className="size-6 flex-none rounded-full" />
                             <div className="ml-3 flex-auto">
@@ -235,6 +223,12 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                                 <dd>{activeOption.ownerPhone}</dd>
                               </>
                             )}
+                            {activeOption.additional_notes && (
+                              <>
+                                <dt className="col-end-1 font-semibold text-gray-900 dark:text-gray-100">Notes</dt>
+                                <dd className="whitespace-pre-wrap">{activeOption.additional_notes}</dd>
+                              </>
+                            )}
                           </dl>
                           <button
                             type="button"
@@ -247,6 +241,14 @@ export default function AnimalSearchModal({ open, onClose }: AnimalSearchModalPr
                       </div>
                     )}
                   </ComboboxOptions>
+                )}
+
+                {query === '' && (
+                  <div className="px-6 py-14 text-center text-sm sm:px-14">
+                    <MagnifyingGlassIcon className="mx-auto size-6 text-gray-400" aria-hidden="true" />
+                    <p className="mt-4 font-semibold text-gray-900 dark:text-gray-100">Search for animals</p>
+                    <p className="mt-2 text-gray-500 dark:text-gray-400">Start typing to search by name, species, breed, or owner.</p>
+                  </div>
                 )}
 
                 {query !== '' && !isSearching && displayedAnimals.length === 0 && (

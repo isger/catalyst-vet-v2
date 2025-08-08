@@ -38,7 +38,6 @@ import {
 } from '@heroicons/react/16/solid'
 import {
   CalendarIcon,
-  Cog6ToothIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
   SparklesIcon,
@@ -48,6 +47,7 @@ import {
 } from '@heroicons/react/20/solid'
 import { usePathname } from 'next/navigation'
 import { QuickActionItem } from '@/components/features/sidebar/QuickActionItem'
+import { Logo } from '@/app/logo'
 
 function AccountDropdownMenu({ anchor }: { anchor: 'top start' | 'bottom end' }) {
   const handleSignOut = async () => {
@@ -112,7 +112,7 @@ export function ApplicationLayout({
   const userAvatar = user?.user_metadata?.avatar_url
   
   // Get tenant display information
-  const tenantName = tenant?.name || 'Catalyst Veterinary'
+  const tenantName = tenant?.name
   const tenantLogo = tenant?.logo
 
   return (
@@ -141,10 +141,14 @@ export function ApplicationLayout({
               <DropdownButton as={SidebarItem}>
                 <Avatar 
                   src={tenantLogo || "/teams/catalyst.svg"} 
-                  initials={!tenantLogo ? tenantName.charAt(0).toUpperCase() : undefined}
+                  initials={!tenantLogo && tenantName ? tenantName.charAt(0).toUpperCase() : !tenantLogo ? "C" : undefined}
                   square={true}
                 />
-                <SidebarLabel>{tenantName}</SidebarLabel>
+                {tenantName ? (
+                  <SidebarLabel>{tenantName}</SidebarLabel>
+                ) : (
+                  <Logo className="h-5 text-white" />
+                )}
                 <ChevronDownIcon />
               </DropdownButton>
               <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
@@ -157,10 +161,16 @@ export function ApplicationLayout({
                   <Avatar 
                     slot="icon" 
                     src={tenantLogo || "/teams/catalyst.svg"} 
-                    initials={!tenantLogo ? tenantName.charAt(0).toUpperCase() : undefined}
+                    initials={!tenantLogo && tenantName ? tenantName.charAt(0).toUpperCase() : !tenantLogo ? "C" : undefined}
                     square={true}
                   />
-                  <DropdownLabel>{tenantName}</DropdownLabel>
+                  {tenantName ? (
+                    <DropdownLabel>{tenantName}</DropdownLabel>
+                  ) : (
+                    <div className="flex items-center">
+                      <Logo className="h-4 text-zinc-950 dark:text-white" />
+                    </div>
+                  )}
                 </DropdownItem>
                 {membership?.role === 'owner' && (
                   <>
@@ -204,10 +214,6 @@ export function ApplicationLayout({
               <SidebarItem href="/financial" current={pathname.startsWith('/financial')}>
                 <BanknotesIcon />
                 <SidebarLabel>Financial</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
-                <Cog6ToothIcon />
-                <SidebarLabel>Settings</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
 

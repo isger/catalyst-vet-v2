@@ -396,7 +396,7 @@ export default function AppointmentModal({ staff, appointmentTypes }: Appointmen
           >
             {isPending 
               ? (isEditing ? 'Updating...' : 'Creating...') 
-              : (isEditing ? 'Update Appointment' : 'Create Appointment')
+              : (isEditing ? 'Update Appointment' : 'Add Appointment')
             }
           </Button>
         </DialogActions>

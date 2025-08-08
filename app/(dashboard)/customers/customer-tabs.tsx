@@ -171,7 +171,7 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
           </h4>
           <Badge color="green">Loading...</Badge>
         </div>
-        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <TableHeader>Customer</TableHeader>
@@ -244,7 +244,7 @@ export function ActiveCustomers({ initialData, searchQuery }: ActiveCustomersPro
         </div>
       ) : (
         <>
-          <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+          <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
             <TableHead>
               <TableRow>
                 <SortableHeader
@@ -459,7 +459,7 @@ export function NewClients({ searchQuery = '', sortBy = 'name' }: TabProps) {
             : 'No new clients found'}
         </div>
       ) : (
-        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -617,7 +617,7 @@ export function Consultation({ searchQuery = '', sortBy = 'name' }: TabProps) {
             : 'No appointments scheduled'}
         </div>
       ) : (
-        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -792,7 +792,7 @@ export function FollowUp({ searchQuery = '', sortBy = 'name' }: TabProps) {
             : 'No follow-ups required'}
         </div>
       ) : (
-        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader
@@ -963,7 +963,7 @@ export function Inactive({ searchQuery = '', sortBy = 'name' }: TabProps) {
             : 'No inactive customers found'}
         </div>
       ) : (
-        <Table striped className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
+        <Table striped bleed className="[--gutter:--spacing(6)] lg:[--gutter:--spacing(10)]">
           <TableHead>
             <TableRow>
               <SortableHeader

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getAnimalById } from '@/server/queries/animals'
 import { Badge } from '@/components/ui/badge'
+import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { 
   CalendarIcon, 
@@ -16,6 +17,8 @@ import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { Divider } from '@/components/ui/divider'
 import { Subheading } from '@/components/ui/heading'
 import { DescriptionDetails, DescriptionList, DescriptionTerm } from '@/components/ui/description-list'
+import { AnimalDetailClient } from './animal-detail-client'
+import type { Tab } from '@/components/ui/tabs-v2'
 
 export default async function AnimalDetailPage({
   params,
@@ -55,7 +58,22 @@ export default async function AnimalDetailPage({
     return colors[species] || 'bg-gray-100 text-gray-800'
   }
 
-  const tabs = [
+  // Function to get default animal image based on species
+  const getAnimalImage = (species: string): string => {
+    const speciesLower = species.toLowerCase()
+    if (speciesLower.includes('dog')) {
+      return 'https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    } else if (speciesLower.includes('cat')) {
+      return 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    } else if (speciesLower.includes('bird')) {
+      return 'https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    } else if (speciesLower.includes('rabbit')) {
+      return 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    }
+    return 'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+  }
+
+  const tabs: Tab[] = [
     { name: 'Basic Information', value: 'basic-info' },
     { name: 'Medical Records', value: 'medical' },
     { name: 'Activity & Comments', value: 'activity' },
@@ -77,6 +95,14 @@ export default async function AnimalDetailPage({
       <div className="mt-4 lg:mt-8">
         <div className="md:flex md:items-center md:justify-between md:space-x-5">
           <div className="flex items-start space-x-5">
+            <div className="flex-shrink-0">
+              <Avatar 
+                src={getAnimalImage(animal.species)} 
+                initials={animal.name.charAt(0).toUpperCase()}
+                alt={`${animal.name} profile`}
+                className="size-20"
+              />
+            </div>
             <div className="pt-1.5">
               <h1 className="text-2xl font-bold text-zinc-950 dark:text-white">
                 {animal.name}
@@ -119,23 +145,11 @@ export default async function AnimalDetailPage({
 
       {/* Tab Navigation */}
       <div className="mt-8">
-        <div className="border-b border-gray-200 dark:border-zinc-700">
-          <nav aria-label="Tabs" className="-mb-px flex space-x-8">
-            {tabs.map((tab) => (
-              <Link
-                key={tab.value}
-                href={`/animals/${id}${tab.value !== 'basic-info' ? `?tab=${tab.value}` : ''}`}
-                className={`flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors ${
-                  tab.value === activeTab
-                    ? 'border-indigo-500 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                    : 'border-transparent text-gray-500 hover:border-gray-200 hover:text-gray-700 dark:text-gray-400 dark:hover:border-zinc-600 dark:hover:text-gray-300'
-                }`}
-              >
-                {tab.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        <AnimalDetailClient
+          animalId={id}
+          activeTab={activeTab}
+          tabs={tabs}
+        />
       </div>
 
       {/* Tab Content */}

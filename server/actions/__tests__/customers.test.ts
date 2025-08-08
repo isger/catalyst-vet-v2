@@ -18,15 +18,15 @@ describe('Customer Actions', () => {
         data: [
           {
             id: 'customer1',
-            firstName: 'John',
-            lastName: 'Doe',
+            first_name: 'John',
+            last_name: 'Doe',
             email: 'john@example.com',
             phone: '1234567890',
             address: { street: '123 Main St' },
-            createdAt: '2023-01-01T00:00:00Z',
-            updatedAt: '2023-01-01T00:00:00Z',
-            tenantId: 'tenant123',
-            patients: [],
+            created_at: '2023-01-01T00:00:00Z',
+            updated_at: '2023-01-01T00:00:00Z',
+            tenant_id: 'tenant123',
+            animals: [],
             lastVisit: undefined
           }
         ],

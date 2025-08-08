@@ -322,16 +322,16 @@ export default function DayView() {
                 
                 {dayAppointments.map((appointment) => {
                   const gridPosition = getAppointmentGridPosition(appointment.start_time, appointment.end_time)
-                  const appointmentColor = appointment.color || appointment.staff.color || '#3B82F6'
+                  const appointmentColor = appointment.color || appointment.staff.color || '#71717a'
                   
                   // Generate color classes based on the appointment color
                   const getColorClasses = (color: string) => {
-                    // Default to blue if no valid color
-                    if (!color || color === '#3B82F6') {
+                    // Default to zinc if no valid color
+                    if (!color || color === '#3B82F6' || color === '#71717a') {
                       return {
-                        bg: 'bg-blue-50 hover:bg-blue-100',
-                        textPrimary: 'text-blue-700',
-                        textSecondary: 'text-blue-500 group-hover:text-blue-700'
+                        bg: 'bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700',
+                        textPrimary: 'text-zinc-700 dark:text-zinc-300',
+                        textSecondary: 'text-zinc-500 group-hover:text-zinc-700 dark:text-zinc-400 dark:group-hover:text-zinc-300'
                       }
                     }
                     
