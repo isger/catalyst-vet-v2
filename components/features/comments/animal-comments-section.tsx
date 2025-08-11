@@ -14,6 +14,15 @@ import {
 } from '@heroicons/react/20/solid'
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 
+interface FieldChange {
+  from?: string | number | null
+  to?: string | number | null
+}
+
+interface ActivityChanges {
+  [fieldName: string]: FieldChange | string | number | null
+}
+
 interface ActivityItem {
   id: string
   type: 'created' | 'edited' | 'sent' | 'viewed' | 'paid' | 'commented'
@@ -24,6 +33,8 @@ interface ActivityItem {
   comment?: string
   date: string
   dateTime: string
+  changes?: ActivityChanges
+  action_description?: string
 }
 
 interface User {
@@ -58,6 +69,57 @@ function getUserInitials(name: string): string {
     .join('')
     .toUpperCase()
     .slice(0, 2)
+}
+
+function formatFieldChanges(changes: ActivityChanges | undefined, action_description?: string): string {
+  if (!changes || typeof changes !== 'object') {
+    return action_description || 'updated the record'
+  }
+
+  const fieldLabels: Record<string, string> = {
+    name: 'name',
+    species: 'species',
+    breed: 'breed',
+    color: 'color',
+    gender: 'gender',
+    date_of_birth: 'date of birth',
+    weight_kg: 'weight',
+    microchip_id: 'microchip ID',
+    insurance_provider: 'insurance provider',
+    insurance_policy_number: 'insurance policy number',
+    behavioral_notes: 'behavioral notes',
+    dietary_requirements: 'dietary requirements',
+    allergies: 'allergies',
+    medical_conditions: 'medical conditions',
+    medications: 'medications'
+  }
+
+  const changedFields = Object.keys(changes)
+  if (changedFields.length === 0) {
+    return action_description || 'updated the record'
+  }
+
+  if (changedFields.length === 1) {
+    const field = changedFields[0]
+    const change = changes[field]
+    const fieldLabel = fieldLabels[field] || field
+    
+    if (change && typeof change === 'object' && 'from' in change && 'to' in change) {
+      const fromValue = change.from ? String(change.from) : 'empty'
+      const toValue = change.to ? String(change.to) : 'empty'
+      return `changed ${fieldLabel} from "${fromValue}" to "${toValue}"`
+    } else {
+      return `updated ${fieldLabel}`
+    }
+  }
+
+  // Multiple fields changed
+  const fieldNames = changedFields.map(field => fieldLabels[field] || field)
+  if (fieldNames.length <= 3) {
+    return `updated ${fieldNames.join(', ')}`
+  } else {
+    return `updated ${fieldNames.slice(0, 2).join(', ')} and ${fieldNames.length - 2} other field${fieldNames.length - 2 > 1 ? 's' : ''}`
+  }
 }
 
 export function AnimalCommentsSection({ activities, currentUser, onAddComment }: AnimalCommentsSectionProps) {
@@ -134,8 +196,11 @@ export function AnimalCommentsSection({ activities, currentUser, onAddComment }:
                   )}
                 </div>
                 <p className="flex-auto py-0.5 text-xs/5 text-gray-500 dark:text-gray-400">
-                  <span className="font-medium text-gray-900 dark:text-white">{activityItem.person.name}</span> {activityItem.type} the
-                  record.
+                  <span className="font-medium text-gray-900 dark:text-white">{activityItem.person.name}</span>{' '}
+                  {activityItem.type === 'edited' ? 
+                    formatFieldChanges(activityItem.changes, activityItem.action_description) : 
+                    `${activityItem.type} the record`
+                  }.
                 </p>
                 <time dateTime={activityItem.dateTime} className="flex-none py-0.5 text-xs/5 text-gray-500 dark:text-gray-400">
                   {activityItem.date}

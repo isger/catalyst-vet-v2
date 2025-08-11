@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@/components/ui/link'
 import { updateAnimal, type AnimalFormData } from '@/server/actions/animals'
 import { toast } from 'sonner'
-import { UserCircleIcon, CalendarDaysIcon, CreditCardIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/20/solid'
-import { DemoAnimalComments } from '@/components/features/comments/demo-animal-comments'
+import { UserCircleIcon, CreditCardIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/20/solid'
+import {PhoneIcon} from "@heroicons/react/16/solid";
+import { AnimalActivityClient } from '@/components/features/comments/animal-activity-client'
 
 interface AnimalBasicInfoFormProps {
   animal: {
@@ -129,7 +130,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
             <div className="flex-none self-end px-6 pt-4">
               <dt className="sr-only">Species</dt>
               <dd className="rounded-md bg-blue-50 dark:bg-blue-900/50 px-2 py-1 text-xs font-medium text-blue-600 dark:text-blue-300 ring-1 ring-blue-600/20 dark:ring-blue-400/20 ring-inset">
-                {formData.species}
+                Insured
               </dd>
             </div>
             <div className="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 dark:border-white/10 px-6 pt-6">
@@ -143,7 +144,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
               <div className="mt-4 flex w-full flex-none gap-x-4 px-6">
                 <dt className="flex-none">
                   <span className="sr-only">Phone</span>
-                  <CalendarDaysIcon className="h-6 w-5 text-gray-400 dark:text-gray-500" />
+                  <PhoneIcon className="h-6 w-5 text-gray-400 dark:text-gray-500" />
                 </dt>
                 <dd className="text-sm/6 text-gray-500 dark:text-gray-400">{animal.owner.phone}</dd>
               </div>
@@ -151,7 +152,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
             {formData.microchip_id && (
               <div className="mt-4 flex w-full flex-none gap-x-4 px-6">
                 <dt className="flex-none">
-                  <span className="sr-only">Microchip</span>
+                  <span className="sr-only">Last Visit</span>
                   <CreditCardIcon className="h-6 w-5 text-gray-400 dark:text-gray-500" />
                 </dt>
                 <dd className="text-sm/6 text-gray-500 dark:text-gray-400 font-mono">{formData.microchip_id}</dd>
@@ -216,7 +217,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                 />
               </dd>
             </div>
@@ -250,7 +251,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                   value={formData.breed}
                   onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                   placeholder={!isEditing && !formData.breed ? 'Unknown' : (isEditing ? 'Enter breed' : '')}
                 />
               </dd>
@@ -265,7 +266,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                   value={formData.color}
                   onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                   placeholder={!isEditing && !formData.color ? 'Not specified' : (isEditing ? 'Enter color' : '')}
                 />
               </dd>
@@ -299,10 +300,10 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                 <Input
                   name="date_of_birth"
                   type={isEditing ? "date" : "text"}
-                  value={isEditing ? formData.date_of_birth : (formData.date_of_birth ? new Date(formData.date_of_birth).toLocaleDateString() : 'Unknown')}
+                  value={isEditing ? formData.date_of_birth : (formData.date_of_birth ? new Date(formData.date_of_birth).toLocaleDateString('en-US') : 'Unknown')}
                   onChange={(e) => setFormData({ ...formData, date_of_birth: e.target.value })}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                 />
               </dd>
             </div>
@@ -322,7 +323,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                     weight_kg: e.target.value ? parseFloat(e.target.value) : undefined 
                   })}
                   readOnly={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                   placeholder={isEditing ? 'Weight in kg' : ''}
                 />
               </dd>
@@ -337,7 +338,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                   value={formData.microchip_id}
                   onChange={(e) => setFormData({ ...formData, microchip_id: e.target.value })}
                   readOnly={!isEditing}
-                  className={`font-mono ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}`}
+                  className={`font-mono ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}`}
                   placeholder={!isEditing && !formData.microchip_id ? 'Not set' : (isEditing ? 'Enter microchip ID' : '')}
                 />
               </dd>
@@ -356,7 +357,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                     value={formData.insurance_provider}
                     onChange={(e) => setFormData({ ...formData, insurance_provider: e.target.value })}
                     readOnly={!isEditing}
-                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                     placeholder={!isEditing && !formData.insurance_provider ? 'None' : (isEditing ? 'Enter provider name' : '')}
                   />
                 </dd>
@@ -370,7 +371,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                     value={formData.insurance_policy_number}
                     onChange={(e) => setFormData({ ...formData, insurance_policy_number: e.target.value })}
                     readOnly={!isEditing}
-                    className={`font-mono ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}`}
+                    className={`font-mono ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}`}
                     placeholder={!isEditing && !formData.insurance_policy_number ? 'None' : (isEditing ? 'Enter policy number' : '')}
                   />
                 </dd>
@@ -391,7 +392,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                     value={formData.behavioral_notes}
                     onChange={(e) => setFormData({ ...formData, behavioral_notes: e.target.value })}
                     readOnly={!isEditing}
-                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                     placeholder={isEditing ? "Any behavioral notes, temperament, or special handling instructions..." : (!formData.behavioral_notes ? 'None recorded' : '')}
                   />
                 </dd>
@@ -406,7 +407,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                     value={formData.dietary_requirements}
                     onChange={(e) => setFormData({ ...formData, dietary_requirements: e.target.value })}
                     readOnly={!isEditing}
-                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                    className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-gray-400' : ''}
                     placeholder={isEditing ? "Special dietary needs, food allergies, or feeding instructions..." : (!formData.dietary_requirements ? 'None recorded' : '')}
                   />
                 </dd>
@@ -420,14 +421,14 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
               <div>
                 <dt className="font-semibold text-gray-900 dark:text-white">Record Created</dt>
                 <dd className="mt-1 text-gray-500 dark:text-gray-400">
-                  {new Date(animal.created_at).toLocaleDateString()}
+                  {new Date(animal.created_at).toLocaleDateString('en-US')}
                 </dd>
               </div>
               
               <div>
                 <dt className="font-semibold text-gray-900 dark:text-white">Last Updated</dt>
                 <dd className="mt-1 text-gray-500 dark:text-gray-400">
-                  {new Date(animal.updated_at).toLocaleDateString()}
+                  {new Date(animal.updated_at).toLocaleDateString('en-US')}
                 </dd>
               </div>
             </dl>
@@ -439,9 +440,10 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
       <div className="lg:col-start-3">
         <h2 className="text-sm/6 font-semibold text-gray-900 dark:text-white">Activity & Comments</h2>
         <div className="mt-6">
-          <DemoAnimalComments animalId={animal.id} />
+          <AnimalActivityClient animalId={animal.id} />
         </div>
       </div>
+
     </div>
   )
 }

@@ -15,7 +15,6 @@ import {
   ArchiveBoxIcon,
   ChevronDownIcon,
   DocumentDuplicateIcon,
-  PencilSquareIcon,
   UserPlusIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon
@@ -27,6 +26,8 @@ import { Divider } from '@/components/ui/divider'
 import { Subheading } from '@/components/ui/heading'
 import { AnimalDetailClient } from './animal-detail-client'
 import { AnimalBasicInfoForm } from './animal-basic-info-form'
+import { AnimalActivityFeed } from '@/components/features/comments/animal-activity-feed'
+import { Suspense } from 'react'
 import type { Tab } from '@/components/ui/tabs-v2'
 
 export default async function AnimalDetailPage({
@@ -85,6 +86,7 @@ export default async function AnimalDetailPage({
   const tabs: Tab[] = [
     { name: 'Basic Information', value: 'basic-info' },
     { name: 'Medical Records', value: 'medical' },
+    { name: 'Activity & Comments', value: 'activity' },
     { name: 'Standard of Care', value: 'standard-of-care' },
     { name: 'Communications', value: 'communications' },
     { name: 'Appointments', value: 'appointments' },
@@ -163,18 +165,6 @@ export default async function AnimalDetailPage({
                       Generate Report
                     </button>
                   </MenuItem>
-                  <MenuItem>
-                    <button
-                      type="button"
-                      className="group flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 data-focus:bg-gray-100 dark:data-focus:bg-zinc-700 data-focus:text-gray-900 dark:data-focus:text-white data-focus:outline-hidden"
-                    >
-                      <PencilSquareIcon
-                        aria-hidden="true"
-                        className="mr-3 size-5 text-gray-400 dark:text-gray-500 group-data-focus:text-gray-500 dark:group-data-focus:text-gray-400"
-                      />
-                      Edit Record
-                    </button>
-                  </MenuItem>
                 </div>
                 <div className="py-1">
                   <MenuItem>
@@ -233,6 +223,22 @@ export default async function AnimalDetailPage({
       <div className="mt-8">
         {activeTab === 'basic-info' && (
           <AnimalBasicInfoForm animal={animal} />
+        )}
+
+        {activeTab === 'activity' && (
+          <>
+            <Subheading>Activity & Comments</Subheading>
+            <Divider className="mt-4" />
+            <div className="mt-6">
+              <Suspense fallback={<div className="animate-pulse space-y-4">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </div>}>
+                <AnimalActivityFeed animalId={id} />
+              </Suspense>
+            </div>
+          </>
         )}
 
         {activeTab === 'medical' && (

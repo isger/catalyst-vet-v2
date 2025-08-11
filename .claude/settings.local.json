@@ -30,7 +30,8 @@
       "Bash(git pull:*)",
       "WebFetch(domain:github.com)",
       "Bash(supabase link:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(supabase projects:*)"
     ],
     "deny": []
   }
