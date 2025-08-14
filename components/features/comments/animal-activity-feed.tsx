@@ -40,7 +40,7 @@ export async function AnimalActivityFeed({ animalId }: AnimalActivityFeedProps) 
     const currentUser = {
       id: user.id,
       name: profile?.name || user.email || 'Unknown User',
-      imageUrl: profile?.image || undefined
+      imageUrl: user.user_metadata?.avatar_url || profile?.image || undefined
     }
 
     // Transform activities to match the expected interface

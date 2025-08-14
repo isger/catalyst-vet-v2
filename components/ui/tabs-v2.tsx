@@ -38,7 +38,7 @@ export default function TabsV2({ tabs, defaultValue, onTabChange }: TabsV2Props)
           value={tabs.find((tab) => tab.value === activeTab)?.name || ''}
           onChange={handleSelectChange}
           aria-label="Select a tab"
-          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white dark:bg-zinc-900 py-2 pr-8 pl-3 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-zinc-600 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:focus:outline-indigo-400"
+          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white dark:bg-zinc-900 py-2 pr-8 pl-3 text-base text-gray-900 dark:text-gray-100 outline-1 -outline-offset-1 outline-gray-300 dark:outline-zinc-600 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 dark:focus:outline-indigo-500"
         >
           {tabs.map((tab) => (
             <option key={tab.value} value={tab.name}>
@@ -61,21 +61,17 @@ export default function TabsV2({ tabs, defaultValue, onTabChange }: TabsV2Props)
                 aria-current={tab.value === activeTab ? 'page' : undefined}
                 className={cn(
                   tab.value === activeTab
-                    ? 'border-b-2'
+                    ? 'border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
                   'flex px-1 py-4 text-sm font-medium whitespace-nowrap',
                 )}
-                style={tab.value === activeTab ? {
-                  borderBottomColor: '#2563eb',
-                  color: '#2563eb'
-                } : undefined}
               >
                 {tab.name}
                 {tab.count ? (
                   <span
                     className={cn(
                       tab.value === activeTab 
-                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300' 
+                        ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-400' 
                         : 'bg-gray-100 text-gray-900 dark:bg-zinc-800 dark:text-gray-300',
                       'ml-3 hidden rounded-full px-2.5 py-0.5 text-xs font-medium md:inline-block',
                     )}

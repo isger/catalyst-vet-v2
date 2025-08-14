@@ -17,6 +17,8 @@ import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@h
 interface FieldChange {
   from?: string | number | null
   to?: string | number | null
+  old?: string | number | null
+  new?: string | number | null
 }
 
 interface ActivityChanges {
@@ -104,9 +106,20 @@ function formatFieldChanges(changes: ActivityChanges | undefined, action_descrip
     const change = changes[field]
     const fieldLabel = fieldLabels[field] || field
     
-    if (change && typeof change === 'object' && 'from' in change && 'to' in change) {
-      const fromValue = change.from ? String(change.from) : 'empty'
-      const toValue = change.to ? String(change.to) : 'empty'
+    if (change && typeof change === 'object') {
+      // Handle both 'from'/'to' and 'old'/'new' formats
+      let fromValue: string, toValue: string
+      
+      if ('from' in change && 'to' in change) {
+        fromValue = change.from ? String(change.from) : 'empty'
+        toValue = change.to ? String(change.to) : 'empty'
+      } else if ('old' in change && 'new' in change) {
+        fromValue = change.old ? String(change.old) : 'empty'
+        toValue = change.new ? String(change.new) : 'empty'
+      } else {
+        return `updated ${fieldLabel}`
+      }
+      
       return `changed ${fieldLabel} from "${fromValue}" to "${toValue}"`
     } else {
       return `updated ${fieldLabel}`

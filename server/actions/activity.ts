@@ -50,7 +50,7 @@ export async function addComment(
         type: 'commented' as const,
         person: {
           name: newComment.posted_by_profile?.name || 'Unknown User',
-          imageUrl: newComment.posted_by_profile?.image || undefined,
+          imageUrl: user.user_metadata?.avatar_url || newComment.posted_by_profile?.image || undefined,
         },
         comment: newComment.comment,
         date: 'now',

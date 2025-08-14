@@ -9,7 +9,7 @@ import { updateAnimal, type AnimalFormData } from '@/server/actions/animals'
 import { toast } from 'sonner'
 import { UserCircleIcon, CreditCardIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/20/solid'
 import {PhoneIcon} from "@heroicons/react/16/solid";
-import { AnimalActivityClient } from '@/components/features/comments/animal-activity-client'
+import { AnimalActivitySummary } from '@/components/features/comments/animal-activity-summary'
 
 interface AnimalBasicInfoFormProps {
   animal: {
@@ -416,7 +416,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
           </div>
 
           {/* Metadata Section */}
-          <div className="mt-12 pt-6 border-t border-gray-200 dark:border-zinc-700">
+          <div className="mt-12 pt-6 -mx-6 px-6 border-t border-gray-200 dark:border-zinc-700">
             <dl className="grid grid-cols-1 text-sm/6 sm:grid-cols-2 gap-x-6 gap-y-4">
               <div>
                 <dt className="font-semibold text-gray-900 dark:text-white">Record Created</dt>
@@ -436,11 +436,11 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
         </form>
       </div>
 
-      {/* Activity Feed */}
+      {/* Recent Activity */}
       <div className="lg:col-start-3">
-        <h2 className="text-sm/6 font-semibold text-gray-900 dark:text-white">Activity & Comments</h2>
+        <h2 className="text-sm/6 font-semibold text-gray-900 dark:text-white">Recent Activity</h2>
         <div className="mt-6">
-          <AnimalActivityClient animalId={animal.id} />
+          <AnimalActivitySummary animalId={animal.id} maxItems={4} />
         </div>
       </div>
 

@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 interface FieldChange {
   from?: string | number | null
   to?: string | number | null
+  old?: string | number | null
+  new?: string | number | null
 }
 
 interface ActivityChanges {
