@@ -33,6 +33,7 @@
       "Bash(cp:*)",
       "Bash(supabase projects:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

@@ -82,7 +82,7 @@ type tenant = {
   id: string
   name: string
   logo: string | null
-}
+} | null
 
 type membership = {
   id: string

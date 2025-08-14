@@ -18,6 +18,13 @@ type Membership = {
   role: 'owner' | 'admin' | 'member'
 }
 
+// Type for ApplicationLayout - simplified tenant interface
+type LayoutTenant = {
+  id: string
+  name: string
+  logo: string | null
+}
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Warm connections early for better performance
   await connection()
@@ -47,6 +54,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   
   let tenant: Tenant | null = null
   let membership: Membership
+  
+  // Helper function to convert Tenant to LayoutTenant
+  const toLayoutTenant = (t: Tenant | null): LayoutTenant | null => {
+    if (!t) return null
+    return {
+      id: t.id,
+      name: t.name,
+      logo: t.logo
+    }
+  }
   
   if (tenantId) {
     // Parallel tenant operations for better performance
@@ -96,7 +113,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       tenant = {
         id: '1',
         name: 'Catalyst Veterinary',
-        slug: 'catalyst-veterinary',
         logo: 'https://nttivargznlzofkcbqtn.supabase.co/storage/v1/object/sign/assets/tenants/logoipsum-356.svg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8wNWZkOGRjYS0yNDc3LTRkYzQtOTM3Yy1mNWZlMGY5MmEyOGUiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhc3NldHMvdGVuYW50cy9sb2dvaXBzdW0tMzU2LnN2ZyIsImlhdCI6MTc1MTgzNTUyMywiZXhwIjo0ODczODk5NTIzfQ.XyQZX2mx5a1ABkwF1hue4KiOzTfBqBkZPp9B_ud8x5Q',
         subdomain: 'default',
         created_at: new Date().toISOString(),
@@ -131,7 +147,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       isCustomDomain={isCustomDomain}
     >
       <AnimalSearchProvider>
-        <ApplicationLayout quickActions={quickActions} user={user} tenant={tenant} membership={membership}>
+        <ApplicationLayout quickActions={quickActions} user={user} tenant={toLayoutTenant(tenant)} membership={membership}>
           {children}
         </ApplicationLayout>
       </AnimalSearchProvider>
