@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidateTag, revalidatePath } from 'next/cache'
+import { getCurrentUserTenant, getCurrentTenantId } from '@/lib/tenant/current-user'
 import type { Database } from '@/types/supabase'
 
 type TenantMembership = Database['public']['Tables']['tenant_membership']['Row']
@@ -11,61 +12,46 @@ export async function getStaffMembers() {
   
   const supabase = await createClient()
   
-  // Get current user's tenant
-  const { data: { user } } = await supabase.auth.getUser()
-  console.log('Current user:', user?.id)
-  
-  if (!user) {
-    console.log('No user found, returning empty array')
-    return []
-  }
+  try {
+    // Get current user's tenant using helper (throws if no app_metadata)
+    const tenantId = await getCurrentTenantId()
+    console.log('Tenant ID from helper:', tenantId)
 
-  const { data: currentMembership, error: membershipError } = await supabase
-    .from('tenant_membership')
-    .select('tenant_id')
-    .eq('user_id', user.id)
-    .single()
+    // Get all staff members for this tenant
+    const { data, error } = await supabase
+      .from('tenant_membership')
+      .select(`
+        *,
+        user:profiles!inner(
+          id,
+          email,
+          name,
+          image
+        )
+      `)
+      .eq('tenant_id', tenantId)
+      .order('created_at', { ascending: false })
 
-  console.log('Current membership query result:', { currentMembership, membershipError })
+    console.log('Staff members query result:', { data, error })
+    console.log('Staff members count:', data?.length || 0)
+    
+    if (data && data.length > 0) {
+      console.log('First staff member:', data[0])
+      console.log('All staff member IDs:', data.map(m => m.id))
+    }
+    
+    console.log('===============================================')
 
-  if (!currentMembership) {
-    console.log('No membership found, returning empty array')
-    return []
-  }
-
-  console.log('Tenant ID:', currentMembership.tenant_id)
-
-  // Get all staff members for this tenant
-  const { data, error } = await supabase
-    .from('tenant_membership')
-    .select(`
-      *,
-      user:profiles!inner(
-        id,
-        email,
-        name,
-        image
-      )
-    `)
-    .eq('tenant_id', currentMembership.tenant_id)
-    .order('created_at', { ascending: false })
-
-  console.log('Staff members query result:', { data, error })
-  console.log('Staff members count:', data?.length || 0)
-  
-  if (data && data.length > 0) {
-    console.log('First staff member:', data[0])
-    console.log('All staff member IDs:', data.map(m => m.id))
-  }
-  
-  console.log('===============================================')
-
-  if (error) {
-    console.error('Staff members query error:', error)
+    if (error) {
+      console.error('Staff members query error:', error)
+      throw error
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Error in getStaffMembers:', error)
     throw error
   }
-  
-  return data || []
 }
 
 export async function inviteStaffMember(formData: FormData) {
@@ -78,16 +64,8 @@ export async function inviteStaffMember(formData: FormData) {
     throw new Error('Email and role are required')
   }
 
-  // Get current user's tenant and verify permissions
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Not authenticated')
-
-  const { data: currentMembership } = await supabase
-    .from('tenant_membership')
-    .select('tenant_id, role')
-    .eq('user_id', user.id)
-    .single()
-
+  // Get current user's tenant and verify permissions using helper
+  const currentMembership = await getCurrentUserTenant()
   if (!currentMembership || !['owner', 'admin'].includes(currentMembership.role)) {
     throw new Error('Insufficient permissions to invite staff members')
   }

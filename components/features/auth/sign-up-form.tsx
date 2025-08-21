@@ -17,12 +17,17 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { useFormStatus } from 'react-dom'
+import { TenantSelector } from './tenant-selector'
+import type { Database } from '@/types/supabase'
+
+type Tenant = Database['public']['Tables']['tenant']['Row']
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
   fullName: z.string().optional(),
+  tenantId: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -40,7 +45,11 @@ function SubmitButton() {
   )
 }
 
-export function SignUpForm() {
+interface SignUpFormProps {
+  tenants: Tenant[]
+}
+
+export function SignUpForm({ tenants }: SignUpFormProps) {
   const router = useRouter()
   const { toast } = useToast()
 
@@ -51,6 +60,7 @@ export function SignUpForm() {
       password: '',
       confirmPassword: '',
       fullName: '',
+      tenantId: '',
     },
   })
 
@@ -59,6 +69,7 @@ export function SignUpForm() {
       email: data.email,
       password: data.password,
       fullName: data.fullName,
+      tenantId: data.tenantId,
     })
     
     if (result?.error) {
@@ -79,6 +90,19 @@ export function SignUpForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {tenants.length > 0 && (
+          <FormField
+            control={form.control}
+            name="tenantId"
+            render={({ field }) => (
+              <TenantSelector
+                value={field.value}
+                onValueChange={field.onChange}
+                tenants={tenants}
+              />
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="fullName"

@@ -1,101 +1,111 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
-import { getSubdomainFromRequest, isReservedSubdomain } from '@/lib/tenant/subdomain'
-import { cachedResolveTenantBySubdomain, cachedResolveTenantByDomain } from '@/lib/tenant/cache'
+import { NextRequest, NextResponse } from 'next/server';
+import { updateSession } from '@/lib/supabase/middleware';
+import { getSubdomainFromRequest, isReservedSubdomain } from '@/lib/tenant/subdomain';
+import { cachedResolveTenantBySubdomain, cachedResolveTenantByDomain } from '@/lib/tenant/cache';
 
-async function handleTenantRequest(
-    request: NextRequest,
-    tenant: { id: string; subdomain: string; name: string },
-    isCustomDomain = false
-): Promise<NextResponse> {
-  // Create headers once
-  const headers = new Headers(request.headers)
-  headers.set('x-tenant-id', tenant.id)
-  headers.set('x-tenant-subdomain', tenant.subdomain)
-  headers.set('x-tenant-name', tenant.name)
+type Tenant = {
+  id: string;
+  subdomain: string;
+  name: string;
+};
 
+/**
+ * Attaches tenant-specific headers to a NextResponse.
+ * @param response The NextResponse object to modify.
+ * @param tenant The tenant data.
+ * @param isCustomDomain A flag indicating if the request is from a custom domain.
+ */
+function addTenantHeaders(response: NextResponse, tenant: Tenant, isCustomDomain = false): void {
+  response.headers.set('x-tenant-id', tenant.id);
+  response.headers.set('x-tenant-subdomain', tenant.subdomain);
+  response.headers.set('x-tenant-name', tenant.name);
   if (isCustomDomain) {
-    headers.set('x-tenant-custom-domain', 'true')
+    response.headers.set('x-tenant-custom-domain', 'true');
   }
-
-  // Create new request with modified headers
-  const modifiedRequest = new NextRequest(request.url, { headers })
-
-  // Run auth middleware
-  const response = await updateSession(modifiedRequest)
-
-  // If response exists, add tenant headers
-  if (response) {
-    response.headers.set('x-tenant-id', tenant.id)
-    response.headers.set('x-tenant-subdomain', tenant.subdomain)
-    response.headers.set('x-tenant-name', tenant.name)
-
-    if (isCustomDomain) {
-      response.headers.set('x-tenant-custom-domain', 'true')
-    }
-  }
-
-  return response
 }
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+/**
+ * The main middleware function to handle requests.
+ * It resolves tenants based on subdomains or custom domains and runs authentication.
+ * @param request The incoming NextRequest.
+ * @returns A NextResponse object.
+ */
+export async function middleware(request: NextRequest): Promise<NextResponse> {
+  const hostname = request.headers.get('host');
 
-  // Skip tenant resolution for static assets and API routes
-  if (pathname.startsWith('/_next/') ||
-      pathname.startsWith('/api/') ||
-      pathname.includes('.')) {
-    return await updateSession(request)
-  }
-
-  const hostname = request.headers.get('host')
+  // Ensure a hostname is present.
   if (!hostname) {
-    return await updateSession(request)
+    // A hostname is crucial for tenant resolution.
+    // If it's missing, return a Bad Request response.
+    return new NextResponse('Hostname not found', { status: 400 });
   }
 
-  // Handle subdomain routing
-  const subdomain = getSubdomainFromRequest(request.url, hostname)
+  let tenant: Tenant | null = null;
+  let isCustomDomain = false;
+
+  // Resolve tenant based on subdomain or custom domain.
+  const subdomain = getSubdomainFromRequest(request.url, hostname);
 
   if (subdomain) {
-    // Check reserved subdomains first
+    // Handle subdomain-based tenant resolution.
     if (isReservedSubdomain(subdomain)) {
-      return new NextResponse('Reserved subdomain', { status: 404 })
+      return new NextResponse('Reserved subdomain', { status: 404 });
     }
-
-    // Resolve tenant by subdomain
-    const tenant = await cachedResolveTenantBySubdomain(subdomain)
-    if (!tenant) {
-      return new NextResponse('Tenant not found', { status: 404 })
+    const resolvedTenant = await cachedResolveTenantBySubdomain(subdomain);
+    if (resolvedTenant) {
+      tenant = {
+        id: resolvedTenant.id,
+        subdomain: resolvedTenant.subdomain || '',
+        name: resolvedTenant.name,
+      };
     }
-
-    return handleTenantRequest(request, {
-      id: tenant.id,
-      subdomain: tenant.subdomain || '',
-      name: tenant.name
-    })
-  }
-
-  // Handle custom domain
-  const cleanHostname = hostname.replace(/:\d+$/, '')
-  if (cleanHostname &&
-      !cleanHostname.includes('localhost') &&
-      !cleanHostname.includes('vercel.app')) {
-    const tenant = await cachedResolveTenantByDomain(cleanHostname)
-    if (tenant) {
-      return handleTenantRequest(request, {
-        id: tenant.id,
-        subdomain: tenant.subdomain || '',
-        name: tenant.name
-      }, true)
+  } else {
+    // Handle custom domain-based tenant resolution.
+    const cleanHostname = hostname.replace(/:\d+$/, ''); // Remove port number
+    if (!cleanHostname.includes('localhost') && !cleanHostname.includes('vercel.app')) {
+      const resolvedTenant = await cachedResolveTenantByDomain(cleanHostname);
+      if (resolvedTenant) {
+        tenant = {
+          id: resolvedTenant.id,
+          subdomain: resolvedTenant.subdomain || '',
+          name: resolvedTenant.name,
+        };
+        isCustomDomain = true;
+      }
     }
   }
 
-  // No tenant found - proceed with normal auth
-  return await updateSession(request)
+  // If no tenant is found, proceed with the default session update.
+  if (!tenant) {
+    // This handles the case for the main app domain without a specific tenant.
+    return await updateSession(request);
+  }
+
+  // If a tenant is found, create a new request with tenant headers for the auth middleware.
+  const requestWithTenantHeaders = new NextRequest(request.url, {
+    headers: request.headers,
+  });
+  addTenantHeaders(requestWithTenantHeaders, tenant, isCustomDomain);
+
+  // Run the authentication middleware.
+  const response = await updateSession(requestWithTenantHeaders);
+
+  // Ensure the final response also contains the tenant headers.
+  addTenantHeaders(response, tenant, isCustomDomain);
+
+  return response;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - anything with a file extension
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],
-}
+};

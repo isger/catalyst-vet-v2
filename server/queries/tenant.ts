@@ -9,6 +9,38 @@ export interface TenantWithMembership extends TenantMembership {
   tenant: Tenant
 }
 
+export async function getTenants(): Promise<Tenant[]> {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('tenant')
+    .select('id, name, subdomain')
+    .order('name')
+  
+  if (error) {
+    console.error('Error fetching tenants:', error)
+    return []
+  }
+  
+  return data || []
+}
+
+export async function getTenantById(tenantId: string): Promise<Tenant | null> {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('tenant')
+    .select('*')
+    .eq('id', tenantId)
+    .single()
+  
+  if (error || !data) {
+    return null
+  }
+  
+  return data
+}
+
 export async function getUserTenantData(userId: string, tenantId?: string): Promise<TenantWithMembership | null> {
   const supabase = await createClient()
   

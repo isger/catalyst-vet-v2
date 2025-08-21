@@ -31,7 +31,9 @@
       "WebFetch(domain:github.com)",
       "Bash(supabase link:*)",
       "Bash(cp:*)",
-      "Bash(supabase projects:*)"
+      "Bash(supabase projects:*)",
+      "WebFetch(domain:supabase.com)",
+      "WebSearch"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

@@ -9,50 +9,31 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
-import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { Address } from './address'
 import { StaffManagement } from './staff-management'
+import { TenantMetadataUpdater } from '@/components/features/settings/tenant-metadata-updater'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserTenant } from '@/lib/tenant/current-user'
 
 export const metadata: Metadata = {
   title: 'Settings',
 }
 
-async function UserInfo() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+interface UserInfoProps {
+  user: any
+  tenantData: any
+}
 
-  // Get user's tenant membership information
-  let tenantInfo = null
-  if (user) {
-    const { data: membershipData } = await supabase
-      .from('tenant_membership')
-      .select(`
-        tenant_id,
-        role,
-        status,
-        tenant (
-          id,
-          name,
-          subdomain
-        )
-      `)
-      .eq('user_id', user.id)
-      .eq('status', 'active')
-      .single()
-
-    tenantInfo = membershipData
-  }
-
+function UserInfo({ user, tenantData }: UserInfoProps) {
   return (
     <div className="space-y-1 text-sm text-muted-foreground">
       <p>User ID: {user?.id}</p>
-      {tenantInfo && (
+      {tenantData && (
         <>
-          <p>Tenant ID: {tenantInfo.tenant_id}</p>
-          <p>Organization: {tenantInfo.tenant_id}</p>
-          <p>Role: {tenantInfo.role}</p>
+          <p>Tenant ID: {tenantData.tenant_id}</p>
+          <p>Organization: {tenantData.tenant?.name || tenantData.tenant_id}</p>
+          <p>Role: {tenantData.role}</p>
         </>
       )}
     </div>
@@ -70,29 +51,15 @@ function UserInfoSkeleton() {
   )
 }
 
-async function getTenantData() {
-  const supabase = await createClient()
-  
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const { data: membership } = await supabase
-    .from('tenant_membership')
-    .select(`
-      *,
-      tenant:tenant(*)
-    `)
-    .eq('user_id', user.id)
-    .single()
-
-  return membership
-}
-
 export default async function Settings() {
-  const tenantData = await getTenantData()
+  const tenantData = await getCurrentUserTenant()
   const tenant = tenantData?.tenant
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  
+  // Check if user has tenant_id in app_metadata
+  const hasAppMetadata = !!(user?.app_metadata?.tenant_id)
+  const currentTenantId = user?.app_metadata?.tenant_id
   
   return (
     <div className="mx-auto max-w-4xl space-y-10">
@@ -100,6 +67,12 @@ export default async function Settings() {
         <Heading>Settings</Heading>
         <Text className="mt-2">Manage your practice settings and staff members.</Text>
       </div>
+
+      {/* Tenant metadata updater for existing users */}
+      <TenantMetadataUpdater 
+        currentTenantId={currentTenantId}
+        hasAppMetadata={hasAppMetadata}
+      />
 
       <Card>
         <CardHeader>
@@ -109,9 +82,7 @@ export default async function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Suspense fallback={<UserInfoSkeleton />}>
-            <UserInfo />
-          </Suspense>
+          <UserInfo user={user} tenantData={tenantData} />
         </CardContent>
       </Card>
 

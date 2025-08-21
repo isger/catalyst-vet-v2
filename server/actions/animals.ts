@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getCurrentTenantId } from '@/lib/tenant/current-user'
 
 export type AnimalFormData = {
   name: string
@@ -21,30 +22,16 @@ export type AnimalFormData = {
 
 export async function updateAnimal(id: string, formData: AnimalFormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    throw new Error('Not authenticated')
-  }
-
-  // Get user's tenant information
-  const { data: membershipData } = await supabase
-    .from('tenant_membership')
-    .select('tenant_id')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .single()
-
-  if (!membershipData) {
-    throw new Error('No tenant membership found')
-  }
+  // Get user's tenant information using helper (throws if no app_metadata)
+  const tenantId = await getCurrentTenantId()
 
   // First verify the animal belongs to this tenant
   const { data: existingAnimal } = await supabase
     .from('animal')
     .select('id')
     .eq('id', id)
-    .eq('tenant_id', membershipData.tenant_id)
+    .eq('tenant_id', tenantId)
     .single()
 
   if (!existingAnimal) {

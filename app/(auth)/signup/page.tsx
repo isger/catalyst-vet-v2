@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import { SignUpForm } from '@/components/features/auth/sign-up-form'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { getTenants } from '@/server/queries/tenant'
 
-export default function SignUpPage() {
+export default async function SignUpPage() {
+  const tenants = await getTenants()
+
   return (
     <div className="container flex items-center justify-center min-h-screen py-8">
       <Card className="w-full max-w-md">
@@ -13,7 +16,7 @@ export default function SignUpPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignUpForm />
+          <SignUpForm tenants={tenants} />
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <div className="text-sm text-muted-foreground">
