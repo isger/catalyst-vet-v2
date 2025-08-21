@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Input, InputGroup } from '@/components/ui/input'
 import { MagnifyingGlassIcon } from '@heroicons/react/16/solid'
-import { Select } from '@/components/ui/select'
 import TabsV2, { Tab } from '@/components/ui/tabs-v2'
 import {
   AllAnimals,
@@ -91,16 +90,17 @@ export default function AnimalPageClient({
           </InputGroup>
         </div>
         <div>
-          <Select
+          <select
             name="sort_by"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           >
             <option value="name">Sort by name</option>
             <option value="species">Sort by species</option>
             <option value="age">Sort by age</option>
             <option value="dateAdded">Sort by date added</option>
-          </Select>
+          </select>
         </div>
       </div>
 

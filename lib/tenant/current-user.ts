@@ -90,5 +90,5 @@ export const hasAccessToTenant = cache(async (tenantId: string): Promise<boolean
  */
 export const getCurrentUserRole = cache(async (): Promise<string> => {
   const membership = await getCurrentUserTenant()
-  return membership.role
+  return membership?.role || 'user'
 })

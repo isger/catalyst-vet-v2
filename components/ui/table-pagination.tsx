@@ -1,6 +1,5 @@
 'use client'
 
-import { Select } from './select'
 import { 
   Pagination, 
   PaginationPrevious, 
@@ -76,17 +75,17 @@ export function TablePagination({
           <label htmlFor="pageSize" className="text-sm text-zinc-600 dark:text-zinc-400">
             Show
           </label>
-          <Select
+          <select
             value={pageSize.toString()}
             onChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
-            className="w-auto"
+            className="w-auto rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
           >
             <option value="5">5</option>
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
             <option value="100">100</option>
-          </Select>
+          </select>
           <span className="text-sm text-zinc-600 dark:text-zinc-400">
             per page
           </span>

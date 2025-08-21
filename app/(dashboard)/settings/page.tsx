@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Checkbox, CheckboxField } from '@/components/ui/checkbox'
 import { Divider } from '@/components/ui/divider'
 import { Label } from '@/components/ui/fieldset'
@@ -10,6 +9,7 @@ import { Select } from '@/components/ui/select'
 import { Text } from '@/components/ui/text'
 import { Textarea } from '@/components/ui/textarea'
 import type { Metadata } from 'next'
+import type { User } from '@supabase/supabase-js'
 import { Address } from './address'
 import { StaffManagement } from './staff-management'
 import { TenantMetadataUpdater } from '@/components/features/settings/tenant-metadata-updater'
@@ -21,8 +21,15 @@ export const metadata: Metadata = {
 }
 
 interface UserInfoProps {
-  user: any
-  tenantData: any
+  user: User | null
+  tenantData: {
+    tenant_id: string
+    role: string
+    tenant?: {
+      name: string
+      id: string
+    } | null
+  } | null
 }
 
 function UserInfo({ user, tenantData }: UserInfoProps) {
@@ -40,16 +47,6 @@ function UserInfo({ user, tenantData }: UserInfoProps) {
   )
 }
 
-function UserInfoSkeleton() {
-  return (
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-64" />
-      <Skeleton className="h-4 w-56" />
-      <Skeleton className="h-4 w-40" />
-      <Skeleton className="h-4 w-32" />
-    </div>
-  )
-}
 
 export default async function Settings() {
   const tenantData = await getCurrentUserTenant()
@@ -59,7 +56,6 @@ export default async function Settings() {
   
   // Check if user has tenant_id in app_metadata
   const hasAppMetadata = !!(user?.app_metadata?.tenant_id)
-  const currentTenantId = user?.app_metadata?.tenant_id
   
   return (
     <div className="mx-auto max-w-4xl space-y-10">
@@ -70,7 +66,6 @@ export default async function Settings() {
 
       {/* Tenant metadata updater for existing users */}
       <TenantMetadataUpdater 
-        currentTenantId={currentTenantId}
         hasAppMetadata={hasAppMetadata}
       />
 

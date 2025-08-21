@@ -25,6 +25,21 @@ function addTenantHeaders(response: NextResponse, tenant: Tenant, isCustomDomain
 }
 
 /**
+ * Attaches tenant-specific headers to a NextRequest.
+ * @param request The NextRequest object to modify.
+ * @param tenant The tenant data.
+ * @param isCustomDomain A flag indicating if the request is from a custom domain.
+ */
+function addTenantHeadersToRequest(request: NextRequest, tenant: Tenant, isCustomDomain = false): void {
+  request.headers.set('x-tenant-id', tenant.id);
+  request.headers.set('x-tenant-subdomain', tenant.subdomain);
+  request.headers.set('x-tenant-name', tenant.name);
+  if (isCustomDomain) {
+    request.headers.set('x-tenant-custom-domain', 'true');
+  }
+}
+
+/**
  * The main middleware function to handle requests.
  * It resolves tenants based on subdomains or custom domains and runs authentication.
  * @param request The incoming NextRequest.
@@ -85,7 +100,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const requestWithTenantHeaders = new NextRequest(request.url, {
     headers: request.headers,
   });
-  addTenantHeaders(requestWithTenantHeaders, tenant, isCustomDomain);
+  addTenantHeadersToRequest(requestWithTenantHeaders, tenant, isCustomDomain);
 
   // Run the authentication middleware.
   const response = await updateSession(requestWithTenantHeaders);

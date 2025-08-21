@@ -4,7 +4,6 @@ import { Heading, Subheading } from '@/components/ui/heading'
 import { Divider } from '@/components/ui/divider'
 import { Text } from '@/components/ui/text'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { TextArea } from '@/components/ui/text-area'
 import { Label } from '@/components/ui/fieldset'
@@ -308,27 +307,35 @@ export default function NewAnimalPage() {
           
           <div>
             <Label htmlFor="species">Species</Label>
-            <Select name="species" value={selectedSpecies} onChange={(e) => setSelectedSpecies(e.target.value)}>
+            <select 
+              name="species" 
+              value={selectedSpecies} 
+              onChange={(e) => setSelectedSpecies(e.target.value)}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            >
               <option value="">Select species</option>
               {speciesOptions.map((species) => (
                 <option key={species} value={species}>
                   {species}
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.species && <Text className="text-red-600 text-sm mt-1">{errors.species}</Text>}
           </div>
           
           <div>
             <Label htmlFor="breed">Breed</Label>
-            <Select name="breed">
+            <select 
+              name="breed"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            >
               <option value="">Select breed (optional)</option>
               {breedSuggestions.map((breed) => (
                 <option key={breed} value={breed}>
                   {breed}
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.breed && <Text className="text-red-600 text-sm mt-1">{errors.breed}</Text>}
           </div>
           
@@ -344,14 +351,17 @@ export default function NewAnimalPage() {
           
           <div>
             <Label htmlFor="gender">Gender</Label>
-            <Select name="gender">
+            <select 
+              name="gender"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+            >
               <option value="">Select gender</option>
               {genderOptions.map((gender) => (
                 <option key={gender} value={gender}>
                   {gender}
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.gender && <Text className="text-red-600 text-sm mt-1">{errors.gender}</Text>}
           </div>
           
@@ -376,17 +386,21 @@ export default function NewAnimalPage() {
                 min="0"
                 className="flex-1"
               />
-              <Select value={weightUnit} onChange={(e) => setWeightUnit(e.target.value as 'kg' | 'lbs')}>
+              <select 
+                value={weightUnit} 
+                onChange={(e) => setWeightUnit(e.target.value as 'kg' | 'lbs')}
+                className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
+              >
                 <option value="kg">kg</option>
                 <option value="lbs">lbs</option>
-              </Select>
+              </select>
             </div>
             {errors.weight_kg && <Text className="text-red-600 text-sm mt-1">{errors.weight_kg}</Text>}
           </div>
           
           <div>
             <Label htmlFor="owner_id">Owner</Label>
-            <Select 
+            <select 
               name="owner_id" 
               value={selectedOwner} 
               onChange={(e) => {
@@ -396,6 +410,7 @@ export default function NewAnimalPage() {
                   checkForDuplicates(nameField.value, e.target.value)
                 }
               }}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
             >
               <option value="">Select owner</option>
               {availableOwners.map((owner) => (
@@ -403,7 +418,7 @@ export default function NewAnimalPage() {
                   {owner.name} ({owner.email})
                 </option>
               ))}
-            </Select>
+            </select>
             {errors.owner_id && <Text className="text-red-600 text-sm mt-1">{errors.owner_id}</Text>}
           </div>
         </div>
@@ -449,15 +464,16 @@ export default function NewAnimalPage() {
                     value={allergy.name}
                     onChange={(e) => updateMedicalItem('allergies', index, 'name', e.target.value)}
                   />
-                  <Select
+                  <select
                     value={allergy.severity}
                     onChange={(e) => updateMedicalItem('allergies', index, 'severity', e.target.value)}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white"
                   >
                     <option value="">Severity</option>
                     <option value="Mild">Mild</option>
                     <option value="Moderate">Moderate</option>
                     <option value="Severe">Severe</option>
-                  </Select>
+                  </select>
                 </div>
                 <Input
                   placeholder="Notes (optional)"

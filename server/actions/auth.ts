@@ -42,9 +42,6 @@ export async function signUp(data: SignUpData) {
     email: data.email,
     password: data.password,
     options: {
-      app_metadata: {
-        tenant_id: tenantId
-      },
       data: {
         full_name: data.fullName,
       },

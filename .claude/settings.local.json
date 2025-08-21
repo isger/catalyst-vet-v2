@@ -33,7 +33,8 @@
       "Bash(cp:*)",
       "Bash(supabase projects:*)",
       "WebFetch(domain:supabase.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npx shadcn@latest add:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

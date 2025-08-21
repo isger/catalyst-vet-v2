@@ -14,7 +14,7 @@ export async function getTenants(): Promise<Tenant[]> {
   
   const { data, error } = await supabase
     .from('tenant')
-    .select('id, name, subdomain')
+    .select('*')
     .order('name')
   
   if (error) {

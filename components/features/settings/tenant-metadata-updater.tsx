@@ -7,11 +7,10 @@ import { useToast } from '@/hooks/use-toast'
 import { updateUserTenantId } from '@/server/actions/auth'
 
 interface TenantMetadataUpdaterProps {
-  currentTenantId?: string
   hasAppMetadata: boolean
 }
 
-export function TenantMetadataUpdater({ currentTenantId, hasAppMetadata }: TenantMetadataUpdaterProps) {
+export function TenantMetadataUpdater({ hasAppMetadata }: TenantMetadataUpdaterProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const { toast } = useToast()
 
@@ -35,7 +34,7 @@ export function TenantMetadataUpdater({ currentTenantId, hasAppMetadata }: Tenan
         // Refresh the page to see the updated metadata
         window.location.reload()
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to update tenant ID',

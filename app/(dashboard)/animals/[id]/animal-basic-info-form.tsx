@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@/components/ui/link'
 import { updateAnimal, type AnimalFormData } from '@/server/actions/animals'
@@ -226,19 +225,19 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
             <div>
               <dt className="font-semibold text-gray-900 dark:text-white">Species *</dt>
               <dd className="mt-2">
-                <Select
+                <select
                   name="species"
                   value={formData.species}
                   onChange={(e) => setFormData({ ...formData, species: e.target.value })}
                   disabled={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={`w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}`}
                 >
                   {SPECIES_OPTIONS.map((species) => (
                     <option key={species} value={species}>
                       {species}
                     </option>
                   ))}
-                </Select>
+                </select>
               </dd>
             </div>
 
@@ -276,12 +275,12 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
             <div>
               <dt className="font-semibold text-gray-900 dark:text-white">Gender</dt>
               <dd className="mt-2">
-                <Select
+                <select
                   name="gender"
                   value={formData.gender}
                   onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                   disabled={!isEditing}
-                  className={!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}
+                  className={`w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white ${!isEditing ? 'bg-gray-50 dark:bg-zinc-900/50 border-gray-200 dark:border-zinc-700' : ''}`}
                 >
                   <option value="">Unknown</option>
                   {GENDER_OPTIONS.map((gender) => (
@@ -289,7 +288,7 @@ export function AnimalBasicInfoForm({ animal }: AnimalBasicInfoFormProps) {
                       {gender}
                     </option>
                   ))}
-                </Select>
+                </select>
               </dd>
             </div>
 
